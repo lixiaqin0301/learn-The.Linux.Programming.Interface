@@ -1,0 +1,11 @@
+# CMake build directory
+/build/
+
+# clangd / IDE caches
+/.cache
+/compile_commands.json
+
+# Stale Make-generated artifacts (kept out of version control)
+*.o
+/lib/ename.c.inc
+/libtlpi.a
