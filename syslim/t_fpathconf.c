@@ -17,19 +17,19 @@
 */
 #include "tlpi_hdr.h"
 
-static void             /* Print 'msg' plus value of fpathconf(fd, name) */
+static void /* Print 'msg' plus value of fpathconf(fd, name) */
 fpathconfPrint(const char *msg, int fd, int name)
 {
     long lim;
 
     errno = 0;
     lim = fpathconf(fd, name);
-    if (lim != -1) {        /* Call succeeded, limit determinate */
+    if (lim != -1) { /* Call succeeded, limit determinate */
         printf("%s %ld\n", msg, lim);
     } else {
-        if (errno == 0)     /* Call succeeded, limit indeterminate */
+        if (errno == 0) /* Call succeeded, limit indeterminate */
             printf("%s (indeterminate)\n", msg);
-        else                /* Call failed */
+        else /* Call failed */
             errExit("fpathconf %s", msg);
     }
 }

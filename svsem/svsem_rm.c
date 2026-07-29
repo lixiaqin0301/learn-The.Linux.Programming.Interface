@@ -15,10 +15,10 @@
    Remove the System V semaphore sets whose IDs are specified by the
    command-line arguments.
 */
-#include <sys/types.h>
-#include <sys/sem.h>
-#include "semun.h"              /* Definition of semun union */
+#include "semun.h" /* Definition of semun union */
 #include "tlpi_hdr.h"
+#include <sys/sem.h>
+#include <sys/types.h>
 
 int
 main(int argc, char *argv[])

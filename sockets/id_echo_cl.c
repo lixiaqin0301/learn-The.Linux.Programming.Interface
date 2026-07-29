@@ -48,7 +48,7 @@ main(int argc, char *argv[])
         if (numRead == -1)
             errExit("read");
 
-        printf("[%ld bytes] %.*s\n", (long) numRead, (int) numRead, buf);
+        printf("[%ld bytes] %.*s\n", (long)numRead, (int)numRead, buf);
     }
 
     exit(EXIT_SUCCESS);

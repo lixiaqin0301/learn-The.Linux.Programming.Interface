@@ -31,19 +31,19 @@
    systems, an incomplete user-space implementation of POSIX timers
    was provided in glibc.
 */
+#include "curr_time.h" /* Declares currTime() */
+#include "itimerspec_from_str.h" /* Declares itimerspecFromStr() */
+#include "tlpi_hdr.h"
+#include <pthread.h>
 #include <signal.h>
 #include <time.h>
-#include <pthread.h>
-#include "curr_time.h"              /* Declares currTime() */
-#include "tlpi_hdr.h"
-#include "itimerspec_from_str.h"    /* Declares itimerspecFromStr() */
 
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 
-static int expireCnt = 0;           /* Number of expirations of all timers */
+static int expireCnt = 0; /* Number of expirations of all timers */
 
-static void                         /* Thread notification function */
+static void /* Thread notification function */
 threadFunc(union sigval sv)
 {
     timer_t *tidptr;
@@ -52,7 +52,7 @@ threadFunc(union sigval sv)
     tidptr = sv.sival_ptr;
 
     printf("[%s] Thread notify\n", currTime("%T"));
-    printf("    timer ID=%ld\n", (long) *tidptr);
+    printf("    timer ID=%ld\n", (long)*tidptr);
     printf("    timer_getoverrun()=%d\n", timer_getoverrun(*tidptr));
 
     /* Increment counter variable shared with main thread and signal
@@ -88,10 +88,10 @@ main(int argc, char *argv[])
     if (tidlist == NULL)
         errExit("malloc");
 
-    sev.sigev_notify = SIGEV_THREAD;            /* Notify via thread */
-    sev.sigev_notify_function = threadFunc;     /* Thread start function */
+    sev.sigev_notify = SIGEV_THREAD; /* Notify via thread */
+    sev.sigev_notify_function = threadFunc; /* Thread start function */
     sev.sigev_notify_attributes = NULL;
-            /* Could be pointer to pthread_attr_t structure */
+    /* Could be pointer to pthread_attr_t structure */
 
     /* Create and start one timer for each command-line argument */
 
@@ -99,11 +99,11 @@ main(int argc, char *argv[])
         itimerspecFromStr(argv[j + 1], &ts);
 
         sev.sigev_value.sival_ptr = &tidlist[j];
-                /* Passed as argument to threadFunc() */
+        /* Passed as argument to threadFunc() */
 
         if (timer_create(CLOCK_REALTIME, &sev, &tidlist[j]) == -1)
             errExit("timer_create");
-        printf("Timer ID: %ld (%s)\n", (long) tidlist[j], argv[j + 1]);
+        printf("Timer ID: %ld (%s)\n", (long)tidlist[j], argv[j + 1]);
 
         if (timer_settime(tidlist[j], 0, &ts, NULL) == -1)
             errExit("timer_settime");

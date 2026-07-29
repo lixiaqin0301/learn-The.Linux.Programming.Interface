@@ -14,27 +14,27 @@
 
    Display contents of a process accounting file.
 */
-#include <fcntl.h>
-#include <time.h>
-#include <sys/stat.h>
-#include <sys/acct.h>
-#include <limits.h>
-#include "ugid_functions.h"             /* Declaration of userNameFromId() */
 #include "tlpi_hdr.h"
+#include "ugid_functions.h" /* Declaration of userNameFromId() */
+#include <fcntl.h>
+#include <limits.h>
+#include <sys/acct.h>
+#include <sys/stat.h>
+#include <time.h>
 
 #define TIME_BUF_SIZE 100
 
-static long long                /* Convert comp_t value into long long */
+static long long /* Convert comp_t value into long long */
 comptToLL(comp_t ct)
 {
-    const int EXP_SIZE = 3;             /* 3-bit, base-8 exponent */
-    const int MANTISSA_SIZE = 13;       /* Followed by 13-bit mantissa */
+    const int EXP_SIZE = 3; /* 3-bit, base-8 exponent */
+    const int MANTISSA_SIZE = 13; /* Followed by 13-bit mantissa */
     const int MANTISSA_MASK = (1 << MANTISSA_SIZE) - 1;
     long long mantissa, exp;
 
     mantissa = ct & MANTISSA_MASK;
     exp = (ct >> MANTISSA_SIZE) & ((1 << EXP_SIZE) - 1);
-    return mantissa << (exp * 3);       /* Power of 8 = left shift 3 bits */
+    return mantissa << (exp * 3); /* Power of 8 = left shift 3 bits */
 }
 
 int
@@ -56,9 +56,9 @@ main(int argc, char *argv[])
         errExit("open");
 
     printf("command  flags   term.  user     "
-            "start time            CPU   elapsed\n");
+           "start time            CPU   elapsed\n");
     printf("                status           "
-            "                      time    time\n");
+           "                      time    time\n");
 
     while ((numRead = read(acctFile, &ac, sizeof(struct acct))) > 0) {
         if (numRead != sizeof(struct acct))
@@ -66,29 +66,28 @@ main(int argc, char *argv[])
 
         printf("%-8.8s  ", ac.ac_comm);
 
-        printf("%c", (ac.ac_flag & AFORK) ? 'F' : '-') ;
-        printf("%c", (ac.ac_flag & ASU)   ? 'S' : '-') ;
+        printf("%c", (ac.ac_flag & AFORK) ? 'F' : '-');
+        printf("%c", (ac.ac_flag & ASU) ? 'S' : '-');
 
         /* Not all implementations support AXSIG and ACORE */
 
 #ifdef AXSIG
-        printf("%c", (ac.ac_flag & AXSIG) ? 'X' : '-') ;
+        printf("%c", (ac.ac_flag & AXSIG) ? 'X' : '-');
 #else
         printf(" ");
 #endif
 #ifdef ACORE
-        printf("%c", (ac.ac_flag & ACORE) ? 'C' : '-') ;
+        printf("%c", (ac.ac_flag & ACORE) ? 'C' : '-');
 #else
         printf(" ");
 #endif
 
 #ifdef __linux__
-        printf(" %#6lx   ", (unsigned long) ac.ac_exitcode);
-#else   /* Many other implementations provide ac_stat instead */
+        printf(" %#6lx   ", (unsigned long)ac.ac_exitcode);
+#else /* Many other implementations provide ac_stat instead */
         /* But the BSDs don't provide this field either */
-#if ! defined(__FreeBSD__) && ! defined(__NetBSD__) && \
-        ! defined(__APPLE__)
-        printf(" %#6lx   ", (unsigned long) ac.ac_stat);
+#if !defined(__FreeBSD__) && !defined(__NetBSD__) && !defined(__APPLE__)
+        printf(" %#6lx   ", (unsigned long)ac.ac_stat);
 #else
         printf("          ");
 #endif
@@ -106,9 +105,7 @@ main(int argc, char *argv[])
             printf("%s ", timeBuf);
         }
 
-        printf("%5.2f %7.2f ", (double) (comptToLL(ac.ac_utime) +
-                    comptToLL(ac.ac_stime)) / sysconf(_SC_CLK_TCK),
-                (double) comptToLL(ac.ac_etime) / sysconf(_SC_CLK_TCK));
+        printf("%5.2f %7.2f ", (double)(comptToLL(ac.ac_utime) + comptToLL(ac.ac_stime)) / sysconf(_SC_CLK_TCK), (double)comptToLL(ac.ac_etime) / sysconf(_SC_CLK_TCK));
         printf("\n");
     }
 

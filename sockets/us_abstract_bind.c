@@ -21,9 +21,9 @@
    correct, but could have been better (to understand why, see the errata
    for page 1176 of the book).  The old code is shown in comments below.
 */
-#include <sys/un.h>
-#include <sys/socket.h>
 #include "tlpi_hdr.h"
+#include <sys/socket.h>
+#include <sys/un.h>
 
 int
 main(int argc, char *argv[])
@@ -32,12 +32,12 @@ main(int argc, char *argv[])
     struct sockaddr_un addr;
     char *str;
 
-    memset(&addr, 0, sizeof(struct sockaddr_un));  /* Clear address structure */
-    addr.sun_family = AF_UNIX;                     /* UNIX domain address */
+    memset(&addr, 0, sizeof(struct sockaddr_un)); /* Clear address structure */
+    addr.sun_family = AF_UNIX; /* UNIX domain address */
 
     /* addr.sun_path[0] has already been set to 0 by memset() */
 
-    str = "xyz";        /* Abstract name is "\0xyz" */
+    str = "xyz"; /* Abstract name is "\0xyz" */
     strncpy(&addr.sun_path[1], str, strlen(str));
 
     // In early printings of the book, the above two lines were instead:
@@ -49,8 +49,7 @@ main(int argc, char *argv[])
     if (sockfd == -1)
         errExit("socket");
 
-    if (bind(sockfd, (struct sockaddr *) &addr,
-            sizeof(sa_family_t) + strlen(str) + 1) == -1)
+    if (bind(sockfd, (struct sockaddr *)&addr, sizeof(sa_family_t) + strlen(str) + 1) == -1)
         errExit("bind");
 
     // In early printings of the book, the final part of the bind() call

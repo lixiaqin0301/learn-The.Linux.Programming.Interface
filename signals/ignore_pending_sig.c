@@ -20,11 +20,11 @@
    Type Control-C (^C) to generate a SIGINT signal after the program prints
    its "sleeping" message (see below).
 */
-#define _GNU_SOURCE     /* Get strsignal() declaration from <string.h> */
-#include <string.h>
-#include <signal.h>
-#include "signal_functions.h"   /* Declaration of printSigset() */
+#define _GNU_SOURCE /* Get strsignal() declaration from <string.h> */
+#include "signal_functions.h" /* Declaration of printSigset() */
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <string.h>
 
 static void
 handler(int sig)
@@ -73,7 +73,8 @@ main(int argc, char *argv[])
 
     sleep(2);
     printf("Ignoring SIGINT\n");
-    if (signal(SIGINT, SIG_IGN) == SIG_ERR)     errExit("signal");
+    if (signal(SIGINT, SIG_IGN) == SIG_ERR)
+        errExit("signal");
 
     /* Redisplay mask of pending signals */
 

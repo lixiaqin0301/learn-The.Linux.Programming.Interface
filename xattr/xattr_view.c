@@ -18,8 +18,8 @@
 
    See also t_setxattr.c.
 */
-#include <sys/xattr.h>
 #include "tlpi_hdr.h"
+#include <sys/xattr.h>
 
 #define XATTR_SIZE 10000
 
@@ -41,8 +41,11 @@ main(int argc, char *argv[])
     hexDisplay = 0;
     while ((opt = getopt(argc, argv, "x")) != -1) {
         switch (opt) {
-        case 'x': hexDisplay = 1;       break;
-        case '?': usageError(argv[0]);
+        case 'x':
+            hexDisplay = 1;
+            break;
+        case '?':
+            usageError(argv[0]);
         }
     }
 
@@ -65,11 +68,11 @@ main(int argc, char *argv[])
             if (valueLen == -1) {
                 printf("couldn't get value");
             } else if (!hexDisplay) {
-                printf("value=%.*s", (int) valueLen, value);
+                printf("value=%.*s", (int)valueLen, value);
             } else {
                 printf("value=");
                 for (k = 0; k < valueLen; k++)
-                    printf("%02x ", (unsigned char) value[k]);
+                    printf("%02x ", (unsigned char)value[k]);
             }
 
             printf("\n");

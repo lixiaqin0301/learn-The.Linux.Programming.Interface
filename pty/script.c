@@ -14,24 +14,24 @@
 
    A simple version of script(1).
 */
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <libgen.h>
+#include <sys/stat.h>
 #include <termios.h>
-#if ! defined(__hpux)
+#if !defined(__hpux)
 /* HP-UX 11 doesn't have this header file */
 #include <sys/select.h>
 #endif
-#include "pty_fork.h"           /* Declaration of ptyFork() */
-#include "tty_functions.h"      /* Declaration of ttySetRaw() */
+#include "pty_fork.h" /* Declaration of ptyFork() */
 #include "tlpi_hdr.h"
+#include "tty_functions.h" /* Declaration of ttySetRaw() */
 
 #define BUF_SIZE 256
 #define MAX_SNAME 1000
 
 struct termios ttyOrig;
 
-static void             /* Reset terminal mode on program exit */
+static void /* Reset terminal mode on program exit */
 ttyReset(void)
 {
     if (tcsetattr(STDIN_FILENO, TCSANOW, &ttyOrig) == -1)
@@ -65,7 +65,7 @@ main(int argc, char *argv[])
     if (childPid == -1)
         errExit("ptyFork");
 
-    if (childPid == 0) {        /* Child: execute a shell on pty slave */
+    if (childPid == 0) { /* Child: execute a shell on pty slave */
 
         /* If the SHELL variable is set, use its value to determine
            the shell execed in child. Otherwise use /bin/sh. */
@@ -74,16 +74,13 @@ main(int argc, char *argv[])
         if (shell == NULL || *shell == '\0')
             shell = "/bin/sh";
 
-        execlp(shell, shell, (char *) NULL);
-        errExit("execlp");      /* If we get here, something went wrong */
+        execlp(shell, shell, (char *)NULL);
+        errExit("execlp"); /* If we get here, something went wrong */
     }
 
     /* Parent: relay data between terminal and pty master */
 
-    scriptFd = open((argc > 1) ? argv[1] : "typescript",
-                        O_WRONLY | O_CREAT | O_TRUNC,
-                        S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
-                                S_IROTH | S_IWOTH);
+    scriptFd = open((argc > 1) ? argv[1] : "typescript", O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     if (scriptFd == -1)
         errExit("open typescript");
 
@@ -108,7 +105,7 @@ main(int argc, char *argv[])
         if (select(masterFd + 1, &inFds, NULL, NULL, NULL) == -1)
             errExit("select");
 
-        if (FD_ISSET(STDIN_FILENO, &inFds)) {   /* stdin --> pty */
+        if (FD_ISSET(STDIN_FILENO, &inFds)) { /* stdin --> pty */
             numRead = read(STDIN_FILENO, buf, BUF_SIZE);
             if (numRead <= 0)
                 exit(EXIT_SUCCESS);
@@ -117,7 +114,7 @@ main(int argc, char *argv[])
                 fatal("partial/failed write (masterFd)");
         }
 
-        if (FD_ISSET(masterFd, &inFds)) {      /* pty --> stdout+file */
+        if (FD_ISSET(masterFd, &inFds)) { /* pty --> stdout+file */
             numRead = read(masterFd, buf, BUF_SIZE);
             if (numRead <= 0)
                 exit(EXIT_SUCCESS);

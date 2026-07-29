@@ -27,12 +27,12 @@ main(int argc, char *argv[])
 
     /* Execute the program specified in argv[1] */
 
-    filename = strrchr(argv[1], '/');       /* Get basename from argv[1] */
+    filename = strrchr(argv[1], '/'); /* Get basename from argv[1] */
     if (filename != NULL)
         filename++;
     else
         filename = argv[1];
 
-    execle(argv[1], filename, "hello world", "goodbye", (char *) NULL, envVec);
-    errExit("execle");          /* If we get here, something went wrong */
+    execle(argv[1], filename, "hello world", "goodbye", (char *)NULL, envVec);
+    errExit("execle"); /* If we get here, something went wrong */
 }

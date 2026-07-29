@@ -39,19 +39,22 @@
 
         ./epoll_flags_fork -es p 5
 */
-#include <sys/epoll.h>
-#include <sys/stat.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <unistd.h>
 #include <string.h>
+#include <sys/epoll.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 #ifndef EPOLLEXCLUSIVE
 #define EPOLLEXCLUSIVE (1 << 28)
@@ -60,21 +63,24 @@
 static void
 usageError(char *pname)
 {
-    fprintf(stderr, "Usage: %s [-1eoprx] <FIFO> <num-children>\n",
-            pname);
-    fprintf(stderr, "\t-s       Create one epoll FD before creating child "
-            "processes\n");
-    fprintf(stderr, "\t\t(By default, each child creates its own epoll FD "
-            "after fork())\n");
+    fprintf(stderr, "Usage: %s [-1eoprx] <FIFO> <num-children>\n", pname);
+    fprintf(stderr,
+        "\t-s       Create one epoll FD before creating child "
+        "processes\n");
+    fprintf(stderr,
+        "\t\t(By default, each child creates its own epoll FD "
+        "after fork())\n");
     fprintf(stderr, "\t-e       Include EPOLLET flag\n");
     fprintf(stderr, "\t-x       Include EPOLLEXCLUSIVE flag\n");
     fprintf(stderr, "\t-o       Include EPOLLONESHOT flag\n");
     fprintf(stderr, "\t-p       Open FIFO individually in each child\n");
-    fprintf(stderr, "\t\t(By default, each child inherits FD for FIFO opened "
-            "by parent)\n");
+    fprintf(stderr,
+        "\t\t(By default, each child inherits FD for FIFO opened "
+        "by parent)\n");
     fprintf(stderr, "\t-r       Do a read() after epoll_wait() returns\n");
-    fprintf(stderr, "\t-l       Children should loop, rather than "
-            "calling epoll_wait() just once\n");
+    fprintf(stderr,
+        "\t-l       Children should loop, rather than "
+        "calling epoll_wait() just once\n");
     exit(EXIT_FAILURE);
 }
 
@@ -97,14 +103,29 @@ main(int argc, char *argv[])
     useLoop = 0;
     while ((opt = getopt(argc, argv, "eloprsx")) != -1) {
         switch (opt) {
-        case 'e': eventsMask |= EPOLLET;        break;
-        case 'o': eventsMask |= EPOLLONESHOT;   break;
-        case 'x': eventsMask |= EPOLLEXCLUSIVE; break;
-        case 'l': useLoop = 1;                  break;
-        case 'p': openFifoInChild = 1;          break;
-        case 'r': readData = 1;                 break;
-        case 's': useOneEpollFD = 1;            break;
-        default:  usageError(argv[0]);
+        case 'e':
+            eventsMask |= EPOLLET;
+            break;
+        case 'o':
+            eventsMask |= EPOLLONESHOT;
+            break;
+        case 'x':
+            eventsMask |= EPOLLEXCLUSIVE;
+            break;
+        case 'l':
+            useLoop = 1;
+            break;
+        case 'p':
+            openFifoInChild = 1;
+            break;
+        case 'r':
+            readData = 1;
+            break;
+        case 's':
+            useOneEpollFD = 1;
+            break;
+        default:
+            usageError(argv[0]);
         }
     }
 
@@ -159,8 +180,7 @@ main(int argc, char *argv[])
             }
 
             if (!useOneEpollFD) {
-                printf("Child %d: creating epoll FD and adding FIFO\n",
-                        childNum);
+                printf("Child %d: creating epoll FD and adding FIFO\n", childNum);
                 epfd = epoll_create(2);
                 if (epfd == -1)
                     errExit("epoll_create");
@@ -177,8 +197,7 @@ main(int argc, char *argv[])
                 numReady = epoll_wait(epfd, &rev, 1, -1);
                 if (numReady == -1)
                     errExit("epoll-wait");
-                printf("Child %d: epoll_wait() returned %d\n", childNum,
-                        numReady);
+                printf("Child %d: epoll_wait() returned %d\n", childNum, numReady);
 
                 /* If specified on command line, read data when the FIFO
                    becomes ready */
@@ -193,11 +212,9 @@ main(int argc, char *argv[])
                         printf("Child %d: read returned EOF\n", childNum);
                         break;
                     } else if (nr > 0) {
-                        printf("Child %d: read returned %zd bytes\n",
-                                childNum, nr);
+                        printf("Child %d: read returned %zd bytes\n", childNum, nr);
                     } else {
-                        printf("Child %d: read failed: %s\n", childNum,
-                                strerror(errno));
+                        printf("Child %d: read failed: %s\n", childNum, strerror(errno));
                     }
                 }
             } while (useLoop);

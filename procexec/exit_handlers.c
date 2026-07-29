@@ -17,11 +17,11 @@
    normal process exit. (These functions are not called if the process does
    an _exit(2) or if it is terminated by a signal.)
 */
-#define _BSD_SOURCE     /* Get on_exit() declaration from <stdlib.h> */
-#include <stdlib.h>
+#define _BSD_SOURCE /* Get on_exit() declaration from <stdlib.h> */
 #include "tlpi_hdr.h"
+#include <stdlib.h>
 
-#ifdef __linux__        /* Few UNIX implementations have on_exit() */
+#ifdef __linux__ /* Few UNIX implementations have on_exit() */
 #define HAVE_ON_EXIT
 #endif
 
@@ -41,8 +41,7 @@ atexitFunc2(void)
 static void
 onexitFunc(int exitStatus, void *arg)
 {
-    printf("on_exit function called: status=%d, arg=%ld\n",
-                exitStatus, (long) arg);
+    printf("on_exit function called: status=%d, arg=%ld\n", exitStatus, (long)arg);
 }
 #endif
 
@@ -50,7 +49,7 @@ int
 main(int argc, char *argv[])
 {
 #ifdef HAVE_ON_EXIT
-    if (on_exit(onexitFunc, (void *) 10) != 0)
+    if (on_exit(onexitFunc, (void *)10) != 0)
         fatal("on_exit 1");
 #endif
     if (atexit(atexitFunc1) != 0)
@@ -58,7 +57,7 @@ main(int argc, char *argv[])
     if (atexit(atexitFunc2) != 0)
         fatal("atexit 2");
 #ifdef HAVE_ON_EXIT
-    if (on_exit(onexitFunc, (void *) 20) != 0)
+    if (on_exit(onexitFunc, (void *)20) != 0)
         fatal("on_exit 2");
 #endif
 

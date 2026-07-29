@@ -15,17 +15,17 @@
    Various useful functions for working with signals.
 */
 #define _GNU_SOURCE
-#include <string.h>
-#include <signal.h>
-#include "signal_functions.h"           /* Declares functions defined here */
+#include "signal_functions.h" /* Declares functions defined here */
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <string.h>
 
 /* NOTE: All of the following functions employ fprintf(), which
    is not async-signal-safe (see Section 21.1.2). As such, these
    functions are also not async-signal-safe (i.e., beware of
    indiscriminately calling them from signal handlers). */
 
-void                    /* Print list of signals within a signal set */
+void /* Print list of signals within a signal set */
 printSigset(FILE *of, const char *prefix, const sigset_t *sigset)
 {
     int sig, cnt;
@@ -42,7 +42,7 @@ printSigset(FILE *of, const char *prefix, const sigset_t *sigset)
         fprintf(of, "%s<empty signal set>\n", prefix);
 }
 
-int                     /* Print mask of blocked signals for this process */
+int /* Print mask of blocked signals for this process */
 printSigMask(FILE *of, const char *msg)
 {
     sigset_t currMask;
@@ -58,7 +58,7 @@ printSigMask(FILE *of, const char *msg)
     return 0;
 }
 
-int                     /* Print signals currently pending for this process */
+int /* Print signals currently pending for this process */
 printPendingSigs(FILE *of, const char *msg)
 {
     sigset_t pendingSigs;

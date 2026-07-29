@@ -16,9 +16,9 @@
 
    See also system.c.
 */
-#include <unistd.h>
-#include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int
 system(char *command)
@@ -31,8 +31,8 @@ system(char *command)
         return -1;
 
     case 0: /* Child */
-        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
-        _exit(127);                     /* Failed exec */
+        execl("/bin/sh", "sh", "-c", command, (char *)NULL);
+        _exit(127); /* Failed exec */
 
     default: /* Parent */
         if (waitpid(childPid, &status, 0) == -1)

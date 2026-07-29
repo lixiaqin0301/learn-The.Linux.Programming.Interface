@@ -14,24 +14,23 @@
 
    Demonstrate the use of setsid(2) to start a new session.
 */
-#if ! defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 500
+#if !defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 500
 #define _XOPEN_SOURCE 500
 #endif
-#include <unistd.h>
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <unistd.h>
 
 int
 main(int argc, char *argv[])
 {
-    if (fork() != 0)            /* Exit if parent, or on error */
+    if (fork() != 0) /* Exit if parent, or on error */
         _exit(EXIT_SUCCESS);
 
     if (setsid() == -1)
         errExit("setsid");
 
-    printf("PID=%ld, PGID=%ld, SID=%ld\n", (long) getpid(),
-            (long) getpgrp(), (long) getsid(0));
+    printf("PID=%ld, PGID=%ld, SID=%ld\n", (long)getpid(), (long)getpgrp(), (long)getsid(0));
 
     /* Following should fail, since we don't have a controlling terminal */
 

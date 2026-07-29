@@ -17,9 +17,9 @@
    This program is Linux-specific.
 */
 #define _LARGEFILE64_SOURCE
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int
 main(int argc, char *argv[])

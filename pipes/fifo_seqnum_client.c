@@ -27,7 +27,7 @@
 
 static char clientFifo[CLIENT_FIFO_NAME_LEN];
 
-static void             /* Invoked on exit to delete client FIFO */
+static void /* Invoked on exit to delete client FIFO */
 removeFifo(void)
 {
     unlink(clientFifo);
@@ -45,11 +45,9 @@ main(int argc, char *argv[])
 
     /* Create our FIFO (before sending request, to avoid a race) */
 
-    umask(0);                   /* So we get the permissions we want */
-    snprintf(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE,
-            (long) getpid());
-    if (mkfifo(clientFifo, S_IRUSR | S_IWUSR | S_IWGRP) == -1
-                && errno != EEXIST)
+    umask(0); /* So we get the permissions we want */
+    snprintf(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE, (long)getpid());
+    if (mkfifo(clientFifo, S_IRUSR | S_IWUSR | S_IWGRP) == -1 && errno != EEXIST)
         errExit("mkfifo %s", clientFifo);
 
     if (atexit(removeFifo) != 0)
@@ -64,8 +62,7 @@ main(int argc, char *argv[])
     if (serverFd == -1)
         errExit("open %s", SERVER_FIFO);
 
-    if (write(serverFd, &req, sizeof(struct request)) !=
-            sizeof(struct request))
+    if (write(serverFd, &req, sizeof(struct request)) != sizeof(struct request))
         fatal("Can't write to server");
 
     /* Open our FIFO, read and display response */
@@ -74,8 +71,7 @@ main(int argc, char *argv[])
     if (clientFd == -1)
         errExit("open %s", clientFifo);
 
-    if (read(clientFd, &resp, sizeof(struct response))
-            != sizeof(struct response))
+    if (read(clientFd, &resp, sizeof(struct response)) != sizeof(struct response))
         fatal("Can't read response from server");
 
     printf("%d\n", resp.seqNum);

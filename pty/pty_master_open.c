@@ -17,20 +17,20 @@
 
    See also pty_master_open_bsd.c.
 */
-#if ! defined(__sun)
-        /* Prevents ptsname() declaration being visible on Solaris 8 */
-#if ! defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600
+#if !defined(__sun)
+/* Prevents ptsname() declaration being visible on Solaris 8 */
+#if !defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600
 #define _XOPEN_SOURCE 600
 #endif
 #endif
-#include <stdlib.h>
-#include <fcntl.h>
-#include "pty_master_open.h"            /* Declares ptyMasterOpen() */
+#include "pty_master_open.h" /* Declares ptyMasterOpen() */
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <stdlib.h>
 
 /* Some implementations don't have posix_openpt() */
 
-#if defined(__sun)                      /* Not on Solaris 8 */
+#if defined(__sun) /* Not on Solaris 8 */
 #define NO_POSIX_OPENPT
 #endif
 
@@ -55,35 +55,35 @@ ptyMasterOpen(char *slaveName, size_t snLen)
     int masterFd, savedErrno;
     char *p;
 
-    masterFd = posix_openpt(O_RDWR | O_NOCTTY);         /* Open pty master */
+    masterFd = posix_openpt(O_RDWR | O_NOCTTY); /* Open pty master */
     if (masterFd == -1)
         return -1;
 
-    if (grantpt(masterFd) == -1) {              /* Grant access to slave pty */
+    if (grantpt(masterFd) == -1) { /* Grant access to slave pty */
         savedErrno = errno;
-        close(masterFd);                        /* Might change 'errno' */
+        close(masterFd); /* Might change 'errno' */
         errno = savedErrno;
         return -1;
     }
 
-    if (unlockpt(masterFd) == -1) {             /* Unlock slave pty */
+    if (unlockpt(masterFd) == -1) { /* Unlock slave pty */
         savedErrno = errno;
-        close(masterFd);                        /* Might change 'errno' */
+        close(masterFd); /* Might change 'errno' */
         errno = savedErrno;
         return -1;
     }
 
-    p = ptsname(masterFd);                      /* Get slave pty name */
+    p = ptsname(masterFd); /* Get slave pty name */
     if (p == NULL) {
         savedErrno = errno;
-        close(masterFd);                        /* Might change 'errno' */
+        close(masterFd); /* Might change 'errno' */
         errno = savedErrno;
         return -1;
     }
 
     if (strlen(p) < snLen) {
         strncpy(slaveName, p, snLen);
-    } else {                    /* Return an error if buffer too small */
+    } else { /* Return an error if buffer too small */
         close(masterFd);
         errno = EOVERFLOW;
         return -1;

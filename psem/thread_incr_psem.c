@@ -17,17 +17,17 @@
 
    See also thread_incr.c and thread_incr_mutex.c.
 */
-#include <semaphore.h>
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
+#include <semaphore.h>
 
 static int glob = 0;
 static sem_t sem;
 
-static void *                   /* Loop 'arg' times incrementing 'glob' */
+static void * /* Loop 'arg' times incrementing 'glob' */
 threadFunc(void *arg)
 {
-    int loops = *((int *) arg);
+    int loops = *((int *)arg);
     int loc, j;
 
     for (j = 0; j < loops; j++) {

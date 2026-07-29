@@ -23,10 +23,10 @@
    To build this program, you must have the ACL library (libacl) installed
    on your system.
 */
+#include "tlpi_hdr.h"
+#include "ugid_functions.h"
 #include <acl/libacl.h>
 #include <sys/acl.h>
-#include "ugid_functions.h"
-#include "tlpi_hdr.h"
 
 static void
 usageError(char *progName)
@@ -51,8 +51,11 @@ main(int argc, char *argv[])
     type = ACL_TYPE_ACCESS;
     while ((opt = getopt(argc, argv, "d")) != -1) {
         switch (opt) {
-        case 'd': type = ACL_TYPE_DEFAULT;      break;
-        case '?': usageError(argv[0]);
+        case 'd':
+            type = ACL_TYPE_DEFAULT;
+            break;
+        case '?':
+            usageError(argv[0]);
         }
     }
 
@@ -65,22 +68,17 @@ main(int argc, char *argv[])
 
     /* Walk through each entry in this ACL */
 
-    for (entryId = ACL_FIRST_ENTRY; ; entryId = ACL_NEXT_ENTRY) {
+    for (entryId = ACL_FIRST_ENTRY;; entryId = ACL_NEXT_ENTRY) {
 
         if (acl_get_entry(acl, entryId, &entry) != 1)
-            break;                      /* Exit on error or no more entries */
+            break; /* Exit on error or no more entries */
 
         /* Retrieve and display tag type */
 
         if (acl_get_tag_type(entry, &tag) == -1)
             errExit("acl_get_tag_type");
 
-        printf("%-12s", (tag == ACL_USER_OBJ) ?  "user_obj" :
-                        (tag == ACL_USER) ?      "user" :
-                        (tag == ACL_GROUP_OBJ) ? "group_obj" :
-                        (tag == ACL_GROUP) ?     "group" :
-                        (tag == ACL_MASK) ?      "mask" :
-                        (tag == ACL_OTHER) ?     "other" : "???");
+        printf("%-12s", (tag == ACL_USER_OBJ) ? "user_obj" : (tag == ACL_USER) ? "user" : (tag == ACL_GROUP_OBJ) ? "group_obj" : (tag == ACL_GROUP) ? "group" : (tag == ACL_MASK) ? "mask" : (tag == ACL_OTHER) ? "other" : "???");
 
         /* Retrieve and display optional tag qualifier */
 

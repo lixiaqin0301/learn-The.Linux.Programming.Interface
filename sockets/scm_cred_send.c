@@ -46,12 +46,12 @@ main(int argc, char *argv[])
        requirements of any type */
 
     union {
-        char   buf[CMSG_SPACE(sizeof(struct ucred))];
-                        /* Space large enough to hold a ucred structure */
+        char buf[CMSG_SPACE(sizeof(struct ucred))];
+        /* Space large enough to hold a ucred structure */
         struct cmsghdr align;
     } controlMsg;
-    struct cmsghdr *cmsgp;      /* Pointer used to iterate through
-                                   headers in ancillary data */
+    struct cmsghdr *cmsgp; /* Pointer used to iterate through
+                              headers in ancillary data */
 
     /* Parse command-line options */
 
@@ -70,9 +70,10 @@ main(int argc, char *argv[])
 
         default:
             usageErr("%s [-d] [-n] [data [PID [UID [GID]]]]\n"
-                    "        -d    use datagram socket\n"
-                    "        -n    don't construct explicit "
-                                  "credentials structure\n", argv[0]);
+                     "        -d    use datagram socket\n"
+                     "        -n    don't construct explicit "
+                     "credentials structure\n",
+                argv[0]);
         }
     }
 
@@ -132,7 +133,7 @@ main(int argc, char *argv[])
 
         /* Set 'ucredp' to point to the data area in the 'cmsghdr' */
 
-        ucredp = (struct ucred *) CMSG_DATA(cmsgp);
+        ucredp = (struct ucred *)CMSG_DATA(cmsgp);
 
         /* Use sender's own PID, real UID, and real GID, unless
            alternate values were supplied on the command line */
@@ -149,8 +150,7 @@ main(int argc, char *argv[])
         if (argc > optind + 3 && strcmp(argv[optind + 3], "-") != 0)
             ucredp->gid = atoi(argv[optind + 3]);
 
-        printf("Send credentials pid=%ld, uid=%ld, gid=%ld\n",
-                (long) ucredp->pid, (long) ucredp->uid, (long) ucredp->gid);
+        printf("Send credentials pid=%ld, uid=%ld, gid=%ld\n", (long)ucredp->pid, (long)ucredp->uid, (long)ucredp->gid);
     }
 
     /* Connect to the peer socket */
@@ -165,7 +165,7 @@ main(int argc, char *argv[])
     if (ns == -1)
         errExit("sendmsg");
 
-    printf("sendmsg() returned %ld\n", (long) ns);
+    printf("sendmsg() returned %ld\n", (long)ns);
 
     exit(EXIT_SUCCESS);
 }

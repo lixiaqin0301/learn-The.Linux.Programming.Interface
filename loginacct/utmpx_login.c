@@ -20,10 +20,10 @@
    This program is Linux-specific.
 */
 #define _GNU_SOURCE
+#include "tlpi_hdr.h"
+#include <paths.h> /* Definitions of _PATH_UTMP and _PATH_WTMP */
 #include <time.h>
 #include <utmpx.h>
-#include <paths.h>              /* Definitions of _PATH_UTMP and _PATH_WTMP */
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -37,10 +37,10 @@ main(int argc, char *argv[])
     /* Initialize login record for utmp and wtmp files */
 
     memset(&ut, 0, sizeof(struct utmpx));
-    ut.ut_type = USER_PROCESS;          /* This is a user login */
+    ut.ut_type = USER_PROCESS; /* This is a user login */
     strncpy(ut.ut_user, argv[1], sizeof(ut.ut_user));
-    if (time((time_t *) &ut.ut_tv.tv_sec) == -1)
-        errExit("time");                /* Stamp with current time */
+    if (time((time_t *)&ut.ut_tv.tv_sec) == -1)
+        errExit("time"); /* Stamp with current time */
     ut.ut_pid = getpid();
 
     /* Set ut_line and ut_id based on the terminal associated with
@@ -51,21 +51,19 @@ main(int argc, char *argv[])
     devName = ttyname(STDIN_FILENO);
     if (devName == NULL)
         errExit("ttyname");
-    if (strlen(devName) <= 8)           /* Should never happen */
+    if (strlen(devName) <= 8) /* Should never happen */
         fatal("Terminal name is too short: %s", devName);
 
     strncpy(ut.ut_line, devName + 5, sizeof(ut.ut_line));
     strncpy(ut.ut_id, devName + 8, sizeof(ut.ut_id));
 
     printf("Creating login entries in utmp and wtmp\n");
-    printf("        using pid %ld, line %.*s, id %.*s\n",
-            (long) ut.ut_pid, (int) sizeof(ut.ut_line), ut.ut_line,
-            (int) sizeof(ut.ut_id), ut.ut_id);
+    printf("        using pid %ld, line %.*s, id %.*s\n", (long)ut.ut_pid, (int)sizeof(ut.ut_line), ut.ut_line, (int)sizeof(ut.ut_id), ut.ut_id);
 
-    setutxent();                        /* Rewind to start of utmp file */
-    if (pututxline(&ut) == NULL)        /* Write login record to utmp */
+    setutxent(); /* Rewind to start of utmp file */
+    if (pututxline(&ut) == NULL) /* Write login record to utmp */
         errExit("pututxline");
-    updwtmpx(_PATH_WTMP, &ut);          /* Append login record to wtmp */
+    updwtmpx(_PATH_WTMP, &ut); /* Append login record to wtmp */
 
     /* Sleep a while, so we can examine utmp and wtmp files */
 
@@ -74,16 +72,16 @@ main(int argc, char *argv[])
     /* Now do a "logout"; use values from previously initialized 'ut',
        except for changes below */
 
-    ut.ut_type = DEAD_PROCESS;          /* Required for logout record */
-    time((time_t *) &ut.ut_tv.tv_sec);  /* Stamp with logout time */
+    ut.ut_type = DEAD_PROCESS; /* Required for logout record */
+    time((time_t *)&ut.ut_tv.tv_sec); /* Stamp with logout time */
     memset(&ut.ut_user, 0, sizeof(ut.ut_user));
-                                        /* Logout record has null username */
+    /* Logout record has null username */
 
     printf("Creating logout entries in utmp and wtmp\n");
-    setutxent();                        /* Rewind to start of utmp file */
-    if (pututxline(&ut) == NULL)        /* Overwrite previous utmp record */
+    setutxent(); /* Rewind to start of utmp file */
+    if (pututxline(&ut) == NULL) /* Overwrite previous utmp record */
         errExit("pututxline");
-    updwtmpx(_PATH_WTMP, &ut);          /* Append logout record to wtmp */
+    updwtmpx(_PATH_WTMP, &ut); /* Append logout record to wtmp */
 
     endutxent();
     exit(EXIT_SUCCESS);

@@ -19,17 +19,17 @@
    sends it back to the parent using the other pipe. The parent reads
    the text returned by the child and echoes it on standard output.
 */
-#include <ctype.h>
 #include "tlpi_hdr.h"
+#include <ctype.h>
 
-#define BUF_SIZE 100    /* Should be <= PIPE_BUF bytes */
+#define BUF_SIZE 100 /* Should be <= PIPE_BUF bytes */
 
 int
 main(int argc, char *argv[])
 {
     char buf[BUF_SIZE];
-    int outbound[2];            /* Pipe to send data from parent to child */
-    int inbound[2];             /* Pipe to send data from child to parent */
+    int outbound[2]; /* Pipe to send data from parent to child */
+    int inbound[2]; /* Pipe to send data from child to parent */
     int j;
     ssize_t cnt;
 
@@ -56,7 +56,7 @@ main(int argc, char *argv[])
 
         while ((cnt = read(outbound[0], buf, BUF_SIZE)) > 0) {
             for (j = 0; j < cnt; j++)
-                buf[j] = toupper((unsigned char) buf[j]);
+                buf[j] = toupper((unsigned char)buf[j]);
             if (write(inbound[1], buf, cnt) != cnt)
                 fatal("failed/partial write(): inbound pipe");
         }

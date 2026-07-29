@@ -14,8 +14,8 @@
 
    Usage: ./t_cap_set_file "<textual-cap-set>" <pathname>
 */
-#include <sys/capability.h>
 #include "tlpi_hdr.h"
+#include <sys/capability.h>
 
 int
 main(int argc, char *argv[])

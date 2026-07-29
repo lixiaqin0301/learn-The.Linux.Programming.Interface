@@ -31,8 +31,8 @@
        wait for a signal from parent          send a signal to child
    }                                      }
 */
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 static void
 handler(int sig)
@@ -71,21 +71,22 @@ main(int argc, char *argv[])
     sigemptyset(&emptyMask);
 
     switch (childPid = fork()) {
-    case -1: errExit("fork");
+    case -1:
+        errExit("fork");
 
-    case 0:     /* child */
+    case 0: /* child */
         for (scnt = 0; scnt < numSigs; scnt++) {
             if (kill(getppid(), TESTSIG) == -1)
                 errExit("kill");
             if (sigsuspend(&emptyMask) == -1 && errno != EINTR)
-                    errExit("sigsuspend");
+                errExit("sigsuspend");
         }
         exit(EXIT_SUCCESS);
 
     default: /* parent */
         for (scnt = 0; scnt < numSigs; scnt++) {
             if (sigsuspend(&emptyMask) == -1 && errno != EINTR)
-                    errExit("sigsuspend");
+                errExit("sigsuspend");
             if (kill(childPid, TESTSIG) == -1)
                 errExit("kill");
         }

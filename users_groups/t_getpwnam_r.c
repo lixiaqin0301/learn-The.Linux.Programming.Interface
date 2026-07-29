@@ -15,8 +15,8 @@
    Demonstrate the use of getpwnam_r() to retrieve the password record for
    a named user from the system password file.
 */
-#include <pwd.h>
 #include "tlpi_hdr.h"
+#include <pwd.h>
 
 int
 main(int argc, char *argv[])

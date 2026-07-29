@@ -16,11 +16,11 @@
 
    Compare this program with svsem_good_init.c.
 */
-#include <sys/types.h>
+#include "semun.h" /* Definition of semun union */
+#include "tlpi_hdr.h"
 #include <sys/sem.h>
 #include <sys/stat.h>
-#include "semun.h"                      /* Definition of semun union */
-#include "tlpi_hdr.h"
+#include <sys/types.h>
 
 int
 main(int argc, char *argv[])
@@ -32,20 +32,20 @@ main(int argc, char *argv[])
     perms = S_IRUSR | S_IWUSR;
     semid = semget(key, 1, IPC_CREAT | IPC_EXCL | perms);
 
-    if (semid != -1) {                  /* Successfully created the semaphore */
+    if (semid != -1) { /* Successfully created the semaphore */
         union semun arg;
 
         /* XXXX */
 
-        arg.val = 0;                    /* So initialize it */
+        arg.val = 0; /* So initialize it */
         if (semctl(semid, 0, SETVAL, arg) == -1)
             errExit("semctl");
 
-    } else {                            /* We didn't create semaphore set */
-        if (errno != EEXIST) {          /* Unexpected error from semget() */
+    } else { /* We didn't create semaphore set */
+        if (errno != EEXIST) { /* Unexpected error from semget() */
             errExit("semget 1");
-        } else {                        /* Someone else already created it */
-            semid = semget(key, 1, perms);      /* So just get ID */
+        } else { /* Someone else already created it */
+            semid = semget(key, 1, perms); /* So just get ID */
             if (semid == -1)
                 errExit("semget 2");
         }
@@ -53,8 +53,8 @@ main(int argc, char *argv[])
 
     /* Now perform some operation on the semaphore */
 
-    sops[0].sem_op = 1;         /* Add 1 */
-    sops[0].sem_num = 0;        /* ... to semaphore 0 */
+    sops[0].sem_op = 1; /* Add 1 */
+    sops[0].sem_num = 0; /* ... to semaphore 0 */
     sops[0].sem_flg = 0;
     if (semop(semid, sops, 1) == -1)
         errExit("semop");

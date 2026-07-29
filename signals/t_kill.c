@@ -14,8 +14,8 @@
 
    Send a signal using kill(2) and analyze the return status of the call.
 */
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 int
 main(int argc, char *argv[])
@@ -33,7 +33,7 @@ main(int argc, char *argv[])
         if (s == -1)
             errExit("kill");
 
-    } else {                    /* Null signal: process existence check */
+    } else { /* Null signal: process existence check */
         if (s == 0) {
             printf("Process exists and we can send it a signal\n");
         } else {

@@ -27,16 +27,16 @@
 
    See also check_password.c.
 */
-#define _BSD_SOURCE             /* Get getpass() declaration from <unistd.h> */
+#define _BSD_SOURCE /* Get getpass() declaration from <unistd.h> */
 #ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE           /* Get crypt() declaration from <unistd.h> */
+#define _XOPEN_SOURCE /* Get crypt() declaration from <unistd.h> */
 #endif
-#include <sys/capability.h>
-#include <unistd.h>
+#include "tlpi_hdr.h"
 #include <limits.h>
 #include <pwd.h>
 #include <shadow.h>
-#include "tlpi_hdr.h"
+#include <sys/capability.h>
+#include <unistd.h>
 
 /* Change setting of capability in caller's effective capabilities */
 
@@ -77,7 +77,7 @@ modifyCap(int capability, int setting)
     return 0;
 }
 
-static int              /* Raise capability in caller's effective set */
+static int /* Raise capability in caller's effective set */
 raiseCap(int capability)
 {
     return modifyCap(capability, CAP_SET);
@@ -86,7 +86,7 @@ raiseCap(int capability)
 /* An analogous dropCap() (unneeded in this program), could be
    defined as: modifyCap(capability, CAP_CLEAR); */
 
-static int              /* Drop all capabilities from all sets */
+static int /* Drop all capabilities from all sets */
 dropAllCaps(void)
 {
     cap_t empty;
@@ -117,8 +117,8 @@ main(int argc, char *argv[])
     /* Determine size of buffer required for a username, and allocate it */
 
     lnmax = sysconf(_SC_LOGIN_NAME_MAX);
-    if (lnmax == -1)                        /* If limit is indeterminate */
-        lnmax = 256;                        /* make a guess */
+    if (lnmax == -1) /* If limit is indeterminate */
+        lnmax = 256; /* make a guess */
 
     username = malloc(lnmax);
     if (username == NULL)
@@ -127,11 +127,11 @@ main(int argc, char *argv[])
     printf("Username: ");
     fflush(stdout);
     if (fgets(username, lnmax, stdin) == NULL)
-        exit(EXIT_FAILURE);                 /* Exit on EOF */
+        exit(EXIT_FAILURE); /* Exit on EOF */
 
     len = strlen(username);
     if (username[len - 1] == '\n')
-        username[len - 1] = '\0';           /* Remove trailing '\n' */
+        username[len - 1] = '\0'; /* Remove trailing '\n' */
 
     /* Look up password record for username */
 
@@ -156,15 +156,15 @@ main(int argc, char *argv[])
     if (dropAllCaps() == -1)
         fatal("dropAllCaps() failed");
 
-    if (spwd != NULL)           /* If there is a shadow password record */
-        pwd->pw_passwd = spwd->sp_pwdp;     /* Use the shadow password */
+    if (spwd != NULL) /* If there is a shadow password record */
+        pwd->pw_passwd = spwd->sp_pwdp; /* Use the shadow password */
 
     password = getpass("Password: ");
 
     /* Encrypt password and erase cleartext version immediately */
 
     encrypted = crypt(password, pwd->pw_passwd);
-    for (p = password; *p != '\0'; )
+    for (p = password; *p != '\0';)
         *p++ = '\0';
 
     if (encrypted == NULL)
@@ -176,7 +176,7 @@ main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    printf("Successfully authenticated: UID=%ld\n", (long) pwd->pw_uid);
+    printf("Successfully authenticated: UID=%ld\n", (long)pwd->pw_uid);
 
     /* Now do authenticated work... */
 

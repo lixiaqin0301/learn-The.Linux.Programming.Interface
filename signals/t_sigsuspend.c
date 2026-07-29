@@ -27,12 +27,12 @@
    sigsuspend() by the nonatomic sigprocmask() + pause(). This allows us to
    show that doing the latter way will cause some signals to be lost.
 */
-#define _GNU_SOURCE     /* Get strsignal() declaration from <string.h> */
-#include <string.h>
-#include <signal.h>
-#include <time.h>
-#include "signal_functions.h"           /* Declarations of printSigMask()
+#define _GNU_SOURCE /* Get strsignal() declaration from <string.h> */
+#include "signal_functions.h" /* Declarations of printSigMask()
                                            and printPendingSigs() */
+#include <signal.h>
+#include <string.h>
+#include <time.h>
 #include "tlpi_hdr.h"
 
 /* Global variable incremented each time SIGINT is handled */
@@ -44,7 +44,7 @@ static void
 handler(int sig)
 {
     printf("Caught signal %d (%s)\n", sig, strsignal(sig));
-                                        /* UNSAFE (see Section 21.1.2) */
+    /* UNSAFE (see Section 21.1.2) */
     if (sig == SIGQUIT)
         gotSigquit = 1;
     sigintCnt++;
@@ -96,15 +96,14 @@ main(int argc, char *argv[])
         /* Simulate a critical section by delaying a few seconds */
 
         printSigMask(stdout, "Starting critical section, signal mask is:\n");
-        for (startTime = time(NULL); time(NULL) < startTime + 4; )
-            continue;                   /* Run for a few seconds elapsed time */
+        for (startTime = time(NULL); time(NULL) < startTime + 4;)
+            continue; /* Run for a few seconds elapsed time */
 
 #ifndef USE_PAUSE
         /* The right way: use sigsuspend() to atomically unblock
            signals and pause waiting for signal */
 
-        printPendingSigs(stdout,
-                "Before sigsuspend() - pending signals:\n");
+        printPendingSigs(stdout, "Before sigsuspend() - pending signals:\n");
         if (sigsuspend(&origMask) == -1 && errno != EINTR)
             errExit("sigsuspend");
 #else
@@ -125,8 +124,7 @@ main(int argc, char *argv[])
 
         if (sleepTime > 0) {
             printf("Unblocked SIGINT, now waiting for %d seconds\n", sleepTime);
-            for (startTime = time(NULL);
-                    time(NULL) < startTime + sleepTime; )
+            for (startTime = time(NULL); time(NULL) < startTime + sleepTime;)
                 continue;
             printf("Finished waiting - now going to pause()\n");
         }

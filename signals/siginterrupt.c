@@ -14,8 +14,8 @@
 
    An implementation of the siginterrupt(3) library function.
 */
-#include <stdio.h>
 #include <signal.h>
+#include <stdio.h>
 
 int
 siginterrupt(int sig, int flag)

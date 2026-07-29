@@ -23,21 +23,21 @@
    This program is Linux-specific.
 */
 #define _GNU_SOURCE
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <linux/fs.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <linux/fs.h>
+#include <sys/ioctl.h>
 
 static void
 usageError(const char *progName)
 {
     fprintf(stderr, "Usage: %s {+-=}{attrib-chars} file...\n\n", progName);
-#define fpe(str) fprintf(stderr, "    " str)            /* Shorter! */
+#define fpe(str) fprintf(stderr, "    " str) /* Shorter! */
     fpe("+ add attribute; - remove attribute; "
-                        "= set attributes absolutely\n\n");
+        "= set attributes absolutely\n\n");
     fpe("'attrib-chars' contains one or more of:\n");
     fpe("    a   Force open() to include O_APPEND "
-                        "(privilege required)\n");
+        "(privilege required)\n");
     fpe("    A   Do not update last access time\n");
     fpe("    c   Compress (requires e2compr package)\n");
     fpe("    d   Do not backup with dump(8)\n");
@@ -58,8 +58,7 @@ main(int argc, char *argv[])
     int attr, oldAttr, j, fd;
     char *p;
 
-    if (argc < 3 || strchr("+-=", argv[1][0]) == NULL ||
-            strcmp(argv[1], "--help") == 0)
+    if (argc < 3 || strchr("+-=", argv[1][0]) == NULL || strcmp(argv[1], "--help") == 0)
         usageError(argv[0]);
 
     /* Build bit mask based on attribute string in argv[1] */
@@ -67,19 +66,44 @@ main(int argc, char *argv[])
     attr = 0;
     for (p = &argv[1][1]; *p != '\0'; p++) {
         switch (*p) {
-        case 'a': attr |= FS_APPEND_FL;         break;
-        case 'A': attr |= FS_NOATIME_FL;        break;
-        case 'c': attr |= FS_COMPR_FL;          break;
-        case 'd': attr |= FS_NODUMP_FL;         break;
-        case 'D': attr |= FS_DIRSYNC_FL;        break;
-        case 'i': attr |= FS_IMMUTABLE_FL;      break;
-        case 'j': attr |= FS_JOURNAL_DATA_FL;   break;
-        case 's': attr |= FS_SECRM_FL;          break;
-        case 'S': attr |= FS_SYNC_FL;           break;
-        case 't': attr |= FS_NOTAIL_FL;         break;
-        case 'T': attr |= FS_TOPDIR_FL;         break;
-        case 'u': attr |= FS_UNRM_FL;           break;
-        default:  usageError(argv[0]);
+        case 'a':
+            attr |= FS_APPEND_FL;
+            break;
+        case 'A':
+            attr |= FS_NOATIME_FL;
+            break;
+        case 'c':
+            attr |= FS_COMPR_FL;
+            break;
+        case 'd':
+            attr |= FS_NODUMP_FL;
+            break;
+        case 'D':
+            attr |= FS_DIRSYNC_FL;
+            break;
+        case 'i':
+            attr |= FS_IMMUTABLE_FL;
+            break;
+        case 'j':
+            attr |= FS_JOURNAL_DATA_FL;
+            break;
+        case 's':
+            attr |= FS_SECRM_FL;
+            break;
+        case 'S':
+            attr |= FS_SYNC_FL;
+            break;
+        case 't':
+            attr |= FS_NOTAIL_FL;
+            break;
+        case 'T':
+            attr |= FS_TOPDIR_FL;
+            break;
+        case 'u':
+            attr |= FS_UNRM_FL;
+            break;
+        default:
+            usageError(argv[0]);
         }
     }
 
@@ -87,7 +111,7 @@ main(int argc, char *argv[])
 
     for (j = 2; j < argc; j++) {
         fd = open(argv[j], O_RDONLY);
-        if (fd == -1) {         /* Most likely error is nonexistent file */
+        if (fd == -1) { /* Most likely error is nonexistent file */
             errMsg("open: %s", argv[j]);
             continue;
         }

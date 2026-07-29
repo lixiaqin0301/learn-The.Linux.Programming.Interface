@@ -16,10 +16,10 @@
 
    Usage mmcopy source-file dest-file
 */
+#include "tlpi_hdr.h"
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -62,7 +62,7 @@ main(int argc, char *argv[])
     if (dst == MAP_FAILED)
         errExit("mmap");
 
-    memcpy(dst, src, sb.st_size);       /* Copy bytes between mappings */
+    memcpy(dst, src, sb.st_size); /* Copy bytes between mappings */
 
     if (msync(dst, sb.st_size, MS_SYNC) == -1)
         errExit("msync");

@@ -14,7 +14,7 @@
 
    Header file for create_pid_file.c.
 */
-#ifndef CREATE_PID_FILE_H   /* Prevent accidental double inclusion */
+#ifndef CREATE_PID_FILE_H /* Prevent accidental double inclusion */
 #define CREATE_PID_FILE_H
 
 #define CPF_CLOEXEC 1

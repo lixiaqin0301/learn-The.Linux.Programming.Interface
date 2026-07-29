@@ -18,17 +18,17 @@
    it may not be consistent if another process makes changes to the semaphore
    at the moment this program is running.
 */
-#include <sys/types.h>
-#include <sys/sem.h>
-#include <time.h>
-#include "semun.h"                      /* Definition of semun union */
+#include "semun.h" /* Definition of semun union */
 #include "tlpi_hdr.h"
+#include <sys/sem.h>
+#include <sys/types.h>
+#include <time.h>
 
 int
 main(int argc, char *argv[])
 {
     struct semid_ds ds;
-    union semun arg, dummy;             /* Fourth argument for semctl() */
+    union semun arg, dummy; /* Fourth argument for semctl() */
     int semid, j;
 
     if (argc != 2 || strcmp(argv[1], "--help") == 0)
@@ -54,10 +54,7 @@ main(int argc, char *argv[])
     printf("Sem #  Value  SEMPID  SEMNCNT  SEMZCNT\n");
 
     for (j = 0; j < ds.sem_nsems; j++)
-        printf("%3d   %5d   %5d  %5d    %5d\n", j, arg.array[j],
-                semctl(semid, j, GETPID, dummy),
-                semctl(semid, j, GETNCNT, dummy),
-                semctl(semid, j, GETZCNT, dummy));
+        printf("%3d   %5d   %5d  %5d    %5d\n", j, arg.array[j], semctl(semid, j, GETPID, dummy), semctl(semid, j, GETNCNT, dummy), semctl(semid, j, GETZCNT, dummy));
 
     exit(EXIT_SUCCESS);
 }

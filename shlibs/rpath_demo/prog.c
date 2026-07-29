@@ -18,7 +18,7 @@ main(int argc, char *argv[])
 {
     void x1(void);
 
-    x1 ();
+    x1();
 
     exit(EXIT_SUCCESS);
 }

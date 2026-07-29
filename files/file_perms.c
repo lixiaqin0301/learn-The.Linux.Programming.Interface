@@ -14,13 +14,13 @@
 
    Return a string representation of a file permissions mask.
 */
-#include <sys/stat.h>
+#include "file_perms.h" /* Interface for this implementation */
 #include <stdio.h>
-#include "file_perms.h"                 /* Interface for this implementation */
+#include <sys/stat.h>
 
 #define STR_SIZE sizeof("rwxrwxrwx")
 
-char *          /* Return ls(1)-style string for file permissions mask */
+char * /* Return ls(1)-style string for file permissions mask */
 filePermStr(mode_t perm, int flags)
 {
     static char str[STR_SIZE];
@@ -31,19 +31,8 @@ filePermStr(mode_t perm, int flags)
        the fact that the case of the character displayed for this bits
        depends on whether the corresponding execute bit is on or off. */
 
-    snprintf(str, STR_SIZE, "%c%c%c%c%c%c%c%c%c",
-        (perm & S_IRUSR) ? 'r' : '-', (perm & S_IWUSR) ? 'w' : '-',
-        (perm & S_IXUSR) ?
-            (((perm & S_ISUID) && (flags & FP_SPECIAL)) ? 's' : 'x') :
-            (((perm & S_ISUID) && (flags & FP_SPECIAL)) ? 'S' : '-'),
-        (perm & S_IRGRP) ? 'r' : '-', (perm & S_IWGRP) ? 'w' : '-',
-        (perm & S_IXGRP) ?
-            (((perm & S_ISGID) && (flags & FP_SPECIAL)) ? 's' : 'x') :
-            (((perm & S_ISGID) && (flags & FP_SPECIAL)) ? 'S' : '-'),
-        (perm & S_IROTH) ? 'r' : '-', (perm & S_IWOTH) ? 'w' : '-',
-        (perm & S_IXOTH) ?
-            (((perm & S_ISVTX) && (flags & FP_SPECIAL)) ? 't' : 'x') :
-            (((perm & S_ISVTX) && (flags & FP_SPECIAL)) ? 'T' : '-'));
+    snprintf(str, STR_SIZE, "%c%c%c%c%c%c%c%c%c", (perm & S_IRUSR) ? 'r' : '-', (perm & S_IWUSR) ? 'w' : '-', (perm & S_IXUSR) ? (((perm & S_ISUID) && (flags & FP_SPECIAL)) ? 's' : 'x') : (((perm & S_ISUID) && (flags & FP_SPECIAL)) ? 'S' : '-'), (perm & S_IRGRP) ? 'r' : '-', (perm & S_IWGRP) ? 'w' : '-', (perm & S_IXGRP) ? (((perm & S_ISGID) && (flags & FP_SPECIAL)) ? 's' : 'x') : (((perm & S_ISGID) && (flags & FP_SPECIAL)) ? 'S' : '-'), (perm & S_IROTH) ? 'r' : '-',
+        (perm & S_IWOTH) ? 'w' : '-', (perm & S_IXOTH) ? (((perm & S_ISVTX) && (flags & FP_SPECIAL)) ? 't' : 'x') : (((perm & S_ISVTX) && (flags & FP_SPECIAL)) ? 'T' : '-'));
 
     return str;
 }

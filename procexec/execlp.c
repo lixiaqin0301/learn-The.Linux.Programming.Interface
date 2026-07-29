@@ -19,17 +19,17 @@
    posix/exec*.c sources in glibc.
 */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 extern char **environ;
 
-#define max(x,y) ((x) > (y) ? (x) : (y))
-#define SHELL_PATH "/bin/sh"            /* Pathname for the standard shell */
+#define max(x, y) ((x) > (y) ? (x) : (y))
+#define SHELL_PATH "/bin/sh" /* Pathname for the standard shell */
 
 /* Exec a script file using the standard shell */
 
@@ -51,20 +51,20 @@ execShScript(int argc, char *argv[], char *envp[])
 int
 execlp(const char *filename, const char *arg, ...)
 {
-    char **argv;                /* Argument vector for new program */
-    int argc;                   /* Number of items used in argv */
-    int argvSize;               /* Currently allocated size of argv */
-    va_list argList;            /* For variable argument list parsing */
-    char **envp;                /* Environment for new program */
-    char *PATH;                 /* Value of PATH environment variable */
-    char *pathname;             /* Path prefix + '/' + filename */
-    char *prStart, *prEnd;      /* Start and end of prefix currently
-                                   being processed from PATH */
+    char **argv; /* Argument vector for new program */
+    int argc; /* Number of items used in argv */
+    int argvSize; /* Currently allocated size of argv */
+    va_list argList; /* For variable argument list parsing */
+    char **envp; /* Environment for new program */
+    char *PATH; /* Value of PATH environment variable */
+    char *pathname; /* Path prefix + '/' + filename */
+    char *prStart, *prEnd; /* Start and end of prefix currently
+                              being processed from PATH */
     int savedErrno;
-    int morePrefixes;           /* True if there are more prefixes in PATH */
+    int morePrefixes; /* True if there are more prefixes in PATH */
     char *p;
     int j;
-    int fndEACCES;              /* True if any execve() returned EACCES */
+    int fndEACCES; /* True if any execve() returned EACCES */
 
     fndEACCES = 0;
 
@@ -75,7 +75,7 @@ execlp(const char *filename, const char *arg, ...)
     if (argv == NULL)
         return -1;
 
-    argv[0] = (char *) arg;
+    argv[0] = (char *)arg;
     argc = 1;
 
     /* Walk through variable-length argument list until NULL terminator
@@ -83,7 +83,7 @@ execlp(const char *filename, const char *arg, ...)
 
     va_start(argList, arg);
     while (argv[argc - 1] != NULL) {
-        if (argc + 1 >= argvSize) {     /* Resize argv if required */
+        if (argc + 1 >= argvSize) { /* Resize argv if required */
             char **nargv;
 
             argvSize += 100;
@@ -104,7 +104,7 @@ execlp(const char *filename, const char *arg, ...)
 
     /***** Use caller's environment to create envp vector *****/
 
-    for (j = 0; environ[j] != NULL; )   /* Calculate size of environ */
+    for (j = 0; environ[j] != NULL;) /* Calculate size of environ */
         j++;
     envp = calloc(sizeof(void *), j + 1);
     if (envp == NULL) {
@@ -112,28 +112,28 @@ execlp(const char *filename, const char *arg, ...)
         return -1;
     }
 
-    for (j = 0; environ[j] != NULL; j++)    /* Duplicate environ in envp */
+    for (j = 0; environ[j] != NULL; j++) /* Duplicate environ in envp */
         envp[j] = strdup(environ[j]);
-    envp[j] = NULL;             /* List must be terminated by NULL pointer */
+    envp[j] = NULL; /* List must be terminated by NULL pointer */
 
     /***** Now try to exec filename *****/
 
     if (strchr(filename, '/') != NULL) {
 
-         /* If file contains a slash, it's a pathname and we don't do
-            a search using PATH */
+        /* If file contains a slash, it's a pathname and we don't do
+           a search using PATH */
 
         pathname = strdup(filename);
 
         execve(pathname, argv, envp);
 
-        savedErrno = errno;             /* So we can return correct errno */
+        savedErrno = errno; /* So we can return correct errno */
         if (errno == ENOEXEC)
             execShScript(argc, argv, envp);
 
-        free(pathname);                 /* Avoid memory leaks */
+        free(pathname); /* Avoid memory leaks */
 
-    } else {            /* Use PATH */
+    } else { /* Use PATH */
 
         /* Treat undefined PATH as "." */
 
@@ -152,30 +152,29 @@ execlp(const char *filename, const char *arg, ...)
             /* Locate end of prefix */
 
             prEnd = strchr(prStart, ':');
-            if (prEnd == NULL)          /* Handle last prefix */
+            if (prEnd == NULL) /* Handle last prefix */
                 prEnd = prStart + strlen(prStart);
 
             /* Build complete pathname from path prefix and filename */
 
-            pathname = malloc(max(1, prEnd - prStart) + strlen(filename)
-                                + 2);
+            pathname = malloc(max(1, prEnd - prStart) + strlen(filename) + 2);
             pathname[0] = '\0';
-            if (prEnd == prStart)       /* Last prefix */
+            if (prEnd == prStart) /* Last prefix */
                 strcat(pathname, ".");
             else
                 strncat(pathname, prStart, prEnd - prStart);
             strcat(pathname, "/");
             strcat(pathname, filename);
 
-            if (*prEnd == '\0')         /* No more prefixes */
+            if (*prEnd == '\0') /* No more prefixes */
                 morePrefixes = 0;
             else
-                prStart = prEnd + 1;    /* Move to start of next prefix */
+                prStart = prEnd + 1; /* Move to start of next prefix */
 
             /* Try to exec pathname; execve() returns only if we failed */
 
             execve(pathname, argv, envp);
-            savedErrno = errno;         /* So we can return correct errno */
+            savedErrno = errno; /* So we can return correct errno */
             if (errno == EACCES)
                 fndEACCES = 1;
             else if (errno == ENOEXEC)

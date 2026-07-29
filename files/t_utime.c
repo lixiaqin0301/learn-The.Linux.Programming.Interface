@@ -19,9 +19,9 @@
 
    See also t_utimes.c.
 */
+#include "tlpi_hdr.h"
 #include <sys/stat.h>
 #include <utime.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -35,12 +35,12 @@ main(int argc, char *argv[])
 
     pathname = argv[1];
 
-    if (stat(pathname, &sb) == -1)    /* Retrieve current file times */
+    if (stat(pathname, &sb) == -1) /* Retrieve current file times */
         errExit("stat");
 
-    utb.actime = sb.st_atime;         /* Leave access time unchanged */
-    utb.modtime = sb.st_atime;        /* Make modify time same as access time */
-    if (utime(pathname, &utb) == -1)  /* Update file times */
+    utb.actime = sb.st_atime; /* Leave access time unchanged */
+    utb.modtime = sb.st_atime; /* Make modify time same as access time */
+    if (utime(pathname, &utb) == -1) /* Update file times */
         errExit("utime");
 
     exit(EXIT_SUCCESS);

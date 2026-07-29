@@ -14,12 +14,12 @@
 
    A simple demonstration of System V semaphores.
 */
-#include <sys/types.h>
+#include "curr_time.h" /* Declaration of currTime() */
+#include "semun.h" /* Definition of semun union */
+#include "tlpi_hdr.h"
 #include <sys/sem.h>
 #include <sys/stat.h>
-#include "curr_time.h"                  /* Declaration of currTime() */
-#include "semun.h"                      /* Definition of semun union */
-#include "tlpi_hdr.h"
+#include <sys/types.h>
 
 int
 main(int argc, char *argv[])
@@ -28,9 +28,10 @@ main(int argc, char *argv[])
 
     if (argc < 2 || argc > 3 || strcmp(argv[1], "--help") == 0)
         usageErr("%s init-value\n"
-                 "   or: %s semid operation\n", argv[0], argv[0]);
+                 "   or: %s semid operation\n",
+            argv[0], argv[0]);
 
-    if (argc == 2) {            /* Create and initialize semaphore */
+    if (argc == 2) { /* Create and initialize semaphore */
         union semun arg;
 
         semid = semget(IPC_PRIVATE, 1, S_IRUSR | S_IWUSR);
@@ -43,22 +44,22 @@ main(int argc, char *argv[])
 
         printf("Semaphore ID = %d\n", semid);
 
-    } else {                    /* Perform an operation on first semaphore */
+    } else { /* Perform an operation on first semaphore */
 
-        struct sembuf sop;              /* Structure defining operation */
+        struct sembuf sop; /* Structure defining operation */
 
         semid = getInt(argv[1], 0, "semid");
 
-        sop.sem_num = 0;                /* Specifies first semaphore in set */
+        sop.sem_num = 0; /* Specifies first semaphore in set */
         sop.sem_op = getInt(argv[2], 0, "operation");
-                                        /* Add, subtract, or wait for 0 */
-        sop.sem_flg = 0;                /* No special options for operation */
+        /* Add, subtract, or wait for 0 */
+        sop.sem_flg = 0; /* No special options for operation */
 
-        printf("%ld: about to semop at  %s\n", (long) getpid(), currTime("%T"));
+        printf("%ld: about to semop at  %s\n", (long)getpid(), currTime("%T"));
         if (semop(semid, &sop, 1) == -1)
             errExit("semop");
 
-        printf("%ld: semop completed at %s\n", (long) getpid(), currTime("%T"));
+        printf("%ld: semop completed at %s\n", (long)getpid(), currTime("%T"));
     }
 
     exit(EXIT_SUCCESS);

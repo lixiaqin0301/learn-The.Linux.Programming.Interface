@@ -16,11 +16,11 @@
 
    See event_flags.h for a summary of the interface.
 */
-#include <sys/types.h>
-#include <sys/sem.h>
-#include "semun.h"              /* Definition of semun union */
 #include "event_flags.h"
+#include "semun.h" /* Definition of semun union */
 #include "tlpi_hdr.h"
+#include <sys/sem.h>
+#include <sys/types.h>
 
 /* Wait for the specified flag to become "set" (0) */
 
@@ -30,7 +30,7 @@ waitForEventFlag(int semId, int semNum)
     struct sembuf sops;
 
     sops.sem_num = semNum;
-    sops.sem_op = 0;                    /* Wait for semaphore to equal 0 */
+    sops.sem_op = 0; /* Wait for semaphore to equal 0 */
     sops.sem_flg = 0;
 
     /* Waiting for a semaphore to become zero may block, so we

@@ -15,9 +15,9 @@
    Remove the System V shared memory segments identified by the
    command-line arguments
 */
-#include <sys/types.h>
-#include <sys/shm.h>
 #include "tlpi_hdr.h"
+#include <sys/shm.h>
+#include <sys/types.h>
 
 int
 main(int argc, char *argv[])

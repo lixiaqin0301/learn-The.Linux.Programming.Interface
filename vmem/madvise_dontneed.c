@@ -24,10 +24,10 @@
 #ifdef __linux__
 #define _BSD_SOURCE
 #endif
+#include "tlpi_hdr.h"
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include "tlpi_hdr.h"
 
 #define MAP_SIZE 4096
 #define WRITE_SIZE 10

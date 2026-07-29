@@ -17,13 +17,13 @@
    Note that although we use signal() to establish the signal handler in this
    program, the use of sigaction() is always preferable for this task.
 */
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 static void
 sigHandler(int sig)
 {
-    printf("Ouch!\n");                  /* UNSAFE (see Section 21.1.2) */
+    printf("Ouch!\n"); /* UNSAFE (see Section 21.1.2) */
 }
 
 int
@@ -41,8 +41,8 @@ main(int argc, char *argv[])
 
     /* Loop continuously waiting for signals to be delivered */
 
-    for (j = 0; ; j++) {
+    for (j = 0;; j++) {
         printf("%d\n", j);
-        sleep(3);                       /* Loop slowly... */
+        sleep(3); /* Loop slowly... */
     }
 }

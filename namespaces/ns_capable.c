@@ -19,32 +19,38 @@
    Usage: ./ns_capable <pid> <namespace-file>
 */
 #define _GNU_SOURCE
-#include <sched.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
 #include <limits.h>
+#include <sched.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/capability.h>
+#include <sys/ioctl.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #ifndef NS_GET_USERNS
-#define NSIO    0xb7
-#define NS_GET_USERNS           _IO(NSIO, 0x1)
-#define NS_GET_PARENT           _IO(NSIO, 0x2)
-#define NS_GET_NSTYPE           _IO(NSIO, 0x3)
-#define NS_GET_OWNER_UID        _IO(NSIO, 0x4)
+#define NSIO 0xb7
+#define NS_GET_USERNS _IO(NSIO, 0x1)
+#define NS_GET_PARENT _IO(NSIO, 0x2)
+#define NS_GET_NSTYPE _IO(NSIO, 0x3)
+#define NS_GET_OWNER_UID _IO(NSIO, 0x4)
 #endif
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
-#define fatal(msg)      do { fprintf(stderr, "%s\n", msg); \
-                             exit(EXIT_FAILURE); } while (0)
+#define fatal(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        fprintf(stderr, "%s\n", msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 /* Display capabilities of process with specified PID */
 
@@ -79,7 +85,7 @@ euid_of_process(pid_t pid)
     int uid;
     FILE *fp;
 
-    snprintf(path, sizeof(path), "/proc/%ld/status", (long) pid);
+    snprintf(path, sizeof(path), "/proc/%ld/status", (long)pid);
 
     fp = fopen(path, "r");
     if (fp == NULL)
@@ -174,7 +180,7 @@ uid_of_userns_owner(int userns_fd)
 static int
 is_ancestor_userns(int fd_x, int fd_y)
 {
-    int parent, child;  /* File descriptors that refer to namespaces */
+    int parent, child; /* File descriptors that refer to namespaces */
 
     /* Starting at the parent of the user namespace referred to by
        'fd_y', we walk upward through the chain of ancestor namespaces
@@ -206,7 +212,7 @@ is_ancestor_userns(int fd_x, int fd_y)
            'fd_x' does refer to an ancestor of 'fd_y'. */
 
         if (ns_equal(parent, fd_x)) {
-            close(parent);              /* No longer need this FD */
+            close(parent); /* No longer need this FD */
             return child;
         }
 
@@ -220,11 +226,11 @@ is_ancestor_userns(int fd_x, int fd_y)
 int
 main(int argc, char *argv[])
 {
-    char *pid_str;      /* PID from command line */
-    pid_t pid;          /* That PID converted to numeric form */
-    int target_ns;      /* FD referring to target NS (from command line) */
-    int target_userns;  /* FD referring to user NS that owns 'target_ns' */
-    int pid_userns;     /* FD referring to user NS of PID in command line */
+    char *pid_str; /* PID from command line */
+    pid_t pid; /* That PID converted to numeric form */
+    int target_ns; /* FD referring to target NS (from command line) */
+    int target_userns; /* FD referring to user NS that owns 'target_ns' */
+    int pid_userns; /* FD referring to user NS of PID in command line */
     char path[PATH_MAX];
 
     if (argc != 3) {
@@ -251,7 +257,7 @@ main(int argc, char *argv[])
         target_userns = target_ns;
     } else {
         target_userns = owning_userns_of(target_ns);
-        close(target_ns);               /* No longer need this FD */
+        close(target_ns); /* No longer need this FD */
     }
 
     /* Obtain a file descriptor for the user namespace of the PID */
@@ -284,7 +290,7 @@ main(int argc, char *argv[])
 
             printf("PID %s is not in an ancestor user namespace.\n", pid_str);
             printf("Therefore, it has no capabilities in the target "
-                    "namespace.\n");
+                   "namespace.\n");
         } else {
 
             /* At this point, we found that PID is in a user namespace that
@@ -296,8 +302,7 @@ main(int argc, char *argv[])
                all capabilities in the descendant namespace(s); otherwise, it
                just has the capabilities that are in its sets. */
 
-            bool is_owner_of_userns = euid_of_process(pid) ==
-                                        uid_of_userns_owner(desc_userns);
+            bool is_owner_of_userns = euid_of_process(pid) == uid_of_userns_owner(desc_userns);
 
             printf("PID %s is in an ancestor user namespace", pid_str);
 
@@ -308,20 +313,20 @@ main(int argc, char *argv[])
             }
 
             printf("the owner of the immediate child user "
-                    "namespace of that ancestor namespace.\n");
+                   "namespace of that ancestor namespace.\n");
 
             if (is_owner_of_userns) {
                 printf("Therefore, subject to LSM checks, it has all "
-                        "capabilities in the target\n"
-                        "namespace!\n");
+                       "capabilities in the target\n"
+                       "namespace!\n");
             } else {
                 printf("Therefore, subject to LSM checks, it has only the "
-                        "capabilities that are in its\n"
-                        "sets, which are:\n");
+                       "capabilities that are in its\n"
+                       "sets, which are:\n");
                 display_process_capabilities(pid);
             }
 
-            if (desc_userns != target_userns)   /* Prevent double close() */
+            if (desc_userns != target_userns) /* Prevent double close() */
                 if (close(desc_userns) == -1)
                     errExit("close-desc_userns");
         }

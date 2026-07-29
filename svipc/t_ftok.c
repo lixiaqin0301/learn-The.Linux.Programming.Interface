@@ -19,9 +19,9 @@
    Simply calls ftok(), using the values supplied in the command-line arguments,
    and displays the resulting key.
 */
+#include "tlpi_hdr.h"
 #include <sys/ipc.h>
 #include <sys/stat.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -32,7 +32,7 @@ main(int argc, char *argv[])
     if (argc != 3 || strcmp(argv[1], "--help") == 0)
         usageErr("%s file-name keychar\n", argv[0]);
 
-    printf("Size of key_t = %ld bytes\n", (long) sizeof(key_t));
+    printf("Size of key_t = %ld bytes\n", (long)sizeof(key_t));
 
     if (stat(argv[1], &sb) == -1)
         errExit("stat");
@@ -41,9 +41,7 @@ main(int argc, char *argv[])
     if (key == -1)
         errExit("ftok");
 
-    printf("Key = %lx i-node = %lx st_dev = %lx proj = %x\n",
-          (unsigned long) key, (unsigned long) sb.st_ino,
-          (unsigned long) sb.st_dev, (unsigned int) argv[2][0]);
+    printf("Key = %lx i-node = %lx st_dev = %lx proj = %x\n", (unsigned long)key, (unsigned long)sb.st_ino, (unsigned long)sb.st_dev, (unsigned int)argv[2][0]);
     if (key == -1)
         printf("File does not exist\n");
 

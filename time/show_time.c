@@ -22,9 +22,9 @@
         TZ=":US/Central" ./show_time
         TZ=":CET" ./show_time
 */
-#include <time.h>
-#include <locale.h>
 #include "tlpi_hdr.h"
+#include <locale.h>
+#include <time.h>
 
 #define BUF_SIZE 200
 
@@ -36,7 +36,7 @@ main(int argc, char *argv[])
     char buf[BUF_SIZE];
 
     if (setlocale(LC_ALL, "") == NULL)
-        errExit("setlocale");   /* Use locale settings in conversions */
+        errExit("setlocale"); /* Use locale settings in conversions */
 
     t = time(NULL);
 

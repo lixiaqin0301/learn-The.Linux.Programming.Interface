@@ -15,9 +15,9 @@
    Demonstrate the use of readlink() and realpath() to read and display
    the contents of a symbolic link.
 */
-#include <sys/stat.h>
-#include <limits.h>             /* For definition of PATH_MAX */
 #include "tlpi_hdr.h"
+#include <limits.h> /* For definition of PATH_MAX */
+#include <sys/stat.h>
 
 #define BUF_SIZE PATH_MAX
 
@@ -44,7 +44,7 @@ main(int argc, char *argv[])
     numBytes = readlink(argv[1], buf, BUF_SIZE - 1);
     if (numBytes == -1)
         errExit("readlink");
-    buf[numBytes] = '\0';                       /* Add terminating null byte */
+    buf[numBytes] = '\0'; /* Add terminating null byte */
     printf("readlink: %s --> %s\n", argv[1], buf);
 
     if (realpath(argv[1], buf) == NULL)

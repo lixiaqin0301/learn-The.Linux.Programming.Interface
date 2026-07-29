@@ -30,7 +30,7 @@
         $ svshm_xfr_writer < infile &
         $ svshm_xfr_reader > out_file
 */
-#include "semun.h"              /* Definition of semun union */
+#include "semun.h" /* Definition of semun union */
 #include "svshm_xfr.h"
 
 int
@@ -59,20 +59,20 @@ main(int argc, char *argv[])
         errExit("shmget");
 
     shmp = shmat(shmid, NULL, 0);
-    if (shmp == (void *) -1)
+    if (shmp == (void *)-1)
         errExit("shmat");
 
     /* Transfer blocks of data from stdin to shared memory */
 
-    for (xfrs = 0, bytes = 0; ; xfrs++, bytes += shmp->cnt) {
-        if (reserveSem(semid, WRITE_SEM) == -1)         /* Wait for our turn */
+    for (xfrs = 0, bytes = 0;; xfrs++, bytes += shmp->cnt) {
+        if (reserveSem(semid, WRITE_SEM) == -1) /* Wait for our turn */
             errExit("reserveSem");
 
         shmp->cnt = read(STDIN_FILENO, shmp->buf, BUF_SIZE);
         if (shmp->cnt == -1)
             errExit("read");
 
-        if (releaseSem(semid, READ_SEM) == -1)          /* Give reader a turn */
+        if (releaseSem(semid, READ_SEM) == -1) /* Give reader a turn */
             errExit("releaseSem");
 
         /* Have we reached EOF? We test this after giving the reader

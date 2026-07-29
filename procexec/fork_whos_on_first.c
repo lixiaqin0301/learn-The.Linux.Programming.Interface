@@ -20,8 +20,8 @@
    Whether the child or the parent is scheduled first after fork() has
    changed a number of times across different kernel versions.
 */
-#include <sys/wait.h>
 #include "tlpi_hdr.h"
+#include <sys/wait.h>
 
 int
 main(int argc, char *argv[])
@@ -34,7 +34,7 @@ main(int argc, char *argv[])
 
     numChildren = (argc > 1) ? getInt(argv[1], GN_GT_0, "num-children") : 1;
 
-    setbuf(stdout, NULL);               /* Make stdout unbuffered */
+    setbuf(stdout, NULL); /* Make stdout unbuffered */
 
     for (j = 0; j < numChildren; j++) {
         switch (childPid = fork()) {
@@ -47,7 +47,7 @@ main(int argc, char *argv[])
 
         default:
             printf("%d parent\n", j);
-            wait(NULL);                 /* Wait for child to terminate */
+            wait(NULL); /* Wait for child to terminate */
             break;
         }
     }

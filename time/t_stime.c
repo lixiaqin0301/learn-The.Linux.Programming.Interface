@@ -16,14 +16,14 @@
 
    Requires superuser privileges.
 */
-#define _SVID_SOURCE            /* For stime() */
-#if ! defined(__sun)
+#define _SVID_SOURCE /* For stime() */
+#if !defined(__sun)
 #ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE           /* For strptime() */
+#define _XOPEN_SOURCE /* For strptime() */
 #endif
 #endif
-#include <time.h>
 #include "tlpi_hdr.h"
+#include <time.h>
 
 int
 main(int argc, char *argv[])

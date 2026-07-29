@@ -14,9 +14,9 @@
 
    Implementation of readLine().
 */
-#include <unistd.h>
+#include "read_line.h" /* Declaration of readLine() */
 #include <errno.h>
-#include "read_line.h"                  /* Declaration of readLine() */
+#include <unistd.h>
 
 /* Read characters from 'fd' until a newline is encountered. If a newline
   character is not encountered in the first (n - 1) bytes, then the excess
@@ -29,8 +29,8 @@
 ssize_t
 readLine(int fd, void *buffer, size_t n)
 {
-    ssize_t numRead;                    /* # of bytes fetched by last read() */
-    size_t totRead;                     /* Total bytes read so far */
+    ssize_t numRead; /* # of bytes fetched by last read() */
+    size_t totRead; /* Total bytes read so far */
     char *buf;
     char ch;
 
@@ -39,26 +39,26 @@ readLine(int fd, void *buffer, size_t n)
         return -1;
     }
 
-    buf = buffer;                       /* No pointer arithmetic on "void *" */
+    buf = buffer; /* No pointer arithmetic on "void *" */
 
     totRead = 0;
     for (;;) {
         numRead = read(fd, &ch, 1);
 
         if (numRead == -1) {
-            if (errno == EINTR)         /* Interrupted --> restart read() */
+            if (errno == EINTR) /* Interrupted --> restart read() */
                 continue;
             else
-                return -1;              /* Some other error */
+                return -1; /* Some other error */
 
-        } else if (numRead == 0) {      /* EOF */
-            if (totRead == 0)           /* No bytes read; return 0 */
+        } else if (numRead == 0) { /* EOF */
+            if (totRead == 0) /* No bytes read; return 0 */
                 return 0;
-            else                        /* Some bytes read; add '\0' */
+            else /* Some bytes read; add '\0' */
                 break;
 
-        } else {                        /* 'numRead' must be 1 if we get here */
-            if (totRead < n - 1) {      /* Discard > (n - 1) bytes */
+        } else { /* 'numRead' must be 1 if we get here */
+            if (totRead < n - 1) { /* Discard > (n - 1) bytes */
                 totRead++;
                 *buf++ = ch;
             }

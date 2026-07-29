@@ -19,9 +19,9 @@
    Note: some UNIX implementations do not provide clearenv(), setenv(),
    and unsetenv().
 */
-#define _GNU_SOURCE     /* Get various declarations from <stdlib.h> */
-#include <stdlib.h>
+#define _GNU_SOURCE /* Get various declarations from <stdlib.h> */
 #include "tlpi_hdr.h"
+#include <stdlib.h>
 
 extern char **environ;
 
@@ -31,7 +31,7 @@ main(int argc, char *argv[])
     int j;
     char **ep;
 
-    clearenv();         /* Erase entire environment */
+    clearenv(); /* Erase entire environment */
 
     /* Add any definitions specified on command line to environment */
 

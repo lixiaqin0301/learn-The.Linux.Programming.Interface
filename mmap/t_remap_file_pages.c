@@ -18,12 +18,12 @@
    This program is Linux-specific. The remap_file_pages() system call is
    supported since kernel 2.6.
 */
-#define _GNU_SOURCE             /* Get remap_file_pages() declaration
-                                   from <sys/mman.h> */
-#include <sys/stat.h>
+#define _GNU_SOURCE /* Get remap_file_pages() declaration                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+                       from <sys/mman.h> */
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <sys/mman.h>
-#include "tlpi_hdr.h"
+#include <sys/stat.h>
 
 int
 main(int argc, char *argv[])
@@ -63,9 +63,9 @@ main(int argc, char *argv[])
 
     /* Now we modify the contents of the mapping */
 
-    for (j = 0; j < 0x100; j++)         /* Modifies page 2 of file */
+    for (j = 0; j < 0x100; j++) /* Modifies page 2 of file */
         *(addr + j) = '0';
-    for (j = 0; j < 0x100; j++)         /* Modifies page 0 of file */
+    for (j = 0; j < 0x100; j++) /* Modifies page 0 of file */
         *(addr + 2 * pageSize + j) = '2';
 
     system("od -a /tmp/tfile");

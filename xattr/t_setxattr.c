@@ -18,8 +18,8 @@
 
    See also view_xattr.c.
 */
-#include <sys/xattr.h>
 #include "tlpi_hdr.h"
+#include <sys/xattr.h>
 
 int
 main(int argc, char *argv[])

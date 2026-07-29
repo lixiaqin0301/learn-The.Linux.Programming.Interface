@@ -15,15 +15,15 @@
    Demonstrate the use of a timer to place a timeout on a blocking system call
    (read(2) in this case).
 */
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 #define BUF_SIZE 200
 
-static void     /* SIGALRM handler: interrupts blocked system call */
+static void /* SIGALRM handler: interrupts blocked system call */
 handler(int sig)
 {
-    printf("Caught signal\n");          /* UNSAFE (see Section 21.1.2) */
+    printf("Caught signal\n"); /* UNSAFE (see Section 21.1.2) */
 }
 
 int
@@ -50,8 +50,8 @@ main(int argc, char *argv[])
 
     numRead = read(STDIN_FILENO, buf, BUF_SIZE);
 
-    savedErrno = errno;                 /* In case alarm() changes it */
-    alarm(0);                           /* Ensure timer is turned off */
+    savedErrno = errno; /* In case alarm() changes it */
+    alarm(0); /* Ensure timer is turned off */
     errno = savedErrno;
 
     /* Determine result of read() */
@@ -62,8 +62,7 @@ main(int argc, char *argv[])
         else
             errMsg("read");
     } else {
-        printf("Successful read (%ld bytes): %.*s",
-                (long) numRead, (int) numRead, buf);
+        printf("Successful read (%ld bytes): %.*s", (long)numRead, (int)numRead, buf);
     }
 
     exit(EXIT_SUCCESS);

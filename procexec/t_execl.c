@@ -14,8 +14,8 @@
 
    Demonstrate the use of execl() to execute printenv(1).
 */
-#include <stdlib.h>
 #include "tlpi_hdr.h"
+#include <stdlib.h>
 
 int
 main(int argc, char *argv[])
@@ -26,6 +26,6 @@ main(int argc, char *argv[])
 
     /* exec printenv to display the USER and SHELL environment vars */
 
-    execl("/usr/bin/printenv", "printenv", "USER", "SHELL", (char *) NULL);
-    errExit("execl");           /* If we get here, something went wrong */
+    execl("/usr/bin/printenv", "printenv", "USER", "SHELL", (char *)NULL);
+    errExit("execl"); /* If we get here, something went wrong */
 }

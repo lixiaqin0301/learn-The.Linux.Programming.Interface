@@ -19,18 +19,18 @@
    logMessage(), and readConfigFile() were omitted for brevity. The version
    of the code in this file is complete, and can be compiled and run.
 */
-#include <sys/stat.h>
-#include <signal.h>
 #include "become_daemon.h"
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <sys/stat.h>
 
 static const char *LOG_FILE = "/tmp/ds.log";
 static const char *CONFIG_FILE = "/tmp/ds.conf";
 
-#include <time.h>
 #include <stdarg.h>
+#include <time.h>
 
-static FILE *logfp;                 /* Log file stream */
+static FILE *logfp; /* Log file stream */
 
 /* Write a message to the log file. Handle variable length argument
    lists, with an initial format string (like printf(3), but without
@@ -40,16 +40,15 @@ static void
 logMessage(const char *format, ...)
 {
     va_list argList;
-    const char *TIMESTAMP_FMT = "%F %X";        /* = YYYY-MM-DD HH:MM:SS */
-#define TS_BUF_SIZE sizeof("YYYY-MM-DD HH:MM:SS")       /* Includes '\0' */
+    const char *TIMESTAMP_FMT = "%F %X"; /* = YYYY-MM-DD HH:MM:SS */
+#define TS_BUF_SIZE sizeof("YYYY-MM-DD HH:MM:SS") /* Includes '\0' */
     char timestamp[TS_BUF_SIZE];
     time_t t;
     struct tm *loc;
 
     t = time(NULL);
     loc = localtime(&t);
-    if (loc == NULL ||
-           strftime(timestamp, TS_BUF_SIZE, TIMESTAMP_FMT, loc) == 0)
+    if (loc == NULL || strftime(timestamp, TS_BUF_SIZE, TIMESTAMP_FMT, loc) == 0)
         fprintf(logfp, "???Unknown time????: ");
     else
         fprintf(logfp, "%s: ", timestamp);
@@ -76,7 +75,7 @@ logOpen(const char *logFilename)
     if (logfp == NULL)
         exit(EXIT_FAILURE);
 
-    setbuf(logfp, NULL);                    /* Disable stdio buffering */
+    setbuf(logfp, NULL); /* Disable stdio buffering */
 
     logMessage("Opened log file");
 }
@@ -103,18 +102,18 @@ readConfigFile(const char *configFilename)
     char str[SBUF_SIZE];
 
     configfp = fopen(configFilename, "r");
-    if (configfp != NULL) {                 /* Ignore nonexistent file */
+    if (configfp != NULL) { /* Ignore nonexistent file */
         if (fgets(str, SBUF_SIZE, configfp) == NULL)
             str[0] = '\0';
         else
-            str[strlen(str) - 1] = '\0';    /* Strip trailing '\n' */
+            str[strlen(str) - 1] = '\0'; /* Strip trailing '\n' */
         logMessage("Read config file: %s", str);
         fclose(configfp);
     }
 }
 
 static volatile sig_atomic_t hupReceived = 0;
-                        /* Set nonzero on receipt of SIGHUP */
+/* Set nonzero on receipt of SIGHUP */
 
 static void
 sighupHandler(int sig)
@@ -125,9 +124,9 @@ sighupHandler(int sig)
 int
 main(int argc, char *argv[])
 {
-    const int SLEEP_TIME = 15;      /* Time to sleep between messages */
-    int count = 0;                  /* Number of completed SLEEP_TIME intervals */
-    int unslept;                    /* Time remaining in sleep interval */
+    const int SLEEP_TIME = 15; /* Time to sleep between messages */
+    int count = 0; /* Number of completed SLEEP_TIME intervals */
+    int unslept; /* Time remaining in sleep interval */
     struct sigaction sa;
 
     sigemptyset(&sa.sa_mask);
@@ -145,19 +144,19 @@ main(int argc, char *argv[])
     unslept = SLEEP_TIME;
 
     for (;;) {
-        unslept = sleep(unslept);       /* Returns > 0 if interrupted */
+        unslept = sleep(unslept); /* Returns > 0 if interrupted */
 
-        if (hupReceived) {              /* If we got SIGHUP... */
-            hupReceived = 0;            /* Get ready for next SIGHUP */
+        if (hupReceived) { /* If we got SIGHUP... */
+            hupReceived = 0; /* Get ready for next SIGHUP */
             logClose();
             logOpen(LOG_FILE);
             readConfigFile(CONFIG_FILE);
         }
 
-        if (unslept == 0) {             /* On completed interval */
+        if (unslept == 0) { /* On completed interval */
             count++;
             logMessage("Main: %d", count);
-            unslept = SLEEP_TIME;       /* Reset interval */
+            unslept = SLEEP_TIME; /* Reset interval */
         }
     }
 }

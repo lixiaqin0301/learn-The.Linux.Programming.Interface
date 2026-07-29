@@ -16,38 +16,38 @@
    to create two children. The first one execs ls(1), which writes to
    the pipe, the second execs wc(1) to read from the pipe.
 */
-#include <sys/wait.h>
 #include "tlpi_hdr.h"
+#include <sys/wait.h>
 
 int
 main(int argc, char *argv[])
 {
-    int pfd[2];                                     /* Pipe file descriptors */
+    int pfd[2]; /* Pipe file descriptors */
 
-    if (pipe(pfd) == -1)                            /* Create pipe */
+    if (pipe(pfd) == -1) /* Create pipe */
         errExit("pipe");
 
     switch (fork()) {
     case -1:
         errExit("fork");
 
-    case 0:             /* First child: exec 'ls' to write to pipe */
-        if (close(pfd[0]) == -1)                    /* Read end is unused */
+    case 0: /* First child: exec 'ls' to write to pipe */
+        if (close(pfd[0]) == -1) /* Read end is unused */
             errExit("close 1");
 
         /* Duplicate stdout on write end of pipe; close duplicated descriptor */
 
-        if (pfd[1] != STDOUT_FILENO) {              /* Defensive check */
+        if (pfd[1] != STDOUT_FILENO) { /* Defensive check */
             if (dup2(pfd[1], STDOUT_FILENO) == -1)
                 errExit("dup2 1");
             if (close(pfd[1]) == -1)
                 errExit("close 2");
         }
 
-        execlp("ls", "ls", (char *) NULL);          /* Writes to pipe */
+        execlp("ls", "ls", (char *)NULL); /* Writes to pipe */
         errExit("execlp ls");
 
-    default:            /* Parent falls through to create next child */
+    default: /* Parent falls through to create next child */
         break;
     }
 
@@ -55,20 +55,20 @@ main(int argc, char *argv[])
     case -1:
         errExit("fork");
 
-    case 0:             /* Second child: exec 'wc' to read from pipe */
-        if (close(pfd[1]) == -1)                    /* Write end is unused */
+    case 0: /* Second child: exec 'wc' to read from pipe */
+        if (close(pfd[1]) == -1) /* Write end is unused */
             errExit("close 3");
 
         /* Duplicate stdin on read end of pipe; close duplicated descriptor */
 
-        if (pfd[0] != STDIN_FILENO) {               /* Defensive check */
+        if (pfd[0] != STDIN_FILENO) { /* Defensive check */
             if (dup2(pfd[0], STDIN_FILENO) == -1)
                 errExit("dup2 2");
             if (close(pfd[0]) == -1)
                 errExit("close 4");
         }
 
-        execlp("wc", "wc", "-l", (char *) NULL);
+        execlp("wc", "wc", "-l", (char *)NULL);
         errExit("execlp wc");
 
     default: /* Parent falls through */

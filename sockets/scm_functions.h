@@ -15,12 +15,12 @@
    Functions to exchange ancillary data over a UNIX domain socket.
 */
 #ifndef SCM_FUNCTIONS_H
-#define SCM_FUNCTIONS_H         /* Prevent accidental double inclusion */
+#define SCM_FUNCTIONS_H /* Prevent accidental double inclusion */
 
+#include <errno.h>
+#include <stdio.h>
 #include <sys/socket.h>
 #include <sys/un.h>
-#include <stdio.h>
-#include <errno.h>
 
 int sendfd(int sockfd, int fd);
 

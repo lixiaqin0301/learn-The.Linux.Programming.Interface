@@ -25,43 +25,43 @@
 
    This program is Linux-specific.
 */
-#include <sys/mount.h>
 #include "tlpi_hdr.h"
+#include <sys/mount.h>
 
-#ifndef MS_DIRSYNC      /* May not be defined in older glibc headers */
+#ifndef MS_DIRSYNC /* May not be defined in older glibc headers */
 #define MS_DIRSYNC 128
 #endif
 
-#ifndef MS_BIND         /* May not be defined in older glibc headers */
+#ifndef MS_BIND /* May not be defined in older glibc headers */
 #define MS_BIND 4096
 #endif
 
-#ifndef MS_MOVE         /* May not be defined in older glibc headers */
+#ifndef MS_MOVE /* May not be defined in older glibc headers */
 #define MS_MOVE 8192
 #endif
 
-#ifndef MS_REC          /* May not be defined in older glibc headers */
+#ifndef MS_REC /* May not be defined in older glibc headers */
 #define MS_REC 16384
 #endif
 
-#ifndef MS_UNBINDABLE   /* May not be defined in older glibc headers */
-#define MS_UNBINDABLE (1<<17) /* change to unbindable */
+#ifndef MS_UNBINDABLE /* May not be defined in older glibc headers */
+#define MS_UNBINDABLE (1 << 17) /* change to unbindable */
 #endif
 
-#ifndef MS_PRIVATE      /* May not be defined in older glibc headers */
-#define MS_PRIVATE (1<<18) /* change to private */
+#ifndef MS_PRIVATE /* May not be defined in older glibc headers */
+#define MS_PRIVATE (1 << 18) /* change to private */
 #endif
 
-#ifndef MS_SLAVE        /* May not be defined in older glibc headers */
-#define MS_SLAVE (1<<19) /* change to slave */
+#ifndef MS_SLAVE /* May not be defined in older glibc headers */
+#define MS_SLAVE (1 << 19) /* change to slave */
 #endif
 
-#ifndef MS_SHARED       /* May not be defined in older glibc headers */
-#define MS_SHARED (1<<20) /* change to shared */
+#ifndef MS_SHARED /* May not be defined in older glibc headers */
+#define MS_SHARED (1 << 20) /* change to shared */
 #endif
 
 #ifndef MS_LAZYTIME
-#define MS_LAZYTIME     (1<<25)
+#define MS_LAZYTIME (1 << 25)
 #endif
 
 static void
@@ -72,7 +72,7 @@ usageError(const char *progName, const char *msg)
 
     fprintf(stderr, "Usage: %s [options] source target\n\n", progName);
     fprintf(stderr, "Available options:\n");
-#define fpe(str) fprintf(stderr, "    " str)    /* Shorter! */
+#define fpe(str) fprintf(stderr, "    " str) /* Shorter! */
     fpe("-t fstype        [e.g., 'ext2' or 'reiserfs']\n");
     fpe("-o data          [file system-dependent options,\n");
     fpe("                 e.g., 'bsdgroups' for ext2]\n");
@@ -128,25 +128,62 @@ main(int argc, char *argv[])
                    in the version of the program shown in the book */
 
                 switch (optarg[j]) {
-                case 'b': flags |= MS_BIND;             break;
-                case 'd': flags |= MS_DIRSYNC;          break;
-                case 'l': flags |= MS_MANDLOCK;         break;
-                case 'm': flags |= MS_MOVE;             break;
-                case 'A': flags |= MS_NOATIME;          break;
-                case 'V': flags |= MS_NODEV;            break;
-                case 'D': flags |= MS_NODIRATIME;       break;
-                case 'E': flags |= MS_NOEXEC;           break;
-                case 'S': flags |= MS_NOSUID;           break;
-                case 'p': flags |= MS_PRIVATE;          break;
-                case 'r': flags |= MS_RDONLY;           break;
-                case 'c': flags |= MS_REC;              break;
-                case 'T': flags |= MS_RELATIME;         break;
-                case 'R': flags |= MS_REMOUNT;          break;
-                case 'h': flags |= MS_SHARED;           break;
-                case 'v': flags |= MS_SLAVE;            break;
-                case 's': flags |= MS_SYNCHRONOUS;      break;
-                case 'u': flags |= MS_UNBINDABLE;       break;
-                default:  usageError(argv[0], NULL);
+                case 'b':
+                    flags |= MS_BIND;
+                    break;
+                case 'd':
+                    flags |= MS_DIRSYNC;
+                    break;
+                case 'l':
+                    flags |= MS_MANDLOCK;
+                    break;
+                case 'm':
+                    flags |= MS_MOVE;
+                    break;
+                case 'A':
+                    flags |= MS_NOATIME;
+                    break;
+                case 'V':
+                    flags |= MS_NODEV;
+                    break;
+                case 'D':
+                    flags |= MS_NODIRATIME;
+                    break;
+                case 'E':
+                    flags |= MS_NOEXEC;
+                    break;
+                case 'S':
+                    flags |= MS_NOSUID;
+                    break;
+                case 'p':
+                    flags |= MS_PRIVATE;
+                    break;
+                case 'r':
+                    flags |= MS_RDONLY;
+                    break;
+                case 'c':
+                    flags |= MS_REC;
+                    break;
+                case 'T':
+                    flags |= MS_RELATIME;
+                    break;
+                case 'R':
+                    flags |= MS_REMOUNT;
+                    break;
+                case 'h':
+                    flags |= MS_SHARED;
+                    break;
+                case 'v':
+                    flags |= MS_SLAVE;
+                    break;
+                case 's':
+                    flags |= MS_SYNCHRONOUS;
+                    break;
+                case 'u':
+                    flags |= MS_UNBINDABLE;
+                    break;
+                default:
+                    usageError(argv[0], NULL);
                 }
             }
             break;

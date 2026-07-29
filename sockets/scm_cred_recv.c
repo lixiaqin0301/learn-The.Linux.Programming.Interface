@@ -47,12 +47,12 @@ main(int argc, char *argv[])
        requirements of any type */
 
     union {
-        char   buf[CMSG_SPACE(sizeof(struct ucred))];
-                        /* Space large enough to hold a 'ucred' structure */
+        char buf[CMSG_SPACE(sizeof(struct ucred))];
+        /* Space large enough to hold a 'ucred' structure */
         struct cmsghdr align;
     } controlMsg;
-    struct cmsghdr *cmsgp;      /* Pointer used to iterate through
-                                   headers in ancillary data */
+    struct cmsghdr *cmsgp; /* Pointer used to iterate through
+                              headers in ancillary data */
     socklen_t len;
 
     /* Parse command-line options */
@@ -67,7 +67,8 @@ main(int argc, char *argv[])
 
         default:
             usageErr("%s [-d]\n"
-                    "        -d    use datagram socket\n", argv[0]);
+                     "        -d    use datagram socket\n",
+                argv[0]);
         }
     }
 
@@ -127,7 +128,7 @@ main(int argc, char *argv[])
     nr = recvmsg(sfd, &msgh, 0);
     if (nr == -1)
         errExit("recvmsg");
-    printf("recvmsg() returned %ld\n", (long) nr);
+    printf("recvmsg() returned %ld\n", (long)nr);
 
     if (nr > 0)
         printf("Received data = %d\n", data);
@@ -149,12 +150,11 @@ main(int argc, char *argv[])
     /* The data area of the 'cmsghdr' is a 'struct ucred', so assign
        the address of the data area to a suitable pointer */
 
-    ucredp = (struct ucred *) CMSG_DATA(cmsgp);
+    ucredp = (struct ucred *)CMSG_DATA(cmsgp);
 
     /* Display the credentials from the received data area */
 
-    printf("Received credentials pid=%ld, uid=%ld, gid=%ld\n",
-                (long) ucredp->pid, (long) ucredp->uid, (long) ucredp->gid);
+    printf("Received credentials pid=%ld, uid=%ld, gid=%ld\n", (long)ucredp->pid, (long)ucredp->uid, (long)ucredp->gid);
 
     /* The Linux-specific, read-only SO_PEERCRED socket option returns
        credential information about the peer, as described in socket(7).
@@ -165,8 +165,7 @@ main(int argc, char *argv[])
     if (getsockopt(sfd, SOL_SOCKET, SO_PEERCRED, &ucred, &len) == -1)
         errExit("getsockopt");
 
-    printf("Credentials from SO_PEERCRED: pid=%ld, euid=%ld, egid=%ld\n",
-            (long) ucred.pid, (long) ucred.uid, (long) ucred.gid);
+    printf("Credentials from SO_PEERCRED: pid=%ld, euid=%ld, egid=%ld\n", (long)ucred.pid, (long)ucred.uid, (long)ucred.gid);
 
     exit(EXIT_SUCCESS);
 }

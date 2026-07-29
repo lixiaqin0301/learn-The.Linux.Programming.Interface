@@ -16,12 +16,12 @@
 
    Usage: catch_SIGHUP [x] [ > logfile 2>&1 ]
 */
-#if ! defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 500
+#if !defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 500
 #define _XOPEN_SOURCE 500
 #endif
-#include <unistd.h>
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <unistd.h>
 
 static void
 handler(int sig)
@@ -34,7 +34,7 @@ main(int argc, char *argv[])
     pid_t childPid;
     struct sigaction sa;
 
-    setbuf(stdout, NULL);       /* Make stdout unbuffered */
+    setbuf(stdout, NULL); /* Make stdout unbuffered */
 
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
@@ -47,16 +47,15 @@ main(int argc, char *argv[])
         errExit("fork");
 
     if (childPid == 0 && argc > 1)
-        if (setpgid(0, 0) == -1)        /* Move to new process group */
+        if (setpgid(0, 0) == -1) /* Move to new process group */
             errExit("setpgid");
 
-    printf("PID=%ld; PPID=%ld; PGID=%ld; SID=%ld\n", (long) getpid(),
-            (long) getppid(), (long) getpgrp(), (long) getsid(0));
+    printf("PID=%ld; PPID=%ld; PGID=%ld; SID=%ld\n", (long)getpid(), (long)getppid(), (long)getpgrp(), (long)getsid(0));
 
-    alarm(60);                  /* An unhandled SIGALRM ensures this process
-                                   will die if nothing else terminates it */
-    for (;;) {                  /* Wait for signals */
+    alarm(60); /* An unhandled SIGALRM ensures this process
+                  will die if nothing else terminates it */
+    for (;;) { /* Wait for signals */
         pause();
-        printf("%ld: caught SIGHUP\n", (long) getpid());
+        printf("%ld: caught SIGHUP\n", (long)getpid());
     }
 }

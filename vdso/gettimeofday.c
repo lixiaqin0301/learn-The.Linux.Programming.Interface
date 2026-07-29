@@ -54,10 +54,10 @@
         time ./syscall_gettimeofday 10000000
         time ./vdso_gettimeofday    10000000
 */
-#define _GNU_SOURCE         /* See feature_test_macros(7) */
+#define _GNU_SOURCE /* See feature_test_macros(7) */
+#include "tlpi_hdr.h"
 #include <sys/syscall.h>
 #include <sys/time.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])

@@ -45,29 +45,31 @@
 */
 
 #define _GNU_SOURCE
-#include <sys/select.h>
-#include <sys/stat.h>
-#include <limits.h>
-#include <sys/select.h>
-#include <sys/inotify.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <ftw.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdarg.h>
-#include <sys/types.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <errno.h>
+#include <sys/inotify.h>
+#include <sys/select.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 /* logMessage() flags */
 
-#define VB_BASIC 1      /* Basic messages */
-#define VB_NOISY 2      /* Verbose messages */
+#define VB_BASIC 1 /* Basic messages */
+#define VB_NOISY 2 /* Verbose messages */
 
 static int verboseMask;
 static int checkCache;
@@ -78,11 +80,10 @@ static int abortOnCacheProblem;
 
 static FILE *logfp = NULL;
 
-static int inotifyReadCnt = 0;          /* Counts number of read()s from
-                                           inotify file descriptor */
+static int inotifyReadCnt = 0; /* Counts number of read()s from
+                                  inotify file descriptor */
 
-static const int INOTIFY_READ_BUF_LEN =
-        (100 * (sizeof(struct inotify_event) + NAME_MAX + 1));
+static const int INOTIFY_READ_BUF_LEN = (100 * (sizeof(struct inotify_event) + NAME_MAX + 1));
 
 static void dumpCacheToLog(void);
 
@@ -90,8 +91,7 @@ static void dumpCacheToLog(void);
    'rand_dtree' processes to stop, dump a copy of the cache to the
    log file, and abort. */
 
-__attribute__ ((__noreturn__))
-static void
+__attribute__((__noreturn__)) static void
 createStopFileAndAbort(void)
 {
     open(stopFile, O_CREAT | O_RDWR, 0600);
@@ -178,13 +178,13 @@ displayInotifyEvent(struct inotify_event *ev)
    efficient, but our main goal is to demonstrate the use of inotify. */
 
 struct watch {
-    int wd;                     /* Watch descriptor (-1 if slot unused) */
-    char path[PATH_MAX];        /* Cached pathname */
+    int wd; /* Watch descriptor (-1 if slot unused) */
+    char path[PATH_MAX]; /* Cached pathname */
 };
 
-struct watch *wlCache = NULL;   /* Array of cached items */
+struct watch *wlCache = NULL; /* Array of cached items */
 
-static int cacheSize = 0;       /* Current size of the array */
+static int cacheSize = 0; /* Current size of the array */
 
 /* Deallocate the watch cache */
 
@@ -210,21 +210,19 @@ checkCacheConsistency(void)
         if (wlCache[j].wd >= 0) {
             if (lstat(wlCache[j].path, &sb) == -1) {
                 logMessage(0,
-                        "checkCacheConsistency: stat: "
-                        "[slot = %d; wd = %d] %s: %s\n",
-                        j, wlCache[j].wd, wlCache[j].path, strerror(errno));
+                    "checkCacheConsistency: stat: "
+                    "[slot = %d; wd = %d] %s: %s\n",
+                    j, wlCache[j].wd, wlCache[j].path, strerror(errno));
                 failures++;
-        } else if (!S_ISDIR(sb.st_mode)) {
-            logMessage(0, "checkCacheConsistency: %s is not a directory\n",
-                                wlCache[j].path);
-                    exit(EXIT_FAILURE);
+            } else if (!S_ISDIR(sb.st_mode)) {
+                logMessage(0, "checkCacheConsistency: %s is not a directory\n", wlCache[j].path);
+                exit(EXIT_FAILURE);
             }
         }
     }
 
     if (failures > 0)
-        logMessage(VB_NOISY, "checkCacheConsistency: %d failures\n",
-                   failures);
+        logMessage(VB_NOISY, "checkCacheConsistency: %d failures\n", failures);
 }
 
 /* Check whether the cache contains the watch descriptor 'wd'.
@@ -276,9 +274,7 @@ findWatchChecked(int wd)
 static void
 markCacheSlotEmpty(int slot)
 {
-    logMessage(VB_NOISY,
-            "        markCacheSlotEmpty: slot = %d;  wd = %d; path = %s\n",
-            slot, wlCache[slot].wd, wlCache[slot].path);
+    logMessage(VB_NOISY, "        markCacheSlotEmpty: slot = %d;  wd = %d; path = %s\n", slot, wlCache[slot].wd, wlCache[slot].path);
 
     wlCache[slot].wd = -1;
     wlCache[slot].path[0] = '\0';
@@ -306,8 +302,8 @@ findEmptyCacheSlot(void)
     for (int j = cacheSize - ALLOC_INCR; j < cacheSize; j++)
         markCacheSlotEmpty(j);
 
-    return cacheSize - ALLOC_INCR;      /* Return first slot in
-                                           newly allocated space */
+    return cacheSize - ALLOC_INCR; /* Return first slot in
+                                      newly allocated space */
 }
 
 /* Add an item to the cache */
@@ -357,8 +353,7 @@ dumpCacheToLog(void)
 
     for (int j = 0; j < cacheSize; j++) {
         if (wlCache[j].wd >= 0) {
-            fprintf(logfp, "%d: wd = %d; %s\n", j,
-                    wlCache[j].wd, wlCache[j].path);
+            fprintf(logfp, "%d: wd = %d; %s\n", j, wlCache[j].wd, wlCache[j].path);
             cnt++;
         }
     }
@@ -373,11 +368,11 @@ dumpCacheToLog(void)
    the trees that we will monitor */
 
 static char **rootDirPaths; /* List of pathnames supplied on command line */
-static int numRootDirs;     /* Number of pathnames supplied on command line */
-static int ignoreRootDirs;  /* Number of command-line pathnames that
-                               we've ceased to monitor */
+static int numRootDirs; /* Number of pathnames supplied on command line */
+static int ignoreRootDirs; /* Number of command-line pathnames that
+                              we've ceased to monitor */
 static struct stat *rootDirStat;
-                            /* stat(2) structures for root directories */
+/* stat(2) structures for root directories */
 
 /* Duplicate the pathnames supplied on the command line, perform
    some sanity checking along the way */
@@ -400,7 +395,7 @@ copyRootDirPaths(char *argv[])
             exit(EXIT_FAILURE);
         }
 
-        if (! S_ISDIR(sb.st_mode)) {
+        if (!S_ISDIR(sb.st_mode)) {
             fprintf(stderr, "'%s' is not a directory\n", *p);
             exit(EXIT_FAILURE);
         }
@@ -436,11 +431,9 @@ copyRootDirPaths(char *argv[])
             errExit("lstat");
 
         for (int k = 0; k < j; k++) {
-            if ((rootDirStat[j].st_ino == rootDirStat[k].st_ino) &&
-                (rootDirStat[j].st_dev == rootDirStat[k].st_dev)) {
+            if ((rootDirStat[j].st_ino == rootDirStat[k].st_ino) && (rootDirStat[j].st_dev == rootDirStat[k].st_dev)) {
 
-                fprintf(stderr, "Duplicate filesystem objects: %s, %s\n",
-                        argv[j], argv[k]);
+                fprintf(stderr, "Duplicate filesystem objects: %s, %s\n", argv[j], argv[k]);
                 exit(EXIT_FAILURE);
             }
         }
@@ -505,17 +498,16 @@ zapRootDirPath(const char *path)
    function invoked by nftw(), so we use these global variables to
    exchange information with the function. */
 
-static int dirCnt;      /* Count of directories added to watch list */
-static int ifd;         /* Inotify file descriptor */
+static int dirCnt; /* Count of directories added to watch list */
+static int ifd; /* Inotify file descriptor */
 
 static int
-traverseTree(const char *pathname, const struct stat *sb, int tflag,
-             struct FTW *ftwbuf)
+traverseTree(const char *pathname, const struct stat *sb, int tflag, struct FTW *ftwbuf)
 {
     int wd, slot, flags;
 
-    if (! S_ISDIR(sb->st_mode))
-        return 0;               /* Ignore nondirectory files */
+    if (!S_ISDIR(sb->st_mode))
+        return 0; /* Ignore nondirectory files */
 
     /* Create a watch for this directory */
 
@@ -533,8 +525,7 @@ traverseTree(const char *pathname, const struct stat *sb, int tflag,
            carry on execution. Other errors are unexpected, and if we
            hit them, we give up. */
 
-        logMessage(VB_BASIC, "inotify_add_watch: %s: %s\n",
-                pathname, strerror(errno));
+        logMessage(VB_BASIC, "inotify_add_watch: %s: %s\n", pathname, strerror(errno));
         if (errno == ENOENT)
             return 0;
         else
@@ -558,8 +549,7 @@ traverseTree(const char *pathname, const struct stat *sb, int tflag,
 
     /* Print the name of the current directory */
 
-    logMessage(VB_NOISY, "    watchDir: wd = %d [cache slot: %d]; %s\n",
-                wd, slot, pathname);
+    logMessage(VB_NOISY, "    watchDir: wd = %d [cache slot: %d]; %s\n", wd, slot, pathname);
 
     return 0;
 }
@@ -583,8 +573,9 @@ watchDir(int inotifyFd, const char *pathname)
 
     if (nftw(pathname, traverseTree, 20, FTW_PHYS) == -1)
         logMessage(VB_BASIC,
-                "nftw: %s: %s (directory probably deleted before we "
-                "could watch)\n", pathname, strerror(errno));
+            "nftw: %s: %s (directory probably deleted before we "
+            "could watch)\n",
+            pathname, strerror(errno));
 
     return dirCnt;
 }
@@ -599,8 +590,7 @@ watchSubtree(int inotifyFd, char *path)
 
     cnt = watchDir(inotifyFd, path);
 
-    logMessage(VB_BASIC, "    watchSubtree: %s: %d entries added\n",
-            path, cnt);
+    logMessage(VB_BASIC, "    watchSubtree: %s: %d entries added\n", path, cnt);
 }
 
 /***********************************************************************/
@@ -611,8 +601,7 @@ watchSubtree(int inotifyFd, char *path)
    to reflect the change. */
 
 static void
-rewriteCachedPaths(const char *oldPathPrefix, const char *oldName,
-                   const char *newPathPrefix, const char *newName)
+rewriteCachedPaths(const char *oldPathPrefix, const char *oldName, const char *newPathPrefix, const char *newName)
 {
     char fullPath[PATH_MAX], newPrefix[PATH_MAX];
     char newPath[PATH_MAX];
@@ -626,18 +615,14 @@ rewriteCachedPaths(const char *oldPathPrefix, const char *oldName,
     logMessage(VB_BASIC, "Rename: %s ==> %s\n", fullPath, newPrefix);
 
     for (int j = 0; j < cacheSize; j++) {
-        if (strncmp(fullPath, wlCache[j].path, len) == 0 &&
-                    (wlCache[j].path[len] == '/' ||
-                     wlCache[j].path[len] == '\0')) {
-            s = snprintf(newPath, sizeof(newPath), "%s%s", newPrefix,
-                    &wlCache[j].path[len]);
+        if (strncmp(fullPath, wlCache[j].path, len) == 0 && (wlCache[j].path[len] == '/' || wlCache[j].path[len] == '\0')) {
+            s = snprintf(newPath, sizeof(newPath), "%s%s", newPrefix, &wlCache[j].path[len]);
             if (s > sizeof(newPath))
                 logMessage(VB_BASIC, "Truncated pathname: %s\n", newPath);
 
             strncpy(wlCache[j].path, newPath, PATH_MAX);
 
-            logMessage(VB_NOISY, "    wd %d [cache slot %d] ==> %s\n",
-                    wlCache[j].wd, j, newPath);
+            logMessage(VB_NOISY, "    wd %d [cache slot %d] ==> %s\n", wlCache[j].wd, j, newPath);
         }
     }
 }
@@ -668,17 +653,12 @@ zapSubtree(int inotifyFd, char *path)
 
     for (int j = 0; j < cacheSize; j++) {
         if (wlCache[j].wd >= 0) {
-            if (strncmp(pn, wlCache[j].path, len) == 0 &&
-                    (wlCache[j].path[len] == '/' ||
-                     wlCache[j].path[len] == '\0')) {
+            if (strncmp(pn, wlCache[j].path, len) == 0 && (wlCache[j].path[len] == '/' || wlCache[j].path[len] == '\0')) {
 
-                logMessage(VB_NOISY,
-                           "    removing watch: wd = %d (%s)\n",
-                           wlCache[j].wd, wlCache[j].path);
+                logMessage(VB_NOISY, "    removing watch: wd = %d (%s)\n", wlCache[j].wd, wlCache[j].path);
 
                 if (inotify_rm_watch(inotifyFd, wlCache[j].wd) == -1) {
-                    logMessage(0, "inotify_rm_watch wd = %d (%s): %s\n",
-                            wlCache[j].wd, wlCache[j].path, strerror(errno));
+                    logMessage(0, "inotify_rm_watch wd = %d (%s): %s\n", wlCache[j].wd, wlCache[j].path, strerror(errno));
 
                     /* When we have multiple renamers, sometimes
                        inotify_rm_watch() fails. In this case, we force a
@@ -718,8 +698,7 @@ reinitialize(int oldInotifyFd)
         close(oldInotifyFd);
 
         reinitCnt++;
-        logMessage(0, "Reinitializing cache and inotify FD (reinitCnt = %d)\n",
-                reinitCnt);
+        logMessage(0, "Reinitializing cache and inotify FD (reinitCnt = %d)\n", reinitCnt);
 
     } else {
         logMessage(0, "Initializing cache\n");
@@ -764,15 +743,15 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
     size_t evLen;
     int evCacheSlot;
 
-    ev = (struct inotify_event *) buf;
+    ev = (struct inotify_event *)buf;
 
     displayInotifyEvent(ev);
 
     if (ev->wd != -1 && !(ev->mask & IN_IGNORED)) {
 
-                /* IN_Q_OVERFLOW has (ev->wd == -1) */
-                /* Skip IN_IGNORED, since it will come after an event
-                   that has already zapped the corresponding cache entry */
+        /* IN_Q_OVERFLOW has (ev->wd == -1) */
+        /* Skip IN_IGNORED, since it will come after an event
+           that has already zapped the corresponding cache entry */
 
         /* Cache consistency check; see the discussion
            of "intra-tree" rename() events */
@@ -792,18 +771,15 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
 
     evLen = sizeof(struct inotify_event) + ev->len;
 
-    if ((ev->mask & IN_ISDIR) &&
-            (ev->mask & (IN_CREATE | IN_MOVED_TO))) {
+    if ((ev->mask & IN_ISDIR) && (ev->mask & (IN_CREATE | IN_MOVED_TO))) {
 
         /* A new subdirectory was created, or a subdirectory was
            renamed into the tree; create watches for it, and all
            of its subdirectories. */
 
-        snprintf(fullPath, sizeof(fullPath), "%s/%s",
-                 wlCache[evCacheSlot].path, ev->name);
+        snprintf(fullPath, sizeof(fullPath), "%s/%s", wlCache[evCacheSlot].path, ev->name);
 
-        logMessage(VB_BASIC, "Directory creation on wd %d: %s\n",
-                ev->wd, fullPath);
+        logMessage(VB_BASIC, "Directory creation on wd %d: %s\n", ev->wd, fullPath);
 
         /* We only watch the new subtree if it has not already been cached.
 
@@ -841,17 +817,15 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
         /* A directory was deleted. Remove the corresponding item from
            the cache. */
 
-        logMessage(VB_BASIC, "Clearing watchlist item %d (%s)\n",
-                   ev->wd, wlCache[evCacheSlot].path);
+        logMessage(VB_BASIC, "Clearing watchlist item %d (%s)\n", ev->wd, wlCache[evCacheSlot].path);
 
         if (isRootDirPath(wlCache[evCacheSlot].path))
             zapRootDirPath(wlCache[evCacheSlot].path);
 
         markCacheSlotEmpty(evCacheSlot);
-            /* No need to remove the watch; that happens automatically */
+        /* No need to remove the watch; that happens automatically */
 
-    } else if ((ev->mask & (IN_MOVED_FROM | IN_ISDIR)) ==
-               (IN_MOVED_FROM | IN_ISDIR)) {
+    } else if ((ev->mask & (IN_MOVED_FROM | IN_ISDIR)) == (IN_MOVED_FROM | IN_ISDIR)) {
 
         /* We have a "moved from" event. To know how to deal with it, we
            need to determine whether there is a following "moved to"
@@ -936,11 +910,9 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
 
         struct inotify_event *nextEv;
 
-        nextEv = (struct inotify_event *) (buf + evLen);
+        nextEv = (struct inotify_event *)(buf + evLen);
 
-        if (((char *) nextEv < buf + bufSize) &&
-                (nextEv->mask & IN_MOVED_TO) &&
-                (nextEv->cookie == ev->cookie)) {
+        if (((char *)nextEv < buf + bufSize) && (nextEv->mask & IN_MOVED_TO) && (nextEv->cookie == ev->cookie)) {
 
             int nextEvCacheSlot;
 
@@ -961,15 +933,14 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
                 return INOTIFY_READ_BUF_LEN;
             }
 
-            rewriteCachedPaths(wlCache[evCacheSlot].path, ev->name,
-                               wlCache[nextEvCacheSlot].path, nextEv->name);
+            rewriteCachedPaths(wlCache[evCacheSlot].path, ev->name, wlCache[nextEvCacheSlot].path, nextEv->name);
 
             /* We have also processed the next (IN_MOVED_TO) event,
                so skip over it */
 
             evLen += sizeof(struct inotify_event) + nextEv->len;
 
-        } else if (((char *) nextEv < buf + bufSize) || !firstTry) {
+        } else if (((char *)nextEv < buf + bufSize) || !firstTry) {
 
             /* We got a "moved from" event without an accompanying
                "moved to" event. The directory has been moved
@@ -977,12 +948,9 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
                remove the watches and zap the cache entries for
                the moved directory and all of its subdirectories. */
 
-            logMessage(VB_NOISY, "MOVED_OUT: %p %p\n",
-                    wlCache[evCacheSlot].path, ev->name);
-            logMessage(VB_NOISY, "firstTry = %d; remaining bytes = %d\n",
-                    firstTry, buf + bufSize - (char *) nextEv);
-            snprintf(fullPath, sizeof(fullPath), "%s/%s",
-                     wlCache[evCacheSlot].path, ev->name);
+            logMessage(VB_NOISY, "MOVED_OUT: %p %p\n", wlCache[evCacheSlot].path, ev->name);
+            logMessage(VB_NOISY, "firstTry = %d; remaining bytes = %d\n", firstTry, buf + bufSize - (char *)nextEv);
+            snprintf(fullPath, sizeof(fullPath), "%s/%s", wlCache[evCacheSlot].path, ev->name);
 
             if (zapSubtree(*inotifyFd, fullPath) == -1) {
 
@@ -998,7 +966,7 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
         } else {
             logMessage(VB_NOISY, "HANGING IN_MOVED_FROM\n");
 
-            return -1;  /* Tell our caller to do another read() */
+            return -1; /* Tell our caller to do another read() */
         }
 
     } else if (ev->mask & IN_Q_OVERFLOW) {
@@ -1007,8 +975,7 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
 
         overflowCnt++;
 
-        logMessage(0, "Queue overflow (%d) (inotifyReadCnt = %d)\n",
-                    overflowCnt, inotifyReadCnt);
+        logMessage(0, "Queue overflow (%d) (inotifyReadCnt = %d)\n", overflowCnt, inotifyReadCnt);
 
         /* When the queue overflows, some events are lost, at which
            point we've lost any chance of keeping our cache consistent
@@ -1029,14 +996,12 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
            There's nothing left for us to monitor, so we just zap the
            corresponding cache entry. */
 
-        logMessage(0, "Filesystem unmounted: %s\n",
-                wlCache[evCacheSlot].path);
+        logMessage(0, "Filesystem unmounted: %s\n", wlCache[evCacheSlot].path);
 
         markCacheSlotEmpty(evCacheSlot);
-            /* No need to remove the watch; that happens automatically */
+        /* No need to remove the watch; that happens automatically */
 
-    } else if (ev->mask & IN_MOVE_SELF &&
-            isRootDirPath(wlCache[evCacheSlot].path)) {
+    } else if (ev->mask & IN_MOVE_SELF && isRootDirPath(wlCache[evCacheSlot].path)) {
 
         /* If the root path moves to a new location in the same
            filesystem, then all cached pathnames become invalid, and we
@@ -1046,8 +1011,7 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
            that corresponds to that i-node. Instead, we'll keep things
            simple, and just cease monitoring it. */
 
-        logMessage(0, "Root path moved: %s\n",
-                    wlCache[evCacheSlot].path);
+        logMessage(0, "Root path moved: %s\n", wlCache[evCacheSlot].path);
 
         zapRootDirPath(wlCache[evCacheSlot].path);
 
@@ -1075,7 +1039,7 @@ processNextInotifyEvent(int *inotifyFd, char *buf, int bufSize, int firstTry)
 static void
 alarmHandler(int sig)
 {
-    return;             /* Just interrupt read() */
+    return; /* Just interrupt read() */
 }
 
 /* Read a block of events from the inotify file descriptor, 'inotifyFd'.
@@ -1086,8 +1050,7 @@ alarmHandler(int sig)
 static void
 processInotifyEvents(int *inotifyFd)
 {
-    char buf[INOTIFY_READ_BUF_LEN]
-        __attribute__ ((aligned(__alignof__(struct inotify_event))));
+    char buf[INOTIFY_READ_BUF_LEN] __attribute__((aligned(__alignof__(struct inotify_event))));
     ssize_t numRead, nr;
     size_t cnt;
     int evLen;
@@ -1117,15 +1080,12 @@ processInotifyEvents(int *inotifyFd)
 
     inotifyReadCnt++;
 
-    logMessage(VB_NOISY,
-               "\n==========> Read %d: got %zd bytes\n",
-               inotifyReadCnt, numRead);
+    logMessage(VB_NOISY, "\n==========> Read %d: got %zd bytes\n", inotifyReadCnt, numRead);
 
     /* Process each event in the buffer returned by read() */
 
-    for (char *evp = buf; evp < buf + numRead; ) {
-        evLen = processNextInotifyEvent(inotifyFd, evp,
-                                 buf + numRead - evp, firstTry);
+    for (char *evp = buf; evp < buf + numRead;) {
+        evLen = processNextInotifyEvent(inotifyFd, evp, buf + numRead - evp, firstTry);
 
         if (evLen > 0) {
             evp += evLen;
@@ -1168,11 +1128,10 @@ processInotifyEvents(int *inotifyFd)
 
             ualarm(2000, 0);
 
-            nr = read(*inotifyFd, buf + numRead,
-                      INOTIFY_READ_BUF_LEN - numRead);
+            nr = read(*inotifyFd, buf + numRead, INOTIFY_READ_BUF_LEN - numRead);
 
             savedErrno = errno; /* In case ualarm() should change errno */
-            ualarm(0, 0);       /* Cancel alarm */
+            ualarm(0, 0); /* Cancel alarm */
             errno = savedErrno;
 
             if (nr == -1 && errno != EINTR)
@@ -1186,16 +1145,13 @@ processInotifyEvents(int *inotifyFd)
                 numRead += nr;
                 inotifyReadCnt++;
 
-                logMessage(VB_NOISY,
-                       "\n==========> SECONDARY Read %d: got %zd bytes\n",
-                       inotifyReadCnt, nr);
+                logMessage(VB_NOISY, "\n==========> SECONDARY Read %d: got %zd bytes\n", inotifyReadCnt, nr);
 
-            } else {                    /* EINTR */
-                logMessage(VB_NOISY,
-                       "\n==========> SECONDARY Read got nothing\n");
+            } else { /* EINTR */
+                logMessage(VB_NOISY, "\n==========> SECONDARY Read got nothing\n");
             }
 
-            evp = buf;          /* Start again at beginning of buffer */
+            evp = buf; /* Start again at beginning of buffer */
         }
     }
 }
@@ -1231,7 +1187,7 @@ executeCommand(int *inotifyFd)
 
     switch (cmd) {
 
-    case 'a':   /* Add/refresh a subtree */
+    case 'a': /* Add/refresh a subtree */
 
         cnt = zapSubtree(*inotifyFd, arg);
         if (cnt == 0) {
@@ -1243,7 +1199,7 @@ executeCommand(int *inotifyFd)
         watchSubtree(*inotifyFd, arg);
         break;
 
-    case 'c':   /* Check that all cached pathnames exist */
+    case 'c': /* Check that all cached pathnames exist */
     case 'C':
 
         cnt = 0;
@@ -1252,21 +1208,15 @@ executeCommand(int *inotifyFd)
             if (wlCache[j].wd >= 0) {
                 if (lstat(wlCache[j].path, &sb) == -1) {
                     if (cmd == 'c')
-                        logMessage(VB_BASIC,
-                                "stat: [slot = %d; wd = %d] %s: %s\n",
-                                j, wlCache[j].wd, wlCache[j].path,
-                                strerror(errno));
+                        logMessage(VB_BASIC, "stat: [slot = %d; wd = %d] %s: %s\n", j, wlCache[j].wd, wlCache[j].path, strerror(errno));
                     failures++;
                 } else if (!S_ISDIR(sb.st_mode)) {
                     if (cmd == 'c')
-                        logMessage(0, "%s is not a directory\n",
-                                wlCache[j].path);
+                        logMessage(0, "%s is not a directory\n", wlCache[j].path);
                     exit(EXIT_FAILURE);
                 } else {
                     if (cmd == 'c')
-                        logMessage(VB_NOISY,
-                                "OK: [slot = %d; wd = %d] %s\n",
-                                j, wlCache[j].wd, wlCache[j].path);
+                        logMessage(VB_NOISY, "OK: [slot = %d; wd = %d] %s\n", j, wlCache[j].wd, wlCache[j].path);
                     cnt++;
                 }
             }
@@ -1276,14 +1226,13 @@ executeCommand(int *inotifyFd)
         logMessage(0, "Failures: %d\n", failures);
         break;
 
-    case 'l':   /* List entries in the cache */
+    case 'l': /* List entries in the cache */
 
         cnt = 0;
 
         for (int j = 0; j < cacheSize; j++) {
             if (wlCache[j].wd >= 0) {
-                logMessage(0, "%d: %d %s\n", j, wlCache[j].wd,
-                           wlCache[j].path);
+                logMessage(0, "%d: %d %s\n", j, wlCache[j].wd, wlCache[j].path);
                 cnt++;
             }
         }
@@ -1291,11 +1240,11 @@ executeCommand(int *inotifyFd)
         logMessage(VB_BASIC, "Total entries: %d\n", cnt);
         break;
 
-    case 'q':   /* Quit */
+    case 'q': /* Quit */
 
         exit(EXIT_SUCCESS);
 
-    case 'v':   /* Set log verbosity level */
+    case 'v': /* Set log verbosity level */
 
         if (ns == 2)
             verboseMask = atoi(arg);
@@ -1305,19 +1254,19 @@ executeCommand(int *inotifyFd)
         }
         break;
 
-    case 'd':   /* Toggle cache dumping */
+    case 'd': /* Toggle cache dumping */
 
         dumpCache = !dumpCache;
         printf("%s\n", dumpCache ? "on" : "off");
         break;
 
-    case 'x':   /* Set toggle checking */
+    case 'x': /* Set toggle checking */
 
         checkCache = !checkCache;
         printf("%s\n", checkCache ? "on" : "off");
         break;
 
-    case 'w':   /* Write directory list to file */
+    case 'w': /* Write directory list to file */
 
         /* We can compare the output from the below against the output
            from "find DIR -type d" to check whether the contents of the
@@ -1334,13 +1283,13 @@ executeCommand(int *inotifyFd)
         fclose(fp);
         break;
 
-    case 'z':   /* Stop watching a subtree, and zap its cache entries */
+    case 'z': /* Stop watching a subtree, and zap its cache entries */
 
         cnt = zapSubtree(*inotifyFd, arg);
         logMessage(VB_BASIC, "Zapped: %s, %d entries\n", arg, cnt);
         break;
 
-    case '0':   /* Rebuild cache */
+    case '0': /* Rebuild cache */
         close(*inotifyFd);
         *inotifyFd = reinitialize(-1);
         break;
@@ -1371,17 +1320,19 @@ executeCommand(int *inotifyFd)
 static void
 usageError(const char *pname)
 {
-    fprintf(stderr, "Usage: %s [options] directory-path\n\n",
-            pname);
+    fprintf(stderr, "Usage: %s [options] directory-path\n\n", pname);
     fprintf(stderr, "    -v lvl   Display logging information\n");
     fprintf(stderr, "    -l file  Send logging information to a file\n");
-    fprintf(stderr, "    -x       Check cache consistency after each "
-                                  "operation\n");
+    fprintf(stderr,
+        "    -x       Check cache consistency after each "
+        "operation\n");
     fprintf(stderr, "    -d       Dump cache to log after every operation\n");
-    fprintf(stderr, "    -b size  Set buffer size for read() from "
-                                  "inotify FD\n");
-    fprintf(stderr, "    -a file  Abort when cache inconsistency detected, "
-            "and create 'stop' file\n");
+    fprintf(stderr,
+        "    -b size  Set buffer size for read() from "
+        "inotify FD\n");
+    fprintf(stderr,
+        "    -a file  Abort when cache inconsistency detected, "
+        "and create 'stop' file\n");
 
     exit(EXIT_FAILURE);
 }

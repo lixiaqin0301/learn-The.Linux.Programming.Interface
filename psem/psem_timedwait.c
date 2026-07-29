@@ -20,9 +20,9 @@
    a glibc that provides the NPTL threading implementation.
 */
 #define _POSIX_C_SOURCE 199309
+#include "tlpi_hdr.h"
 #include <semaphore.h>
 #include <time.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -49,6 +49,6 @@ main(int argc, char *argv[])
     if (sem_timedwait(sem, &ts) == -1)
         errExit("sem_timedwait");
 
-    printf("%ld sem_wait() succeeded\n", (long) getpid());
+    printf("%ld sem_wait() succeeded\n", (long)getpid());
     exit(EXIT_SUCCESS);
 }

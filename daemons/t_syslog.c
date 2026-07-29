@@ -15,8 +15,8 @@
    Demonstrate the use of syslog(3) to write arbitrary messages to
    the system log. Usage is as shown in usageError() below.
 */
-#include <syslog.h>
 #include "tlpi_hdr.h"
+#include <syslog.h>
 
 static void
 usageError(const char *progName)
@@ -41,14 +41,29 @@ main(int argc, char *argv[])
         switch (opt) {
         case 'l':
             switch (optarg[0]) {
-            case 'a': level = LOG_ALERT;        break;
-            case 'c': level = LOG_CRIT;         break;
-            case 'e': level = LOG_ERR;          break;
-            case 'w': level = LOG_WARNING;      break;
-            case 'n': level = LOG_NOTICE;       break;
-            case 'i': level = LOG_INFO;         break;
-            case 'd': level = LOG_DEBUG;        break;
-            default:  cmdLineErr("Bad facility: %c\n", optarg[0]);
+            case 'a':
+                level = LOG_ALERT;
+                break;
+            case 'c':
+                level = LOG_CRIT;
+                break;
+            case 'e':
+                level = LOG_ERR;
+                break;
+            case 'w':
+                level = LOG_WARNING;
+                break;
+            case 'n':
+                level = LOG_NOTICE;
+                break;
+            case 'i':
+                level = LOG_INFO;
+                break;
+            case 'd':
+                level = LOG_DEBUG;
+                break;
+            default:
+                cmdLineErr("Bad facility: %c\n", optarg[0]);
             }
             break;
 
@@ -56,9 +71,9 @@ main(int argc, char *argv[])
             options |= LOG_PID;
             break;
 
-#if ! defined(__hpux) && ! defined(__sun)
+#if !defined(__hpux) && !defined(__sun)
 
-        /* Not on HP-UX 11 or Solaris 8 */
+            /* Not on HP-UX 11 or Solaris 8 */
 
         case 'e':
             options |= LOG_PERROR;

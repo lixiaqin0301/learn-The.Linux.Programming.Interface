@@ -21,23 +21,23 @@
     Usage: list_files [dir...]
 */
 #if defined(__APPLE__)
-        /* Darwin requires this header before including <dirent.h> */
+/* Darwin requires this header before including <dirent.h> */
 #include <sys/types.h>
 #endif
-#include <dirent.h>
 #include "tlpi_hdr.h"
+#include <dirent.h>
 
-static void             /* List all files in directory 'dirpath' */
+static void /* List all files in directory 'dirpath' */
 listFiles(const char *dirpath)
 {
     DIR *dirp;
     struct dirent *dp;
-    Boolean isCurrent;          /* True if 'dirpath' is "." */
+    Boolean isCurrent; /* True if 'dirpath' is "." */
 
     isCurrent = strcmp(dirpath, ".") == 0;
 
     dirp = opendir(dirpath);
-    if (dirp  == NULL) {
+    if (dirp == NULL) {
         errMsg("opendir failed on '%s'", dirpath);
         return;
     }
@@ -45,13 +45,13 @@ listFiles(const char *dirpath)
     /* For each entry in this directory, print directory + filename */
 
     for (;;) {
-        errno = 0;              /* To distinguish error from end-of-directory */
+        errno = 0; /* To distinguish error from end-of-directory */
         dp = readdir(dirp);
         if (dp == NULL)
             break;
 
         if (strcmp(dp->d_name, ".") == 0 || strcmp(dp->d_name, "..") == 0)
-            continue;           /* Skip . and .. */
+            continue; /* Skip . and .. */
 
         if (!isCurrent)
             printf("%s/", dirpath);
@@ -71,7 +71,7 @@ main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "--help") == 0)
         usageErr("%s [dir-path...]\n", argv[0]);
 
-    if (argc == 1)              /* No arguments - use current directory */
+    if (argc == 1) /* No arguments - use current directory */
         listFiles(".");
     else
         for (argv++; *argv; argv++)

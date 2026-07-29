@@ -28,18 +28,22 @@
 
        libseccomp/tools/scmp_bpf_disasm < dump-file
 */
-#include <linux/seccomp.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <linux/filter.h>
+#include <linux/seccomp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
-#include <errno.h>
-#include <string.h>
-#include <stdlib.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 /* Fetch BPF filter with specified index for specified PID. A pointer to a
    dynamically allocated buffer is containing the filter code returned as the
@@ -69,9 +73,10 @@ fetchFilter(pid_t pid, int filterIndex, int *instrCnt)
         if (errno == ENOENT) {
             fprintf(stderr, "No BPF program exists at index %d\n", filterIndex);
             exit(EXIT_FAILURE);
-        } else if (errno == EACCES) {   /* As documented in ptrace(2)... */
-            fprintf(stderr, "You lack the CAP_SYS_ADMIN capability; "
-                    "run this program as root\n");
+        } else if (errno == EACCES) { /* As documented in ptrace(2)... */
+            fprintf(stderr,
+                "You lack the CAP_SYS_ADMIN capability; "
+                "run this program as root\n");
             exit(EXIT_FAILURE);
         } else {
             errExit("ptrace - PTRACE_SECCOMP_GET_FILTER-1");
@@ -119,7 +124,7 @@ main(int argc, char *argv[])
 {
     struct sock_filter *filterProg;
     int filterIndex;
-    int instrCnt;       /* Number of instructions in BPF filter */
+    int instrCnt; /* Number of instructions in BPF filter */
     pid_t pid;
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0) {

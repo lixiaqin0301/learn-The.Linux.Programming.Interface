@@ -15,9 +15,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-//void xxx(void) { printf("Hi there\n"); }
+// void xxx(void) { printf("Hi there\n"); }
 
-int main(int argc, char *argv[]) {
+int
+main(int argc, char *argv[])
+{
     void xyz(void);
     void xyz_old(void), xyz_new(void);
     void abc(void);
@@ -34,7 +36,7 @@ int main(int argc, char *argv[]) {
     printf("Calling xyz_old()\n");
     xyz_old();
 
-    //xxx();
+    // xxx();
 
     exit(0);
 }

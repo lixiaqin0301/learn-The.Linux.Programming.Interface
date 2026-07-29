@@ -30,9 +30,9 @@
 
         atomic_append f2 1000000 x & atomic_append f2 1000000 x
 */
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int
 main(int argc, char *argv[])
@@ -43,7 +43,7 @@ main(int argc, char *argv[])
     if (argc < 3 || strcmp(argv[1], "--help") == 0)
         usageErr("%s file num-bytes [x]\n"
                  "        'x' means use lseek() instead of O_APPEND\n",
-                 argv[0]);
+            argv[0]);
 
     useLseek = argc > 3;
     flags = useLseek ? 0 : O_APPEND;
@@ -61,6 +61,6 @@ main(int argc, char *argv[])
             fatal("write() failed");
     }
 
-    printf("%ld done\n", (long) getpid());
+    printf("%ld done\n", (long)getpid());
     exit(EXIT_SUCCESS);
 }

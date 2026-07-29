@@ -19,8 +19,8 @@
    The presence or absence of a command-line argument determines which of two
    functions (f1() or f2()) we will longjmp() from.
 */
-#include <setjmp.h>
 #include "tlpi_hdr.h"
+#include <setjmp.h>
 
 static jmp_buf env;
 
@@ -42,10 +42,10 @@ int
 main(int argc, char *argv[])
 {
     switch (setjmp(env)) {
-    case 0:     /* This is the return after the initial setjmp() */
+    case 0: /* This is the return after the initial setjmp() */
         printf("Calling f1() after initial setjmp()\n");
-        f1(argc);               /* Never returns... */
-        break;                  /* ... but this is good form */
+        f1(argc); /* Never returns... */
+        break; /* ... but this is good form */
 
     case 1:
         printf("We jumped back from f1()\n");

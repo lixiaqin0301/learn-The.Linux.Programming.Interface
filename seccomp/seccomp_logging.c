@@ -21,21 +21,20 @@
         # ausearch -ui $USER --format text --start recent -c seccomp_logging
 */
 #define _GNU_SOURCE
-#include <stddef.h>
+#include "tlpi_hdr.h"
 #include <linux/audit.h>
-#include <sys/syscall.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>
-#include <sys/syscall.h>
+#include <stddef.h>
 #include <sys/prctl.h>
-#include "tlpi_hdr.h"
+#include <sys/syscall.h>
 
 /* For the x32 ABI, all system call numbers have bit 30 set */
 
-#define X32_SYSCALL_BIT         0x40000000
+#define X32_SYSCALL_BIT 0x40000000
 
 #ifndef SECCOMP_RET_LOG
-#define SECCOMP_RET_LOG         0x7ffc0000U
+#define SECCOMP_RET_LOG 0x7ffc0000U
 #endif
 
 /* The following is a hack to allow for systems (pre-Linux 4.14) that don't
@@ -59,8 +58,7 @@ install_filter(void)
     struct sock_filter filter[] = {
         /* Load architecture */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                (offsetof(struct seccomp_data, arch))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, arch))),
 
         /* Kill the process if the architecture is not what we expect */
 
@@ -68,8 +66,7 @@ install_filter(void)
 
         /* Load system call number */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, nr))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, nr))),
 
         /* Kill the process if this is an x32 system call (bit 30 is set) */
 
@@ -82,7 +79,7 @@ install_filter(void)
     };
 
     struct sock_fprog prog = {
-        .len = (unsigned short) (sizeof(filter) / sizeof(filter[0])),
+        .len = (unsigned short)(sizeof(filter) / sizeof(filter[0])),
         .filter = filter,
     };
 

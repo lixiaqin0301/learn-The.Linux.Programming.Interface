@@ -18,10 +18,10 @@
    passes each pattern to a popen() call that returns the output from ls(1)
    for the wildcard pattern. The program displays the returned output.
 */
+#include "print_wait_status.h" /* For printWaitStatus() */
+#include "tlpi_hdr.h"
 #include <ctype.h>
 #include <limits.h>
-#include "print_wait_status.h"          /* For printWaitStatus() */
-#include "tlpi_hdr.h"
 
 #define POPEN_FMT "/bin/ls -d %s 2> /dev/null"
 #define PAT_SIZE 50
@@ -30,23 +30,23 @@
 int
 main(int argc, char *argv[])
 {
-    char pat[PAT_SIZE];                 /* Pattern for globbing */
+    char pat[PAT_SIZE]; /* Pattern for globbing */
     char popenCmd[PCMD_BUF_SIZE];
-    FILE *fp;                           /* File stream returned by popen() */
-    Boolean badPattern;                 /* Invalid characters in 'pat'? */
+    FILE *fp; /* File stream returned by popen() */
+    Boolean badPattern; /* Invalid characters in 'pat'? */
     int len, status, fileCnt, j;
     char pathname[PATH_MAX];
 
-    for (;;) {                  /* Read pattern, display results of globbing */
+    for (;;) { /* Read pattern, display results of globbing */
         printf("pattern: ");
         fflush(stdout);
         if (fgets(pat, PAT_SIZE, stdin) == NULL)
-            break;                      /* EOF */
+            break; /* EOF */
         len = strlen(pat);
-        if (len <= 1)                   /* Empty line */
+        if (len <= 1) /* Empty line */
             continue;
 
-        if (pat[len - 1] == '\n')       /* Strip trailing newline */
+        if (pat[len - 1] == '\n') /* Strip trailing newline */
             pat[len - 1] = '\0';
 
         /* Ensure that the pattern contains only valid characters,
@@ -56,8 +56,7 @@ main(int argc, char *argv[])
            to be included in a filename if they are quoted.) */
 
         for (j = 0, badPattern = FALSE; j < len && !badPattern; j++)
-            if (!isalnum((unsigned char) pat[j]) &&
-                    strchr("_*?[^-].", pat[j]) == NULL)
+            if (!isalnum((unsigned char)pat[j]) && strchr("_*?[^-].", pat[j]) == NULL)
                 badPattern = TRUE;
 
         if (badPattern) {
@@ -87,7 +86,7 @@ main(int argc, char *argv[])
 
         status = pclose(fp);
         printf("    %d matching file%s\n", fileCnt, (fileCnt != 1) ? "s" : "");
-        printf("    pclose() status = %#x\n", (unsigned int) status);
+        printf("    pclose() status = %#x\n", (unsigned int)status);
         if (status != -1)
             printWaitStatus("\t", status);
     }

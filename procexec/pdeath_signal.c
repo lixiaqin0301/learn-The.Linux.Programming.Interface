@@ -21,29 +21,32 @@
         ./pdeath_signal 1 20 @4:+5:6 @3:+2 2
 */
 #define _GNU_SOURCE
-#include <sys/syscall.h>
-#include <sys/prctl.h>
+#include <errno.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdbool.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
+#include <string.h>
+#include <sys/prctl.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
-#include <pthread.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 /* Structure defining parameters used by each thread */
 
 struct threadParam {
-    int    sleepTime;
+    int sleepTime;
     char **argv;
-    int    threadNum;
-    bool   createNextChild;
+    int threadNum;
+    bool createNextChild;
 };
 
 static int childPreSleep, childPostSleep;
@@ -53,10 +56,11 @@ static void createAncestor(char **argv);
 static void
 usageError(char *pname)
 {
-    fprintf(stderr, "Usage: %s child-pre-sleep "
-            "child-post-sleep [ancestor-arg...]\n", pname);
     fprintf(stderr,
-"Create a series of processes with the parental relationship:\n\
+        "Usage: %s child-pre-sleep "
+        "child-post-sleep [ancestor-arg...]\n",
+        pname);
+    fprintf(stderr, "Create a series of processes with the parental relationship:\n\
 \n\
         ancestor1 -> ancestor2 -> ... ancestorN -> child\n\
 \n\
@@ -81,8 +85,7 @@ in order to explore the behavior of the prctl() PR_SET_PDEATHSIG setting\n\
         a '+', then the initial thread will create the next ancestor.\n\
         If 'ancestor-arg' begins with an at sign ('@'), then the initial\n\
         thread marks the process as a subreaper before creating any\n\
-        additional threads.\n"
-    );
+        additional threads.\n");
     exit(EXIT_FAILURE);
 }
 
@@ -101,9 +104,9 @@ handler(int sig, siginfo_t *si, void *ucontext)
 
     cnt++;
     printf("*********** Child (%ld) got signal [%d]; "
-            "si_pid = %d; si_uid = %d\n",
-            (long) getpid(), cnt, si->si_pid, si->si_uid);
-    printf("            Parent PID is now %ld\n", (long) getppid());
+           "si_pid = %d; si_uid = %d\n",
+        (long)getpid(), cnt, si->si_pid, si->si_uid);
+    printf("            Parent PID is now %ld\n", (long)getppid());
 }
 
 /* Create the child process. This step is performed after the chain
@@ -114,16 +117,14 @@ createChild(void)
 {
     struct sigaction sa;
 
-    printf("TID %ld (PID %ld) about to call fork()\n",
-            syscall(SYS_gettid), (long) getpid());
+    printf("TID %ld (PID %ld) about to call fork()\n", syscall(SYS_gettid), (long)getpid());
 
     switch (fork()) {
     case -1:
         errExit("fork");
 
     case 0:
-        printf("Final child %ld created; parent %ld\n",
-                (long) getpid(), (long) getppid());
+        printf("Final child %ld created; parent %ld\n", (long)getpid(), (long)getppid());
 
         /* Establish handler for "parent death" signal */
 
@@ -139,7 +140,8 @@ createChild(void)
 
         if (childPreSleep > 0) {
             printf("\tChild (PID %ld) about to sleep %d sec before setting "
-                    "PR_SET_PDEATHSIG\n", (long) getpid(), childPreSleep);
+                   "PR_SET_PDEATHSIG\n",
+                (long)getpid(), childPreSleep);
             sleep(childPreSleep);
         }
 
@@ -154,8 +156,7 @@ createChild(void)
            invocations will interrupt sleep() (and thus terminate
            a single long sleep of 'childPostSleep' seconds). */
 
-        printf("\tChild (PID %ld) about to sleep %d seconds\n",
-                (long) getpid(), childPostSleep);
+        printf("\tChild (PID %ld) about to sleep %d seconds\n", (long)getpid(), childPostSleep);
 
         for (int j = 0; j < childPostSleep; j++)
             sleep(1);
@@ -183,25 +184,23 @@ performPerThreadSteps(struct threadParam *tparam)
     if (tparam->createNextChild) {
         if (*(tparam->argv) != NULL)
             createAncestor(tparam->argv);
-        else            /* Last ancestor, so now we create the child */
+        else /* Last ancestor, so now we create the child */
             createChild();
     }
 
     /* Sleep for the specified interval, and then terminate */
 
-    printf("\tTID %ld (PID: %ld) about to sleep %d sec\n",
-            (long) tid, (long) getpid(), tparam->sleepTime);
+    printf("\tTID %ld (PID: %ld) about to sleep %d sec\n", (long)tid, (long)getpid(), tparam->sleepTime);
 
     sleep(tparam->sleepTime);
 
-    printf("TID %ld (PID: %ld) terminating (after %d sec sleep)\n",
-            (long) tid, (long) getpid(), tparam->sleepTime);
+    printf("TID %ld (PID: %ld) terminating (after %d sec sleep)\n", (long)tid, (long)getpid(), tparam->sleepTime);
 }
 
 /* Thread start function executed by each (noninitial) thread */
 
 static void *
-threadStartFunc(void * arg)
+threadStartFunc(void *arg)
 {
     struct threadParam *tparam = arg;
 
@@ -227,7 +226,7 @@ createThreads(char *ancestorArg, char **argv)
        token will be handled by the initial thread in this process, which,
        by definition, already exists.) */
 
-    for (int tnum = 0; ; tnum++) {
+    for (int tnum = 0;; tnum++) {
         char *tokenp = strtok((tnum == 0) ? ancestorArg : NULL, ":");
 
         if (tokenp == NULL)
@@ -236,7 +235,7 @@ createThreads(char *ancestorArg, char **argv)
         /* Allocate and populate the structure that will be employed
            by the thread associated with this token. */
 
-        tparam = malloc(sizeof (struct threadParam));
+        tparam = malloc(sizeof(struct threadParam));
         if (tparam == NULL)
             errExit("malloc");
 
@@ -254,7 +253,7 @@ createThreads(char *ancestorArg, char **argv)
                 exit(EXIT_FAILURE);
             }
 
-            tokenp++;           /* Advance past '+' */
+            tokenp++; /* Advance past '+' */
             nextParentMarked = true;
         }
 
@@ -310,8 +309,7 @@ createAncestor(char **argv)
 
     /* Create a child process */
 
-    printf("TID %ld (PID %ld) about to call fork()\n",
-            syscall(SYS_gettid), (long) getpid());
+    printf("TID %ld (PID %ld) about to call fork()\n", syscall(SYS_gettid), (long)getpid());
 
     childPid = fork();
     if (childPid == -1)
@@ -324,8 +322,7 @@ createAncestor(char **argv)
 
     /* Child falls through to following */
 
-    printf("Child %ld created; parent %ld\n", (long) getpid(),
-            (long) getppid());
+    printf("Child %ld created; parent %ld\n", (long)getpid(), (long)getppid());
 
     /* If the argument started with '@', mark this process as a subreaper */
 
@@ -334,9 +331,8 @@ createAncestor(char **argv)
     if (*ancestorArg == '@') {
         if (prctl(PR_SET_CHILD_SUBREAPER, 1) == -1)
             errExit("prctl");
-        printf("\t*** PID %ld (child of %ld) became a subreaper\n",
-                (long) getpid(), (long) getppid());
-        ancestorArg++;          /* Advance past '@' */
+        printf("\t*** PID %ld (child of %ld) became a subreaper\n", (long)getpid(), (long)getppid());
+        ancestorArg++; /* Advance past '@' */
     }
 
     /* Create the threads for this process, as specified in 'ancestorArg' */
@@ -361,7 +357,7 @@ main(int argc, char *argv[])
 
     if (argc > 3)
         createAncestor(&argv[3]);
-    else        /* Handle the degenerate case, for completeness */
+    else /* Handle the degenerate case, for completeness */
         createChild();
 
     wait(NULL);

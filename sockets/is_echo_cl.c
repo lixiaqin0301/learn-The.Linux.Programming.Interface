@@ -63,19 +63,19 @@ main(int argc, char *argv[])
     case -1:
         errExit("fork");
 
-    case 0:             /* Child: read server's response, echo on stdout */
+    case 0: /* Child: read server's response, echo on stdout */
         for (;;) {
             numRead = read(sfd, buf, BUF_SIZE);
-            if (numRead <= 0)                   /* Exit on EOF or error */
+            if (numRead <= 0) /* Exit on EOF or error */
                 break;
-            printf("%.*s", (int) numRead, buf);
+            printf("%.*s", (int)numRead, buf);
         }
         exit(EXIT_SUCCESS);
 
-    default:            /* Parent: write contents of stdin to socket */
+    default: /* Parent: write contents of stdin to socket */
         for (;;) {
             numRead = read(STDIN_FILENO, buf, BUF_SIZE);
-            if (numRead <= 0)                   /* Exit loop on EOF or error */
+            if (numRead <= 0) /* Exit loop on EOF or error */
                 break;
             if (write(sfd, buf, numRead) != numRead)
                 fatal("write() failed");

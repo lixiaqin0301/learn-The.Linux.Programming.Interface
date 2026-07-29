@@ -16,18 +16,16 @@
    command line, and print out statistics about the types of file in the tree.
 */
 #if defined(__sun)
-#define _XOPEN_SOURCE 500   /* Solaris 8 needs it this way */
+#define _XOPEN_SOURCE 500 /* Solaris 8 needs it this way */
 #else
-#if ! defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600
-#define _XOPEN_SOURCE 600   /* Get nftw() and S_IFSOCK declarations */
+#if !defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600
+#define _XOPEN_SOURCE 600 /* Get nftw() and S_IFSOCK declarations */
 #endif
 #endif
-#include <ftw.h>
 #include "tlpi_hdr.h"
+#include <ftw.h>
 
-static int numReg = 0, numDir = 0, numSymLk = 0, numSocket = 0,
-           numFifo = 0, numChar = 0, numBlock = 0,
-           numNonstatable = 0;
+static int numReg = 0, numDir = 0, numSymLk = 0, numSocket = 0, numFifo = 0, numChar = 0, numBlock = 0, numNonstatable = 0;
 
 static int
 countFile(const char *path, const struct stat *sb, int flag, struct FTW *ftwb)
@@ -39,15 +37,29 @@ countFile(const char *path, const struct stat *sb, int flag, struct FTW *ftwb)
     }
 
     switch (sb->st_mode & S_IFMT) {
-    case S_IFREG:  numReg++;    break;
-    case S_IFDIR:  numDir++;    break;
-    case S_IFCHR:  numChar++;   break;
-    case S_IFBLK:  numBlock++;  break;
-    case S_IFLNK:  numSymLk++;  break;
-    case S_IFIFO:  numFifo++;   break;
-    case S_IFSOCK: numSocket++; break;
+    case S_IFREG:
+        numReg++;
+        break;
+    case S_IFDIR:
+        numDir++;
+        break;
+    case S_IFCHR:
+        numChar++;
+        break;
+    case S_IFBLK:
+        numBlock++;
+        break;
+    case S_IFLNK:
+        numSymLk++;
+        break;
+    case S_IFIFO:
+        numFifo++;
+        break;
+    case S_IFSOCK:
+        numSocket++;
+        break;
     }
-    return 0;           /* Always tell nftw() to continue */
+    return 0; /* Always tell nftw() to continue */
 }
 
 static void
@@ -59,7 +71,7 @@ printStats(const char *msg, int num, int numFiles)
 int
 main(int argc, char *argv[])
 {
-    int numFiles;       /* Total number of files */
+    int numFiles; /* Total number of files */
 
     if (argc != 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s dir-path\n", argv[0]);
@@ -71,8 +83,7 @@ main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    numFiles = numReg + numDir + numSymLk + numSocket +
-                numFifo + numChar + numBlock + numNonstatable;
+    numFiles = numReg + numDir + numSymLk + numSocket + numFifo + numChar + numBlock + numNonstatable;
 
     if (numFiles == 0) {
         printf("No files found\n");

@@ -48,13 +48,13 @@ main(int argc, char *argv[])
     addr.sun_family = AF_UNIX;
     strncpy(addr.sun_path, SV_SOCK_PATH, sizeof(addr.sun_path) - 1);
 
-    if (bind(sfd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1)
+    if (bind(sfd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1)
         errExit("bind");
 
     if (listen(sfd, BACKLOG) == -1)
         errExit("listen");
 
-    for (;;) {          /* Handle client connections iteratively */
+    for (;;) { /* Handle client connections iteratively */
 
         /* Accept a connection. The connection is returned on a new
            socket, 'cfd'; the listening socket ('sfd') remains open

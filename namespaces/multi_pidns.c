@@ -17,24 +17,27 @@
    See https://lwn.net/Articles/531419/
 */
 #define _GNU_SOURCE
+#include <limits.h>
 #include <sched.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <string.h>
 #include <signal.h>
 #include <stdio.h>
-#include <limits.h>
-#include <sys/mount.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
+#include <sys/mount.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 /* A simple error-handling function: print an error message based
    on the value in 'errno' and terminate the calling process */
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 #define STACK_SIZE (1024 * 1024)
 
@@ -47,7 +50,7 @@ static int
 childFunc(void *arg)
 {
     static int first_call = 1;
-    long level = (long) arg;
+    long level = (long)arg;
     char *stack;
 
     if (!first_call) {
@@ -58,9 +61,9 @@ childFunc(void *arg)
 
         char mount_point[PATH_MAX];
 
-        snprintf(mount_point, PATH_MAX, "/proc%c", (char) ('0' + level));
+        snprintf(mount_point, PATH_MAX, "/proc%c", (char)('0' + level));
 
-        mkdir(mount_point, 0555);       /* Create directory for mount point */
+        mkdir(mount_point, 0555); /* Create directory for mount point */
         if (mount("proc", mount_point, "proc", 0, NULL) == -1)
             errExit("mount");
         printf("Mounting procfs at %s\n", mount_point);
@@ -76,19 +79,17 @@ childFunc(void *arg)
         level--;
         pid_t child_pid;
 
-        stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE,
-                     MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+        stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
         if (stack == MAP_FAILED)
             errExit("mmap");
 
-        child_pid = clone(childFunc,
-                          stack + STACK_SIZE, /* Assume stack grows downward */
-                          CLONE_NEWPID | SIGCHLD, (void *) level);
+        child_pid = clone(childFunc, stack + STACK_SIZE, /* Assume stack grows downward */
+            CLONE_NEWPID | SIGCHLD, (void *)level);
 
         if (child_pid == -1)
             errExit("clone");
 
-        if (waitpid(child_pid, NULL, 0) == -1)  /* Wait for child */
+        if (waitpid(child_pid, NULL, 0) == -1) /* Wait for child */
             errExit("waitpid");
 
         if (munmap(stack, STACK_SIZE) == -1)
@@ -98,7 +99,7 @@ childFunc(void *arg)
         /* Tail end of recursion: execute sleep(1) */
 
         printf("Final child sleeping\n");
-        execlp("sleep", "sleep", "1000", (char *) NULL);
+        execlp("sleep", "sleep", "1000", (char *)NULL);
         errExit("execlp");
     }
 
@@ -111,7 +112,7 @@ main(int argc, char *argv[])
     long levels;
 
     levels = (argc > 1) ? atoi(argv[1]) : 5;
-    childFunc((void *) levels);
+    childFunc((void *)levels);
 
     exit(EXIT_SUCCESS);
 }

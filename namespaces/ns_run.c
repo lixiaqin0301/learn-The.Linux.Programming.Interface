@@ -23,22 +23,24 @@
 #define _GNU_SOURCE
 #include <fcntl.h>
 #include <sched.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 /* A simple error-handling function: print an error message based
    on the value in 'errno' and terminate the calling process */
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 static void
 usage(char *pname)
 {
-    fprintf(stderr, "Usage: %s [-f] [-n /proc/PID/ns/FILE] cmd [arg...]\n",
-            pname);
+    fprintf(stderr, "Usage: %s [-f] [-n /proc/PID/ns/FILE] cmd [arg...]\n", pname);
     fprintf(stderr, "\t-f     Execute command in child process\n");
     fprintf(stderr, "\t-n     Join specified namespace\n");
 
@@ -62,13 +64,13 @@ main(int argc, char *argv[])
     while ((opt = getopt(argc, argv, "+fn:")) != -1) {
         switch (opt) {
 
-        case 'n':       /* Join a namespace */
+        case 'n': /* Join a namespace */
 
-            fd = open(optarg, O_RDONLY | O_CLOEXEC);  /* Get FD for namespace */
+            fd = open(optarg, O_RDONLY | O_CLOEXEC); /* Get FD for namespace */
             if (fd == -1)
                 errExit("open");
 
-            if (setns(fd, 0) == -1)      /* Join that namespace */
+            if (setns(fd, 0) == -1) /* Join that namespace */
                 errExit("setns");
 
             close(fd);
@@ -98,8 +100,8 @@ main(int argc, char *argv[])
         if (pid == -1)
             errExit("fork");
 
-        if (pid != 0) {                 /* Parent */
-            if (waitpid(pid, NULL, 0) == -1)    /* Wait for child */
+        if (pid != 0) { /* Parent */
+            if (waitpid(pid, NULL, 0) == -1) /* Wait for child */
                 errExit("waitpid");
             exit(EXIT_SUCCESS);
         }

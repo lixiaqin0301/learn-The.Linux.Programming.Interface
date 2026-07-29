@@ -30,21 +30,21 @@
 
    See also is_echo_sv.c.
 */
-#include <syslog.h>
+#include "become_daemon.h"
+#include "inet_sockets.h" /* Declares our socket functions */
+#include "tlpi_hdr.h"
 #include <signal.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
-#include "become_daemon.h"
-#include "inet_sockets.h"       /* Declares our socket functions */
-#include "tlpi_hdr.h"
+#include <syslog.h>
 
-#define SERVICE "echo"          /* Name of TCP service */
+#define SERVICE "echo" /* Name of TCP service */
 #define BUF_SIZE 4096
 
-static void             /* SIGCHLD handler to reap dead child processes */
+static void /* SIGCHLD handler to reap dead child processes */
 grimReaper(int sig)
 {
-    int savedErrno;             /* Save 'errno' in case changed here */
+    int savedErrno; /* Save 'errno' in case changed here */
 
     savedErrno = errno;
     while (waitpid(-1, NULL, WNOHANG) > 0)
@@ -52,7 +52,7 @@ grimReaper(int sig)
     errno = savedErrno;
 }
 
-static void             /* Handle client: copy socket input back to socket */
+static void /* Handle client: copy socket input back to socket */
 handleRequest(int cfd)
 {
     ssize_t numRead;
@@ -74,7 +74,7 @@ handleRequest(int cfd)
 int
 main(int argc, char *argv[])
 {
-    int lfd, cfd;               /* Listening and connected sockets */
+    int lfd, cfd; /* Listening and connected sockets */
     struct sigaction sa;
 
     /* The "-i" option means we were invoked from inetd(8), so that
@@ -103,28 +103,26 @@ main(int argc, char *argv[])
     }
 
     for (;;) {
-        cfd = accept(lfd, NULL, NULL);  /* Wait for connection */
+        cfd = accept(lfd, NULL, NULL); /* Wait for connection */
         if (cfd == -1) {
-            syslog(LOG_ERR, "Failure in accept(): %s",
-                    strerror(errno));
-            continue;           /* Try next */
+            syslog(LOG_ERR, "Failure in accept(): %s", strerror(errno));
+            continue; /* Try next */
         }
 
-        switch (fork()) {       /* Create child for each client */
+        switch (fork()) { /* Create child for each client */
         case -1:
-            syslog(LOG_ERR, "Can't create child (%s)",
-                    strerror(errno));
-            close(cfd);         /* Give up on this client */
-            break;              /* May be temporary; try next client */
+            syslog(LOG_ERR, "Can't create child (%s)", strerror(errno));
+            close(cfd); /* Give up on this client */
+            break; /* May be temporary; try next client */
 
-        case 0:                 /* Child */
-            close(lfd);         /* Don't need copy of listening socket */
+        case 0: /* Child */
+            close(lfd); /* Don't need copy of listening socket */
             handleRequest(cfd);
             _exit(EXIT_SUCCESS);
 
-        default:                /* Parent */
-            close(cfd);         /* Don't need copy of connected socket */
-            break;              /* Loop to accept next connection */
+        default: /* Parent */
+            close(cfd); /* Don't need copy of connected socket */
+            break; /* Loop to accept next connection */
         }
     }
 }

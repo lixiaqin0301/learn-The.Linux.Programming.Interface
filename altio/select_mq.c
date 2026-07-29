@@ -25,14 +25,14 @@
    and msg_send.c programs from the System V IPC chapter.
 */
 #include <sys/time.h>
-#if ! defined(__hpux)
+#if !defined(__hpux)
 /* HP-UX 11 doesn't have this header file */
 #include <sys/select.h>
 #endif
-#include <sys/msg.h>
+#include "tlpi_hdr.h"
 #include <signal.h>
 #include <stddef.h>
-#include "tlpi_hdr.h"
+#include <sys/msg.h>
 
 #define BUF_SIZE 200
 
@@ -43,10 +43,10 @@
 #define MAX_MTEXT 400
 
 struct pbuf {
-    int msqid;                  /* Origin of message */
-    int len;                    /* Number of bytes used in mtext */
-    long mtype;                 /* Message type */
-    char mtext[MAX_MTEXT];      /* Message body */
+    int msqid; /* Origin of message */
+    int len; /* Number of bytes used in mtext */
+    long mtype; /* Message type */
+    char mtext[MAX_MTEXT]; /* Message body */
 };
 
 /* Function called by child: monitors message queue identified by
@@ -68,7 +68,7 @@ childMon(int msqid, int fd)
            writing to the pipe. */
 
         pmsg.msqid = msqid;
-        pmsg.len = msgLen;      /* So parent knows how much to read from pipe */
+        pmsg.len = msgLen; /* So parent knows how much to read from pipe */
 
         wlen = offsetof(struct pbuf, mtext) + msgLen;
         /* Or: wlen = &pmsg.mtext - &pmsg + msgLen */
@@ -83,8 +83,8 @@ main(int argc, char *argv[])
 {
     fd_set readfds;
     int ready, nfds, j;
-    int pfd[2];                 /* Pipe used to transfer messages from
-                                   children to parent */
+    int pfd[2]; /* Pipe used to transfer messages from
+                   children to parent */
     ssize_t numRead;
     char buf[BUF_SIZE];
     struct pbuf pmsg;
@@ -102,11 +102,11 @@ main(int argc, char *argv[])
         case -1:
             errMsg("fork");
             killpg(0, SIGTERM);
-            _exit(EXIT_FAILURE);        /* NOTREACHED */
+            _exit(EXIT_FAILURE); /* NOTREACHED */
 
         case 0:
             childMon(getInt(argv[j], 0, "msqid"), pfd[1]);
-            _exit(EXIT_FAILURE);        /* NOTREACHED */
+            _exit(EXIT_FAILURE); /* NOTREACHED */
 
         default:
             break;
@@ -153,8 +153,7 @@ main(int argc, char *argv[])
             if (numRead == 0)
                 fatal("EOF on pipe");
 
-            printf("MQ %d: type=%ld length=%d <%.*s>\n", pmsg.msqid,
-                    pmsg.mtype, pmsg.len, pmsg.len, pmsg.mtext);
+            printf("MQ %d: type=%ld length=%d <%.*s>\n", pmsg.msqid, pmsg.mtype, pmsg.len, pmsg.len, pmsg.mtext);
         }
     }
 }

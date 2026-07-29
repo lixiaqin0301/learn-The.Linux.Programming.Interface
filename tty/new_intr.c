@@ -15,9 +15,9 @@
    Demonstrate the use of tcgetattr() and tcsetattr() to change the
    terminal INTR (interrupt) character.
 */
-#include <termios.h>
-#include <ctype.h>
 #include "tlpi_hdr.h"
+#include <ctype.h>
+#include <termios.h>
 
 int
 main(int argc, char *argv[])
@@ -30,13 +30,13 @@ main(int argc, char *argv[])
 
     /* Determine new INTR setting from command line */
 
-    if (argc == 1) {                                    /* Disable */
+    if (argc == 1) { /* Disable */
         intrChar = fpathconf(STDIN_FILENO, _PC_VDISABLE);
         if (intrChar == -1)
             errExit("Couldn't determine VDISABLE");
-    } else if (isdigit((unsigned char) argv[1][0])) {
-        intrChar = strtoul(argv[1], NULL, 0);           /* Allows hex, octal */
-    } else {                                            /* Literal character */
+    } else if (isdigit((unsigned char)argv[1][0])) {
+        intrChar = strtoul(argv[1], NULL, 0); /* Allows hex, octal */
+    } else { /* Literal character */
         intrChar = argv[1][0];
     }
 

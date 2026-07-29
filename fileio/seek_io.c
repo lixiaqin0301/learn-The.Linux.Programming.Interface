@@ -33,10 +33,10 @@
 
         seek_io myfile wxyz s1 r2
 */
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <ctype.h>
 #include "tlpi_hdr.h"
+#include <ctype.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int
 main(int argc, char *argv[])
@@ -48,19 +48,16 @@ main(int argc, char *argv[])
     ssize_t numRead, numWritten;
 
     if (argc < 3 || strcmp(argv[1], "--help") == 0)
-        usageErr("%s file {r<length>|R<length>|w<string>|s<offset>}...\n",
-                 argv[0]);
+        usageErr("%s file {r<length>|R<length>|w<string>|s<offset>}...\n", argv[0]);
 
-    fd = open(argv[1], O_RDWR | O_CREAT,
-                S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
-                S_IROTH | S_IWOTH);                     /* rw-rw-rw- */
+    fd = open(argv[1], O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH); /* rw-rw-rw- */
     if (fd == -1)
         errExit("open");
 
     for (ap = 2; ap < argc; ap++) {
         switch (argv[ap][0]) {
-        case 'r':   /* Display bytes at current offset, as text */
-        case 'R':   /* Display bytes at current offset, in hex */
+        case 'r': /* Display bytes at current offset, as text */
+        case 'R': /* Display bytes at current offset, in hex */
             len = getLong(&argv[ap][1], GN_ANY_BASE, argv[ap]);
 
             buf = malloc(len);
@@ -77,7 +74,7 @@ main(int argc, char *argv[])
                 printf("%s: ", argv[ap]);
                 for (j = 0; j < numRead; j++) {
                     if (argv[ap][0] == 'r')
-                        printf("%c", isprint(buf[j]) ?  buf[j] : '?');
+                        printf("%c", isprint(buf[j]) ? buf[j] : '?');
                     else
                         printf("%02x ", buf[j]);
                 }
@@ -87,14 +84,14 @@ main(int argc, char *argv[])
             free(buf);
             break;
 
-        case 'w':   /* Write string at current offset */
+        case 'w': /* Write string at current offset */
             numWritten = write(fd, &argv[ap][1], strlen(&argv[ap][1]));
             if (numWritten == -1)
                 errExit("write");
-            printf("%s: wrote %ld bytes\n", argv[ap], (long) numWritten);
+            printf("%s: wrote %ld bytes\n", argv[ap], (long)numWritten);
             break;
 
-        case 's':   /* Change file offset */
+        case 's': /* Change file offset */
             offset = getLong(&argv[ap][1], GN_ANY_BASE, argv[ap]);
             if (lseek(fd, offset, SEEK_SET) == -1)
                 errExit("lseek");

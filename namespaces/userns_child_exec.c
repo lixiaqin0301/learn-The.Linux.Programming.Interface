@@ -18,37 +18,40 @@
    been expanded significantly since then).
 */
 #define _GNU_SOURCE
-#include <sched.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-#include <signal.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <sys/prctl.h>
-#include <limits.h>
-#include <linux/securebits.h>
-#include <sys/capability.h>
-#include <sys/mman.h>
 #include "cap_functions.h"
 #include "userns_functions.h"
+#include <fcntl.h>
+#include <limits.h>
+#include <linux/securebits.h>
+#include <sched.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/capability.h>
+#include <sys/mman.h>
+#include <sys/prctl.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#ifndef CLONE_NEWCGROUP         /* Added in Linux 4.6 */
-#define CLONE_NEWCGROUP         0x02000000
+#ifndef CLONE_NEWCGROUP /* Added in Linux 4.6 */
+#define CLONE_NEWCGROUP 0x02000000
 #endif
 
 /* A simple error-handling function: print an error message based
    on the value in 'errno' and terminate the calling process */
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
-static int pipe_fd[2];  /* Pipe used to synchronize parent and child */
+static int pipe_fd[2]; /* Pipe used to synchronize parent and child */
 
 struct option_list {
-    char  opt;
+    char opt;
     char *val;
 };
 
@@ -56,13 +59,13 @@ struct option_list {
 
 struct cmd_options {
     char **argv;
-    int    flags;
-    int    create_root_mappings;
-    int    deny_setgroups;
-    int    verbose;
-    char  *uid_map;
-    char  *gid_map;
-    int    opt_cnt;
+    int flags;
+    int create_root_mappings;
+    int deny_setgroups;
+    int verbose;
+    char *uid_map;
+    char *gid_map;
+    int opt_cnt;
     struct option_list opt_list[MAX_OPT];
 };
 
@@ -70,9 +73,10 @@ static void
 usage(char *pname)
 {
     fprintf(stderr, "Usage: %s [options] cmd [arg...]\n\n", pname);
-    fprintf(stderr, "Create a child process that executes a shell "
-            "command in (typically) a new user\n"
-            "namespace, and possibly also other new namespaces.\n\n");
+    fprintf(stderr,
+        "Create a child process that executes a shell "
+        "command in (typically) a new user\n"
+        "namespace, and possibly also other new namespaces.\n\n");
     fprintf(stderr, "Options can be:\n\n");
 #define fpe(str) fprintf(stderr, "    %s", str);
     fpe("-C          New cgroup namespace\n");
@@ -103,14 +107,13 @@ usage(char *pname)
         " by commas;\n");
     fpe("the commas are replaced by newlines before writing"
         " to map files.\n");
-    fprintf(stderr, "\nThe following additional options (primarily useful "
-            "when experimenting with user\n"
-            "namespaces) are repeatable: they are performed in the order "
-            "that they are\n"
-            "specified, before 'cmd' is execed:\n\n");
-    fpe("-h          Push all possible capabilities into inheritable set\n")
-    fpe("-a          Push all possible capabilities into inheritable and\n")
-    fpe("            ambient sets\n");
+    fprintf(stderr,
+        "\nThe following additional options (primarily useful "
+        "when experimenting with user\n"
+        "namespaces) are repeatable: they are performed in the order "
+        "that they are\n"
+        "specified, before 'cmd' is execed:\n\n");
+    fpe("-h          Push all possible capabilities into inheritable set\n") fpe("-a          Push all possible capabilities into inheritable and\n") fpe("            ambient sets\n");
     fpe("-s <uid>    Set all process UIDs to <uid>\n");
     fpe("-S r,e,s    Set real/effective/saved-set UIDs\n");
     fpe("-b <bits>   Set securebits flags; 'bits' can be '0' to clear "
@@ -121,7 +124,7 @@ usage(char *pname)
     fpe("-d          Display process credentials and capabilities\n");
     fpe("-w <nsecs>  Wait (sleep) for <nsecs> seconds\n");
     fpe("-x <caps>   Set process capabilities; <caps> as per "
-            "cap_from_text(3)\n");
+        "cap_from_text(3)\n");
     fpe("-X [peiba]{+|-}<cap-name>\n");
     fpe("            Modify one or more process sets by adding or removing\n");
     fpe("            a capability.\n");
@@ -206,15 +209,14 @@ modify_individual_capability(char *optval)
         case 'p':
         case 'i':
         case 'e':
-            flag = (*p == 'p') ? CAP_PERMITTED :
-                   (*p == 'e') ? CAP_EFFECTIVE : CAP_INHERITABLE;
+            flag = (*p == 'p') ? CAP_PERMITTED : (*p == 'e') ? CAP_EFFECTIVE : CAP_INHERITABLE;
             capval = (*op == '+') ? CAP_SET : CAP_CLEAR;
 
             if (modifyCapSetting(flag, cap, capval) == -1) {
-                fprintf(stderr, "-X: modifyCapSetting() failed while "
-                        "%s '%s' in '%c'\n",
-                        (capval == CAP_SET) ? "raising" : "lowering",
-                        op + 1, *p);
+                fprintf(stderr,
+                    "-X: modifyCapSetting() failed while "
+                    "%s '%s' in '%c'\n",
+                    (capval == CAP_SET) ? "raising" : "lowering", op + 1, *p);
                 exit(EXIT_FAILURE);
             }
             break;
@@ -229,10 +231,7 @@ modify_individual_capability(char *optval)
             break;
 
         case 'a':
-            if (prctl(PR_CAP_AMBIENT,
-                        (*op == '+') ? PR_CAP_AMBIENT_RAISE :
-                                      PR_CAP_AMBIENT_LOWER,
-                        cap, 0, 0) == -1)
+            if (prctl(PR_CAP_AMBIENT, (*op == '+') ? PR_CAP_AMBIENT_RAISE : PR_CAP_AMBIENT_LOWER, cap, 0, 0) == -1)
                 errExit("-X: PR_CAP_AMBIENT");
             break;
 
@@ -254,12 +253,20 @@ set_securebits(char *optval)
     secbits = 0;
     for (p = optval; *p != '\0'; p++) {
         switch (*p) {
-        case 'r': secbits |= SECBIT_NOROOT;             break;
-        case 's': secbits |= SECBIT_NO_SETUID_FIXUP;    break;
-        case '0': secbits = 0;                          break;
+        case 'r':
+            secbits |= SECBIT_NOROOT;
+            break;
+        case 's':
+            secbits |= SECBIT_NO_SETUID_FIXUP;
+            break;
+        case '0':
+            secbits = 0;
+            break;
         default:
-            fprintf(stderr, "Unexpected value for '-b' "
-                    "(securebits flag): %c\n", *p);
+            fprintf(stderr,
+                "Unexpected value for '-b' "
+                "(securebits flag): %c\n",
+                *p);
             exit(EXIT_FAILURE);
         }
     }
@@ -281,7 +288,7 @@ set_process_uids(char *optval)
     if (comma1 != NULL)
         comma2 = strchr(comma1 + 1, ',');
     if (comma2 == NULL) {
-        fprintf(stderr, "Poorly formed option: -S %s\n",optval);
+        fprintf(stderr, "Poorly formed option: -S %s\n", optval);
         exit(EXIT_FAILURE);
     }
     *comma1 = '\0';
@@ -352,8 +359,10 @@ perform_repeatable_options(struct cmd_options *opts)
             break;
 
         default:
-            fprintf(stderr, "Unexpected option (-%c) in "
-                    "perform_repeatable_options()\n", opts->opt_list[j].opt);
+            fprintf(stderr,
+                "Unexpected option (-%c) in "
+                "perform_repeatable_options()\n",
+                opts->opt_list[j].opt);
         }
     }
 }
@@ -363,7 +372,7 @@ perform_repeatable_options(struct cmd_options *opts)
 static int
 childFunc(void *arg)
 {
-    struct cmd_options *opts = (struct cmd_options *) arg;
+    struct cmd_options *opts = (struct cmd_options *)arg;
     char ch;
 
     /* Wait until the parent has updated the UID and GID mappings.
@@ -371,16 +380,15 @@ childFunc(void *arg)
        pipe that will be closed by the parent process once it has
        updated the mappings. */
 
-    close(pipe_fd[1]);          /* Close our descriptor for the write
-                                   end of the pipe so that we see EOF
-                                   when parent closes its descriptor */
+    close(pipe_fd[1]); /* Close our descriptor for the write
+                          end of the pipe so that we see EOF
+                          when parent closes its descriptor */
     if (read(pipe_fd[0], &ch, 1) != 0) {
-        fprintf(stderr,
-                "Failure in child: read from pipe returned != 0\n");
+        fprintf(stderr, "Failure in child: read from pipe returned != 0\n");
         exit(EXIT_FAILURE);
     }
 
-    close(pipe_fd[0]);  /* We no longer need the pipe */
+    close(pipe_fd[0]); /* We no longer need the pipe */
 
     perform_repeatable_options(opts);
 
@@ -405,9 +413,9 @@ update_child_maps(struct cmd_options *opts, pid_t child_pid)
     /* UID map */
 
     if (opts->uid_map != NULL || opts->create_root_mappings) {
-        snprintf(map_path, PATH_MAX, "/proc/%ld/uid_map", (long) child_pid);
+        snprintf(map_path, PATH_MAX, "/proc/%ld/uid_map", (long)child_pid);
         if (opts->create_root_mappings) {
-            snprintf(map_buf, MAP_BUF_SIZE, "0 %ld 1", (long) getuid());
+            snprintf(map_buf, MAP_BUF_SIZE, "0 %ld 1", (long)getuid());
             opts->uid_map = map_buf;
         }
         if (update_map(opts->uid_map, map_path) == -1)
@@ -422,10 +430,9 @@ update_child_maps(struct cmd_options *opts, pid_t child_pid)
                 errExit("proc_setgroups_write");
         }
 
-        snprintf(map_path, PATH_MAX, "/proc/%ld/gid_map",
-                (long) child_pid);
+        snprintf(map_path, PATH_MAX, "/proc/%ld/gid_map", (long)child_pid);
         if (opts->create_root_mappings) {
-            snprintf(map_buf, MAP_BUF_SIZE, "0 %ld 1", (long) getgid());
+            snprintf(map_buf, MAP_BUF_SIZE, "0 %ld 1", (long)getgid());
             opts->gid_map = map_buf;
         }
         if (update_map(opts->gid_map, map_path) == -1)
@@ -451,24 +458,47 @@ parse_command_options(int argc, char *argv[], struct cmd_options *opts)
     opts->uid_map = NULL;
     opts->create_root_mappings = 0;
     opts->deny_setgroups = 1;
-    while ((opt = getopt(argc, argv,
-                         "+CimnuUM:G:rzDvpahs:b:S:dx:X:w:")) != -1) {
+    while ((opt = getopt(argc, argv, "+CimnuUM:G:rzDvpahs:b:S:dx:X:w:")) != -1) {
         switch (opt) {
-        case 'C': opts->flags |= CLONE_NEWCGROUP;       break;
-        case 'i': opts->flags |= CLONE_NEWIPC;          break;
-        case 'm': opts->flags |= CLONE_NEWNS;           break;
-        case 'n': opts->flags |= CLONE_NEWNET;          break;
-        case 'p': opts->flags |= CLONE_NEWPID;          break;
-        case 'u': opts->flags |= CLONE_NEWUTS;          break;
-        case 'U': opts->flags |= CLONE_NEWUSER;         break;
-        case 'M': opts->uid_map = optarg;               break;
-        case 'G': opts->gid_map = optarg;               break;
+        case 'C':
+            opts->flags |= CLONE_NEWCGROUP;
+            break;
+        case 'i':
+            opts->flags |= CLONE_NEWIPC;
+            break;
+        case 'm':
+            opts->flags |= CLONE_NEWNS;
+            break;
+        case 'n':
+            opts->flags |= CLONE_NEWNET;
+            break;
+        case 'p':
+            opts->flags |= CLONE_NEWPID;
+            break;
+        case 'u':
+            opts->flags |= CLONE_NEWUTS;
+            break;
+        case 'U':
+            opts->flags |= CLONE_NEWUSER;
+            break;
+        case 'M':
+            opts->uid_map = optarg;
+            break;
+        case 'G':
+            opts->gid_map = optarg;
+            break;
         case 'r':
-        case 'z': opts->create_root_mappings = 1;       break;
-        case 'D': opts->deny_setgroups = 0;             break;
-        case 'v': opts->verbose = 1;                    break;
+        case 'z':
+            opts->create_root_mappings = 1;
+            break;
+        case 'D':
+            opts->deny_setgroups = 0;
+            break;
+        case 'v':
+            opts->verbose = 1;
+            break;
 
-        /* Repeatable options: */
+            /* Repeatable options: */
 
         case 'h':
         case 'a':
@@ -479,15 +509,13 @@ parse_command_options(int argc, char *argv[], struct cmd_options *opts)
         case 'X':
         case 'w':
             if (opts->opt_cnt >= MAX_OPT) {
-                fprintf(stderr, "Too many repeatable options (maximum: %d)\n",
-                        MAX_OPT);
+                fprintf(stderr, "Too many repeatable options (maximum: %d)\n", MAX_OPT);
                 exit(EXIT_FAILURE);
             }
 
             opts->opt_list[opts->opt_cnt].opt = opt;
             opts->opt_list[opts->opt_cnt].val = NULL;
-            if (opt == 's' || opt == 'S' || opt == 'x' || opt == 'X' ||
-                    opt == 'w')
+            if (opt == 's' || opt == 'S' || opt == 'x' || opt == 'X' || opt == 'w')
                 opts->opt_list[opts->opt_cnt].val = optarg;
             opts->opt_cnt++;
             break;
@@ -499,10 +527,7 @@ parse_command_options(int argc, char *argv[], struct cmd_options *opts)
 
     /* -M, -G, or -r without -U is nonsensical */
 
-    if (((opts->uid_map != NULL || opts->gid_map != NULL ||
-            opts->create_root_mappings) && !(opts->flags & CLONE_NEWUSER)) ||
-            (opts->create_root_mappings &&
-                (opts->uid_map != NULL || opts->gid_map != NULL)))
+    if (((opts->uid_map != NULL || opts->gid_map != NULL || opts->create_root_mappings) && !(opts->flags & CLONE_NEWUSER)) || (opts->create_root_mappings && (opts->uid_map != NULL || opts->gid_map != NULL)))
         usage(argv[0]);
 
     if (optind >= argc)
@@ -552,21 +577,18 @@ main(int argc, char *argv[])
 
     /* Create the child in new namespace(s) */
 
-    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
     if (stack == MAP_FAILED)
         errExit("mmap");
 
-    child_pid = clone(childFunc, stack + STACK_SIZE,
-                      opts.flags | SIGCHLD, &opts);
+    child_pid = clone(childFunc, stack + STACK_SIZE, opts.flags | SIGCHLD, &opts);
     if (child_pid == -1)
         errExit("clone");
 
     /* Parent falls through to here */
 
     if (opts.verbose)
-        printf("%s: PID of child created by clone() is %ld\n",
-                argv[0], (long) child_pid);
+        printf("%s: PID of child created by clone() is %ld\n", argv[0], (long)child_pid);
 
     /* Update the UID and GID maps in the child */
 
@@ -577,7 +599,7 @@ main(int argc, char *argv[])
 
     close(pipe_fd[1]);
 
-    if (waitpid(child_pid, NULL, 0) == -1)      /* Wait for child */
+    if (waitpid(child_pid, NULL, 0) == -1) /* Wait for child */
         errExit("waitpid");
 
     if (opts.verbose)

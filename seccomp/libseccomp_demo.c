@@ -11,14 +11,15 @@
 /* Supplementary program for Chapter Z */
 
 /* libseccomp_demo.c
-*/
+ */
+#include "tlpi_hdr.h"
 #include <errno.h>
+#include <seccomp.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <seccomp.h>
-#include "tlpi_hdr.h"
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     int rc;
     scmp_filter_ctx ctx;

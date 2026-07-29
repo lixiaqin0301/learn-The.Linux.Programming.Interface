@@ -23,9 +23,9 @@
    See Section 38.7 of "The Linux Programming Interface" for more details
    on this subject.)
 */
-#include <sys/un.h>
-#include <sys/socket.h>
 #include "tlpi_hdr.h"
+#include <sys/socket.h>
+#include <sys/un.h>
 
 #define SV_SOCK_PATH "/tmp/us_xfr"
 

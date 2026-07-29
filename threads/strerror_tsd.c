@@ -17,26 +17,27 @@
 
    See also strerror_tls.c.
 */
-#define _GNU_SOURCE                 /* Get '_sys_nerr' and '_sys_errlist'
-                                       declarations from <stdio.h> */
-#include <stdio.h>
-#include <string.h>                 /* Get declaration of strerror() */
-#include <pthread.h>
+#define _GNU_SOURCE /* Get '_sys_nerr' and '_sys_errlist'                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+                       declarations from <stdio.h> */
 #include "tlpi_hdr.h"
+#include <pthread.h>
+#include <stdio.h>
+#include <string.h> /* Get declaration of strerror() */
 
 static pthread_once_t once = PTHREAD_ONCE_INIT;
 static pthread_key_t strerrorKey;
 
-#define MAX_ERROR_LEN 256           /* Maximum length of string in per-thread
-                                       buffer returned by strerror() */
+#define MAX_ERROR_LEN                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+    256 /* Maximum length of string in per-thread                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+           buffer returned by strerror() */
 
-static void                         /* Free thread-specific data buffer */
+static void /* Free thread-specific data buffer */
 destructor(void *buf)
 {
     free(buf);
 }
 
-static void                         /* One-time key creation function */
+static void /* One-time key creation function */
 createKey(void)
 {
     int s;
@@ -62,8 +63,8 @@ strerror(int err)
         errExitEN(s, "pthread_once");
 
     buf = pthread_getspecific(strerrorKey);
-    if (buf == NULL) {          /* If first call from this thread, allocate
-                                   buffer for thread, and save its location */
+    if (buf == NULL) { /* If first call from this thread, allocate
+                          buffer for thread, and save its location */
         buf = malloc(MAX_ERROR_LEN);
         if (buf == NULL)
             errExit("malloc");
@@ -77,7 +78,7 @@ strerror(int err)
         snprintf(buf, MAX_ERROR_LEN, "Unknown error %d", err);
     } else {
         strncpy(buf, strerrordesc_np(err), MAX_ERROR_LEN - 1);
-        buf[MAX_ERROR_LEN - 1] = '\0';          /* Ensure null termination */
+        buf[MAX_ERROR_LEN - 1] = '\0'; /* Ensure null termination */
     }
 
     return buf;

@@ -18,16 +18,18 @@
 
    Linux supports POSIX message queues since kernel 2.6.6.
 */
+#include "tlpi_hdr.h"
+#include <fcntl.h>
 #include <mqueue.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include "tlpi_hdr.h"
 
 static void
 usageError(const char *progName)
 {
-    fprintf(stderr, "Usage: %s [-cx] [-m maxmsg] [-s msgsize] mq-name "
-            "[octal-perms]\n", progName);
+    fprintf(stderr,
+        "Usage: %s [-cx] [-m maxmsg] [-s msgsize] mq-name "
+        "[octal-perms]\n",
+        progName);
     fprintf(stderr, "    -c          Create queue (O_CREAT)\n");
     fprintf(stderr, "    -m maxmsg   Set maximum # of messages\n");
     fprintf(stderr, "    -s msgsize  Set maximum message size\n");
@@ -85,11 +87,10 @@ main(int argc, char *argv[])
     if (optind >= argc)
         usageError(argv[0]);
 
-    perms = (argc <= optind + 1) ? (S_IRUSR | S_IWUSR) :
-                getInt(argv[optind + 1], GN_BASE_8, "octal-perms");
+    perms = (argc <= optind + 1) ? (S_IRUSR | S_IWUSR) : getInt(argv[optind + 1], GN_BASE_8, "octal-perms");
 
     mqd = mq_open(argv[optind], flags, perms, attrp);
-    if (mqd == (mqd_t) -1)
+    if (mqd == (mqd_t)-1)
         errExit("mq_open");
 
     exit(EXIT_SUCCESS);

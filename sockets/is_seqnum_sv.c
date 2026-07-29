@@ -20,10 +20,10 @@
 
    See also is_seqnum_cl.c.
 */
-#define _BSD_SOURCE             /* To get definitions of NI_MAXHOST and
-                                   NI_MAXSERV from <netdb.h> */
-#include <netdb.h>
+#define _BSD_SOURCE /* To get definitions of NI_MAXHOST and                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+                       NI_MAXSERV from <netdb.h> */
 #include "is_seqnum.h"
+#include <netdb.h>
 
 #define BACKLOG 50
 
@@ -31,8 +31,8 @@ int
 main(int argc, char *argv[])
 {
     uint32_t seqNum;
-    char reqLenStr[INT_LEN];            /* Length of requested sequence */
-    char seqNumStr[INT_LEN];            /* Start of granted sequence */
+    char reqLenStr[INT_LEN]; /* Length of requested sequence */
+    char seqNumStr[INT_LEN]; /* Start of granted sequence */
     struct sockaddr_storage claddr;
     int lfd, cfd, optval, reqLen;
     socklen_t addrlen;
@@ -51,7 +51,8 @@ main(int argc, char *argv[])
     /* Ignore the SIGPIPE signal, so that we find out about broken connection
        errors via a failure from write(). */
 
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)    errExit("signal");
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        errExit("signal");
 
     /* Call getaddrinfo() to obtain a list of addresses that
        we can try binding to */
@@ -61,9 +62,9 @@ main(int argc, char *argv[])
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_family = AF_UNSPEC;        /* Allows IPv4 or IPv6 */
+    hints.ai_family = AF_UNSPEC; /* Allows IPv4 or IPv6 */
     hints.ai_flags = AI_PASSIVE | AI_NUMERICSERV;
-                        /* Wildcard IP address; service name is numeric */
+    /* Wildcard IP address; service name is numeric */
 
     if (getaddrinfo(NULL, PORT_NUM, &hints, &result) != 0)
         errExit("getaddrinfo");
@@ -75,14 +76,13 @@ main(int argc, char *argv[])
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         lfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (lfd == -1)
-            continue;                   /* On error, try next address */
+            continue; /* On error, try next address */
 
-        if (setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval))
-                == -1)
-             errExit("setsockopt");
+        if (setsockopt(lfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+            errExit("setsockopt");
 
         if (bind(lfd, rp->ai_addr, rp->ai_addrlen) == 0)
-            break;                      /* Success */
+            break; /* Success */
 
         /* bind() failed: close this socket and try next address */
 
@@ -97,19 +97,18 @@ main(int argc, char *argv[])
 
     freeaddrinfo(result);
 
-    for (;;) {                  /* Handle clients iteratively */
+    for (;;) { /* Handle clients iteratively */
 
         /* Accept a client connection, obtaining client's address */
 
         addrlen = sizeof(struct sockaddr_storage);
-        cfd = accept(lfd, (struct sockaddr *) &claddr, &addrlen);
+        cfd = accept(lfd, (struct sockaddr *)&claddr, &addrlen);
         if (cfd == -1) {
             errMsg("accept");
             continue;
         }
 
-        if (getnameinfo((struct sockaddr *) &claddr, addrlen,
-                    host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
+        if (getnameinfo((struct sockaddr *)&claddr, addrlen, host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
             snprintf(addrStr, ADDRSTRLEN, "(%s, %s)", host, service);
         else
             snprintf(addrStr, ADDRSTRLEN, "(?UNKNOWN?)");
@@ -119,22 +118,22 @@ main(int argc, char *argv[])
 
         if (readLine(cfd, reqLenStr, INT_LEN) <= 0) {
             close(cfd);
-            continue;                   /* Failed read; skip request */
+            continue; /* Failed read; skip request */
         }
 
         reqLen = atoi(reqLenStr);
-        if (reqLen <= 0) {              /* Watch for misbehaving clients */
+        if (reqLen <= 0) { /* Watch for misbehaving clients */
             close(cfd);
-            continue;                   /* Bad request; skip it */
+            continue; /* Bad request; skip it */
         }
 
         snprintf(seqNumStr, INT_LEN, "%d\n", seqNum);
         if (write(cfd, seqNumStr, strlen(seqNumStr)) != strlen(seqNumStr))
             fprintf(stderr, "Error on write");
 
-        seqNum += reqLen;               /* Update sequence number */
+        seqNum += reqLen; /* Update sequence number */
 
-        if (close(cfd) == -1)           /* Close connection */
+        if (close(cfd) == -1) /* Close connection */
             errMsg("close");
     }
 }

@@ -18,14 +18,14 @@
    The conversion is then reversed by calling strftime() with the given
    "out-format" (or a default format if this argument is omitted).
 */
-#if ! defined(__sun)
+#if !defined(__sun)
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE
 #endif
 #endif
-#include <time.h>
-#include <locale.h>
 #include "tlpi_hdr.h"
+#include <locale.h>
+#include <time.h>
 
 #define SBUF_SIZE 1000
 
@@ -40,15 +40,15 @@ main(int argc, char *argv[])
         usageErr("%s input-date-time in-format [out-format]\n", argv[0]);
 
     if (setlocale(LC_ALL, "") == NULL)
-        errExit("setlocale");   /* Use locale settings in conversions */
+        errExit("setlocale"); /* Use locale settings in conversions */
 
-    memset(&tm, 0, sizeof(struct tm));          /* Initialize 'tm' */
+    memset(&tm, 0, sizeof(struct tm)); /* Initialize 'tm' */
     if (strptime(argv[1], argv[2], &tm) == NULL)
         fatal("strptime");
 
-    tm.tm_isdst = -1;           /* Not set by strptime(); tells mktime()
-                                   to determine if DST is in effect */
-    printf("calendar time (seconds since Epoch): %ld\n", (long) mktime(&tm));
+    tm.tm_isdst = -1; /* Not set by strptime(); tells mktime()
+                         to determine if DST is in effect */
+    printf("calendar time (seconds since Epoch): %ld\n", (long)mktime(&tm));
 
     ofmt = (argc > 3) ? argv[3] : "%H:%M:%S %A, %d %B %Y %Z";
     if (strftime(sbuf, SBUF_SIZE, ofmt, &tm) == 0)

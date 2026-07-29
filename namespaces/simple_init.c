@@ -19,18 +19,21 @@
    See https://lwn.net/Articles/532748/
 */
 #define _GNU_SOURCE
-#include <unistd.h>
+#include <errno.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
-#include <wordexp.h>
-#include <errno.h>
-#include <sys/wait.h>
 #include <sys/mount.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <wordexp.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 static int verbose = 0;
 
@@ -47,18 +50,16 @@ child_handler(int sig)
     /* WUNTRACED and WCONTINUED allow waitpid() to catch stopped and
        continued children (in addition to terminated children) */
 
-    while ((pid = waitpid(-1, &wstatus,
-                          WNOHANG | WUNTRACED | WCONTINUED)) != 0) {
+    while ((pid = waitpid(-1, &wstatus, WNOHANG | WUNTRACED | WCONTINUED)) != 0) {
         if (pid == -1) {
-            if (errno == ECHILD)        /* No more children */
+            if (errno == ECHILD) /* No more children */
                 break;
             else
-                perror("waitpid");      /* Unexpected error */
+                perror("waitpid"); /* Unexpected error */
         }
 
         if (verbose)
-            printf("\tinit: SIGCHLD handler: PID %ld terminated\n",
-                    (long) pid);
+            printf("\tinit: SIGCHLD handler: PID %ld terminated\n", (long)pid);
     }
 }
 
@@ -73,10 +74,11 @@ expand_words(char *cmd)
 
     int s = wordexp(cmd, &pwordexp, 0);
     if (s != 0) {
-        fprintf(stderr, "Word expansion failed.\n"
-                        "\tNote that only simple "
-                        "commands plus arguments are supported\n"
-                        "\t(no pipelines, I/O redirection, and so on)\n");
+        fprintf(stderr,
+            "Word expansion failed.\n"
+            "\tNote that only simple "
+            "commands plus arguments are supported\n"
+            "\t(no pipelines, I/O redirection, and so on)\n");
         return NULL;
     }
 
@@ -115,9 +117,14 @@ main(int argc, char *argv[])
     proc_path = NULL;
     while ((opt = getopt(argc, argv, "p:v")) != -1) {
         switch (opt) {
-        case 'p': proc_path = optarg;   break;
-        case 'v': verbose = 1;          break;
-        default:  usage(argv[0]);
+        case 'p':
+            proc_path = optarg;
+            break;
+        case 'v':
+            verbose = 1;
+            break;
+        default:
+            usage(argv[0]);
         }
     }
 
@@ -128,7 +135,7 @@ main(int argc, char *argv[])
         errExit("sigaction");
 
     if (verbose)
-        printf("\tinit: my PID is %ld\n", (long) getpid());
+        printf("\tinit: my PID is %ld\n", (long)getpid());
 
     /* Performing terminal operations while not being the foreground
        process group for the terminal generates a SIGTTOU that stops the
@@ -142,7 +149,8 @@ main(int argc, char *argv[])
        group the foreground process group for the terminal */
 
     if (setpgid(0, 0) == -1)
-        errExit("setpgid");;
+        errExit("setpgid");
+    ;
     if (tcsetpgrp(STDIN_FILENO, getpgrp()) == -1)
         errExit("tcsetpgrp-child");
 
@@ -170,8 +178,7 @@ main(int argc, char *argv[])
         /* EINVAL is the case that occurs if 'proc_path' exists but is
            not (yet) a mount point */
 
-        if (mount("none", proc_path, NULL, MS_SLAVE, NULL) == -1 &&
-                errno != EINVAL)
+        if (mount("none", proc_path, NULL, MS_SLAVE, NULL) == -1 && errno != EINVAL)
             perror("mount-make-slave-/");
 
         if (verbose)
@@ -201,22 +208,22 @@ main(int argc, char *argv[])
         }
 
         if (cmd[strlen(cmd) - 1] == '\n')
-            cmd[strlen(cmd) - 1] = '\0';        /* Strip trailing '\n' */
+            cmd[strlen(cmd) - 1] = '\0'; /* Strip trailing '\n' */
 
         if (strlen(cmd) == 0)
-            continue;           /* Ignore empty commands */
+            continue; /* Ignore empty commands */
 
-        pid = fork();           /* Create child process */
+        pid = fork(); /* Create child process */
         if (pid == -1) {
             perror("fork");
             break;
         }
 
-        if (pid == 0) {         /* Child */
+        if (pid == 0) { /* Child */
             char **arg_vec;
 
             arg_vec = expand_words(cmd);
-            if (arg_vec == NULL)        /* Word expansion failed */
+            if (arg_vec == NULL) /* Word expansion failed */
                 exit(EXIT_FAILURE);
 
             /* Make child the leader of a new process group and
@@ -224,22 +231,23 @@ main(int argc, char *argv[])
                group for the terminal */
 
             if (setpgid(0, 0) == -1)
-                errExit("setpgid");;
+                errExit("setpgid");
+            ;
             if (tcsetpgrp(STDIN_FILENO, getpgrp()) == -1)
                 errExit("tcsetpgrp-child");
 
             /* Child executes shell command and terminates */
 
             execvp(arg_vec[0], arg_vec);
-            errExit("execvp");          /* Only reached if execvp() fails */
+            errExit("execvp"); /* Only reached if execvp() fails */
         }
 
         /* Parent falls through to here */
 
         if (verbose)
-            printf("\tinit: created child %ld\n", (long) pid);
+            printf("\tinit: created child %ld\n", (long)pid);
 
-        pause();                /* Will be interrupted by signal handler */
+        pause(); /* Will be interrupted by signal handler */
 
         /* After child changes state, ensure that the 'init' program
            is the foreground process group for the terminal */

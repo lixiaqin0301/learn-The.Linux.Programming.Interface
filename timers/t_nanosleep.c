@@ -18,15 +18,15 @@
    See also t_clock_nanosleep.c.
 */
 #define _POSIX_C_SOURCE 199309
+#include "tlpi_hdr.h"
+#include <signal.h>
 #include <sys/time.h>
 #include <time.h>
-#include <signal.h>
-#include "tlpi_hdr.h"
 
 static void
 sigintHandler(int sig)
 {
-    return;                     /* Just interrupt nanosleep() */
+    return; /* Just interrupt nanosleep() */
 }
 
 int
@@ -61,14 +61,13 @@ main(int argc, char *argv[])
 
         if (gettimeofday(&finish, NULL) == -1)
             errExit("gettimeofday");
-        printf("Slept for: %9.6f secs\n", finish.tv_sec - start.tv_sec +
-                        (finish.tv_usec - start.tv_usec) / 1000000.0);
+        printf("Slept for: %9.6f secs\n", finish.tv_sec - start.tv_sec + (finish.tv_usec - start.tv_usec) / 1000000.0);
 
         if (s == 0)
-            break;                      /* nanosleep() completed */
+            break; /* nanosleep() completed */
 
-        printf("Remaining: %2ld.%09ld\n", (long) remain.tv_sec, remain.tv_nsec);
-        request = remain;               /* Next sleep is with remaining time */
+        printf("Remaining: %2ld.%09ld\n", (long)remain.tv_sec, remain.tv_nsec);
+        request = remain; /* Next sleep is with remaining time */
     }
 
     printf("Sleep complete\n");

@@ -36,13 +36,15 @@ usageError(char *pname)
     fprintf(stderr, "Usage: %s [options] file...\n", pname);
     fprintf(stderr, "    Options:\n");
     fprintf(stderr, "\t-d        Use datagram (instead of stream) socket\n");
-    fprintf(stderr, "\t-n        Don't send any real data with the "
-                    "ancillary data\n");
+    fprintf(stderr,
+        "\t-n        Don't send any real data with the "
+        "ancillary data\n");
     fprintf(stderr, "\t-p <pid>  Use this PID when sending credentials\n");
     fprintf(stderr, "\t-u <uid>  Use this UID when sending credentials\n");
     fprintf(stderr, "\t-g <gid>  Use this GID when sending credentials\n");
-    fprintf(stderr, "    If any of any of -p/-u/-g is absent, the "
-                    "corresponding real\n    credential is used.\n");
+    fprintf(stderr,
+        "    If any of any of -p/-u/-g is absent, the "
+        "corresponding real\n    credential is used.\n");
     exit(EXIT_FAILURE);
 }
 
@@ -57,15 +59,15 @@ main(int argc, char *argv[])
     bool useDatagramSocket, sendData;
     struct msghdr msgh;
     struct iovec iov;
-    struct ucred *ucredp;       /* Pointer to data area of a 'cmsghdr' that
-                                   contains credentials */
-    int *fdList;                /* Pointer to data area of a 'cmsghdr' that
-                                   contains a list of file descriptors */
-    int fdCnt;                  /* Number of FDs in ancillary data */
-    char *controlMsg;           /* Ancillary data (control message) */
-    size_t controlMsgSize;      /* Size of ancillary data */
-    struct cmsghdr *cmsgp;      /* Pointer used to iterate through
-                                   headers in ancillary data */
+    struct ucred *ucredp; /* Pointer to data area of a 'cmsghdr' that
+                             contains credentials */
+    int *fdList; /* Pointer to data area of a 'cmsghdr' that
+                    contains a list of file descriptors */
+    int fdCnt; /* Number of FDs in ancillary data */
+    char *controlMsg; /* Ancillary data (control message) */
+    size_t controlMsgSize; /* Size of ancillary data */
+    struct cmsghdr *cmsgp; /* Pointer used to iterate through
+                              headers in ancillary data */
 
     /* By default, this program sends an SCM_CREDENTIALS message containing
        the process's real credentials. This can be altered via command-line
@@ -116,8 +118,7 @@ main(int argc, char *argv[])
        and so needs to be suitably aligned: malloc() provides a block
        with suitable alignment. */
 
-    controlMsgSize = CMSG_SPACE(sizeof(int) * fdCnt) +
-                     CMSG_SPACE(sizeof(struct ucred));
+    controlMsgSize = CMSG_SPACE(sizeof(int) * fdCnt) + CMSG_SPACE(sizeof(struct ucred));
     controlMsg = malloc(controlMsgSize);
     if (controlMsg == NULL)
         errExit("malloc");
@@ -170,12 +171,12 @@ main(int argc, char *argv[])
        of file descriptors */
 
     cmsgp->cmsg_len = CMSG_LEN(sizeof(int) * fdCnt);
-    printf("cmsg_len 1: %ld\n", (long) cmsgp->cmsg_len);
+    printf("cmsg_len 1: %ld\n", (long)cmsgp->cmsg_len);
 
     /* Set 'fdList' pointing to the data area of this ancillary message block.
        The file descriptors are placed into the data block by the loop below. */
 
-    fdList = (int *) CMSG_DATA(cmsgp);
+    fdList = (int *)CMSG_DATA(cmsgp);
 
     /* Next, the credentials */
 
@@ -186,12 +187,12 @@ main(int argc, char *argv[])
     /* The ancillary message must include space for a 'struct ucred' */
 
     cmsgp->cmsg_len = CMSG_LEN(sizeof(struct ucred));
-    printf("cmsg_len 2: %ld\n", (long) cmsgp->cmsg_len);
+    printf("cmsg_len 2: %ld\n", (long)cmsgp->cmsg_len);
 
     /* Set 'ucredp' pointing to the data area of this ancillary message block.
        The credentials are placed into the data area by code below. */
 
-    ucredp = (struct ucred *) CMSG_DATA(cmsgp);
+    ucredp = (struct ucred *)CMSG_DATA(cmsgp);
 
     /* Initialize the credentials inside the ancillary data */
 
@@ -203,9 +204,9 @@ main(int argc, char *argv[])
        descriptors into the ancillary data */
 
     for (int j = 0; j < fdCnt; j++) {
-         fdList[j] = open(argv[optind + j], O_RDONLY);
-         if (fdList[j] == -1)
-             errExit("open");
+        fdList[j] = open(argv[optind + j], O_RDONLY);
+        if (fdList[j] == -1)
+            errExit("open");
     }
 
     /* Connect to the peer socket */
@@ -220,7 +221,7 @@ main(int argc, char *argv[])
     if (numSent == -1)
         errExit("sendmsg");
 
-    printf("sendmsg() returned %ld\n", (long) numSent);
+    printf("sendmsg() returned %ld\n", (long)numSent);
 
     exit(EXIT_SUCCESS);
 }

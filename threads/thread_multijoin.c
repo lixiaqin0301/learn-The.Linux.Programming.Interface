@@ -28,37 +28,37 @@
    threads that it created has terminated. When 'numLive', which records
    the number of live threads, falls to 0, the main thread terminates.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
 static pthread_cond_t threadDied = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t threadMutex = PTHREAD_MUTEX_INITIALIZER;
-                /* Protects all of the following global variables */
+/* Protects all of the following global variables */
 
-static int totThreads = 0;      /* Total number of threads created */
-static int numLive = 0;         /* Total number of threads still alive or
-                                   terminated but not yet joined */
-static int numUnjoined = 0;     /* Number of terminated threads that
-                                   have not yet been joined */
-enum tstate {                   /* Thread states */
-    TS_ALIVE,                   /* Thread is alive */
-    TS_TERMINATED,              /* Thread terminated, not yet joined */
-    TS_JOINED                   /* Thread terminated, and joined */
+static int totThreads = 0; /* Total number of threads created */
+static int numLive = 0; /* Total number of threads still alive or
+                           terminated but not yet joined */
+static int numUnjoined = 0; /* Number of terminated threads that
+                               have not yet been joined */
+enum tstate { /* Thread states */
+    TS_ALIVE, /* Thread is alive */
+    TS_TERMINATED, /* Thread terminated, not yet joined */
+    TS_JOINED /* Thread terminated, and joined */
 };
 
-static struct {                 /* Info about each thread */
-    pthread_t tid;              /* ID of this thread */
-    enum tstate state;          /* Thread state (TS_* constants above) */
-    int sleepTime;              /* Number seconds to live before terminating */
+static struct { /* Info about each thread */
+    pthread_t tid; /* ID of this thread */
+    enum tstate state; /* Thread state (TS_* constants above) */
+    int sleepTime; /* Number seconds to live before terminating */
 } *thread;
 
-static void *                   /* Start function for thread */
+static void * /* Start function for thread */
 threadFunc(void *arg)
 {
-    int idx = (int) arg;
+    int idx = (int)arg;
     int s;
 
-    sleep(thread[idx].sleepTime);       /* Simulate doing some work */
+    sleep(thread[idx].sleepTime); /* Simulate doing some work */
     printf("Thread %d terminating\n", idx);
 
     s = pthread_mutex_lock(&threadMutex);
@@ -95,7 +95,7 @@ main(int argc, char *argv[])
     for (idx = 0; idx < argc - 1; idx++) {
         thread[idx].sleepTime = getInt(argv[idx + 1], GN_NONNEG, NULL);
         thread[idx].state = TS_ALIVE;
-        s = pthread_create(&thread[idx].tid, NULL, threadFunc, (void *) idx);
+        s = pthread_create(&thread[idx].tid, NULL, threadFunc, (void *)idx);
         if (s != 0)
             errExitEN(s, "pthread_create");
     }

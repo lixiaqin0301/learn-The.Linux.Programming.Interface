@@ -18,9 +18,9 @@
    This program is Linux-specific.
 */
 #define _GNU_SOURCE
-#include <sys/sem.h>
-#include "semun.h"              /* Definition of semun union */
+#include "semun.h" /* Definition of semun union */
 #include "tlpi_hdr.h"
+#include <sys/sem.h>
 
 int
 main(int argc, char *argv[])
@@ -36,7 +36,7 @@ main(int argc, char *argv[])
         errExit("semctl");
 
     printf("Maximum ID index = %d\n", s);
-    printf("sets in_use      = %ld\n", (long) info.semusz);
-    printf("used_sems        = %ld\n", (long) info.semaem);
+    printf("sets in_use      = %ld\n", (long)info.semusz);
+    printf("used_sems        = %ld\n", (long)info.semaem);
     exit(EXIT_SUCCESS);
 }

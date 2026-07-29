@@ -15,8 +15,8 @@
    An example of the use of POSIX thread attributes (pthread_attr_t):
    creating a detached thread.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
 static void *
 threadFunc(void *x)
@@ -31,7 +31,7 @@ main(int argc, char *argv[])
     pthread_attr_t attr;
     int s;
 
-    s = pthread_attr_init(&attr);       /* Assigns default values */
+    s = pthread_attr_init(&attr); /* Assigns default values */
     if (s != 0)
         errExitEN(s, "pthread_attr_init");
 
@@ -39,11 +39,11 @@ main(int argc, char *argv[])
     if (s != 0)
         errExitEN(s, "pthread_attr_setdetachstate");
 
-    s = pthread_create(&thr, &attr, threadFunc, (void *) 1);
+    s = pthread_create(&thr, &attr, threadFunc, (void *)1);
     if (s != 0)
         errExitEN(s, "pthread_create");
 
-    s = pthread_attr_destroy(&attr);    /* No longer needed */
+    s = pthread_attr_destroy(&attr); /* No longer needed */
     if (s != 0)
         errExitEN(s, "pthread_attr_destroy");
 

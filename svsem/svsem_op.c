@@ -16,14 +16,15 @@
 
    Usage as shown in usageError().
 */
-#include <sys/types.h>
-#include <sys/sem.h>
-#include <ctype.h>
-#include "curr_time.h"          /* Declaration of currTime() */
+#include "curr_time.h" /* Declaration of currTime() */
 #include "tlpi_hdr.h"
+#include <ctype.h>
+#include <sys/sem.h>
+#include <sys/types.h>
 
-#define MAX_SEMOPS 1000         /* Maximum operations that we permit for
-                                   a single semop() */
+#define MAX_SEMOPS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
+    1000 /* Maximum operations that we permit for                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+            a single semop() */
 
 static void
 usageError(const char *progName)
@@ -33,8 +34,9 @@ usageError(const char *progName)
     fprintf(stderr, "            or: <sem#>=0[n]\n");
     fprintf(stderr, "       \"n\" means include IPC_NOWAIT in 'op'\n");
     fprintf(stderr, "       \"u\" means include SEM_UNDO in 'op'\n\n");
-    fprintf(stderr, "The operations in each argument are "
-                    "performed in a single semop() call\n\n");
+    fprintf(stderr,
+        "The operations in each argument are "
+        "performed in a single semop() call\n\n");
     fprintf(stderr, "e.g.: %s 12345 0+1,1-2un\n", progName);
     fprintf(stderr, "      %s 12345 0=0n 1+1,2-1u 1=0\n", progName);
     exit(EXIT_FAILURE);
@@ -47,30 +49,29 @@ static int
 parseOps(char *arg, struct sembuf sops[])
 {
     char *comma, *sign, *remaining, *flags;
-    int numOps;                 /* Number of operations in 'arg' */
+    int numOps; /* Number of operations in 'arg' */
 
-    for (numOps = 0, remaining = arg; ; numOps++) {
+    for (numOps = 0, remaining = arg;; numOps++) {
         if (numOps >= MAX_SEMOPS)
-            cmdLineErr("Too many operations (maximum=%d): \"%s\"\n",
-                        MAX_SEMOPS, arg);
+            cmdLineErr("Too many operations (maximum=%d): \"%s\"\n", MAX_SEMOPS, arg);
 
         if (*remaining == '\0')
             fatal("Trailing comma or empty argument: \"%s\"", arg);
-        if (!isdigit((unsigned char) *remaining))
+        if (!isdigit((unsigned char)*remaining))
             cmdLineErr("Expected initial digit: \"%s\"\n", arg);
 
         sops[numOps].sem_num = strtol(remaining, &sign, 10);
 
         if (*sign == '\0' || strchr("+-=", *sign) == NULL)
             cmdLineErr("Expected '+', '-', or '=' in \"%s\"\n", arg);
-        if (!isdigit((unsigned char) *(sign + 1)))
+        if (!isdigit((unsigned char)*(sign + 1)))
             cmdLineErr("Expected digit after '%c' in \"%s\"\n", *sign, arg);
 
         sops[numOps].sem_op = strtol(sign + 1, &flags, 10);
 
-        if (*sign == '-')                       /* Reverse sign of operation */
-            sops[numOps].sem_op = - sops[numOps].sem_op;
-        else if (*sign == '=')                  /* Should be '=0' */
+        if (*sign == '-') /* Reverse sign of operation */
+            sops[numOps].sem_op = -sops[numOps].sem_op;
+        else if (*sign == '=') /* Should be '=0' */
             if (sops[numOps].sem_op != 0)
                 cmdLineErr("Expected \"=0\" in \"%s\"\n", arg);
 
@@ -89,7 +90,7 @@ parseOps(char *arg, struct sembuf sops[])
 
         comma = strchr(remaining, ',');
         if (comma == NULL)
-            break;                              /* No comma --> no more ops */
+            break; /* No comma --> no more ops */
         else
             remaining = comma + 1;
     }
@@ -109,14 +110,12 @@ main(int argc, char *argv[])
     for (ind = 2; argv[ind] != NULL; ind++) {
         nsops = parseOps(argv[ind], sops);
 
-        printf("%5ld, %s: about to semop()  [%s]\n", (long) getpid(),
-                currTime("%T"), argv[ind]);
+        printf("%5ld, %s: about to semop()  [%s]\n", (long)getpid(), currTime("%T"), argv[ind]);
 
         if (semop(getInt(argv[1], 0, "semid"), sops, nsops) == -1)
-            errExit("semop (PID=%ld)", (long) getpid());
+            errExit("semop (PID=%ld)", (long)getpid());
 
-        printf("%5ld, %s: semop() completed [%s]\n", (long) getpid(),
-                currTime("%T"), argv[ind]);
+        printf("%5ld, %s: semop() completed [%s]\n", (long)getpid(), currTime("%T"), argv[ind]);
     }
 
     exit(EXIT_SUCCESS);

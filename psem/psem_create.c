@@ -19,10 +19,10 @@
    On Linux, named semaphores are supported with kernel 2.6 or later, and
    a glibc that provides the NPTL threading implementation.
 */
+#include "tlpi_hdr.h"
+#include <fcntl.h>
 #include <semaphore.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include "tlpi_hdr.h"
 
 static void
 usageError(const char *progName)
@@ -44,9 +44,14 @@ main(int argc, char *argv[])
     flags = 0;
     while ((opt = getopt(argc, argv, "cx")) != -1) {
         switch (opt) {
-        case 'c':   flags |= O_CREAT;           break;
-        case 'x':   flags |= O_EXCL;            break;
-        default:    usageError(argv[0]);
+        case 'c':
+            flags |= O_CREAT;
+            break;
+        case 'x':
+            flags |= O_EXCL;
+            break;
+        default:
+            usageError(argv[0]);
         }
     }
 
@@ -56,8 +61,7 @@ main(int argc, char *argv[])
     /* Default permissions are rw-------; default semaphore initialization
        value is 0 */
 
-    perms = (argc <= optind + 1) ? (S_IRUSR | S_IWUSR) :
-                getInt(argv[optind + 1], GN_BASE_8, "octal-perms");
+    perms = (argc <= optind + 1) ? (S_IRUSR | S_IWUSR) : getInt(argv[optind + 1], GN_BASE_8, "octal-perms");
     value = (argc <= optind + 2) ? 0 : getInt(argv[optind + 2], 0, "value");
 
     sem = sem_open(argv[optind], flags, perms, value);

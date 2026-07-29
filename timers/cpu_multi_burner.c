@@ -26,21 +26,21 @@
 
    See also cpu_multithread_burner.c.
 */
+#include "tlpi_hdr.h"
 #include <sys/times.h>
 #include <time.h>
-#include "tlpi_hdr.h"
 
 #define NANO 1000000000
 
 static void
 burnCPU(float period)
 {
-    int curr_step;      /* Current number of intervals of consumed CPU time */
-    int prev_step;      /* Number of intervals of consumed CPU time calculated
-                           in previous loop iteration */
+    int curr_step; /* Current number of intervals of consumed CPU time */
+    int prev_step; /* Number of intervals of consumed CPU time calculated
+                      in previous loop iteration */
     struct timespec curr_cpu;
     struct timespec curr_rt, prev_rt;
-    int elapsed_rt_us;  /* Elapsed real microseconds for current CPU interval */
+    int elapsed_rt_us; /* Elapsed real microseconds for current CPU interval */
 
     prev_step = 0;
 
@@ -56,15 +56,10 @@ burnCPU(float period)
         if (clock_gettime(CLOCK_REALTIME, &curr_rt) == -1)
             errExit("clock_gettime");
 
-        elapsed_rt_us = (curr_rt.tv_sec - prev_rt.tv_sec) * 1000000 +
-                     (curr_rt.tv_nsec - prev_rt.tv_nsec) / 1000;
+        elapsed_rt_us = (curr_rt.tv_sec - prev_rt.tv_sec) * 1000000 + (curr_rt.tv_nsec - prev_rt.tv_nsec) / 1000;
 
         if (curr_step > prev_step) {
-            printf("[%ld]  CPU: %.3f; elapsed/cpu = %0.3f; %%CPU = %.3f\n",
-                    (long) getpid(),
-                    (float) curr_step * period,
-                    elapsed_rt_us / 1000000.0 / period,
-                    period / (elapsed_rt_us / 1000000.0) * 100.0);
+            printf("[%ld]  CPU: %.3f; elapsed/cpu = %0.3f; %%CPU = %.3f\n", (long)getpid(), (float)curr_step * period, elapsed_rt_us / 1000000.0 / period, period / (elapsed_rt_us / 1000000.0) * 100.0);
             prev_step = curr_step;
             prev_rt = curr_rt;
         }
@@ -79,9 +74,10 @@ main(int argc, char *argv[])
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s [period]...\n"
-                "Creates one process per argument that reports "
-                "CPU time each 'period' CPU seconds\n"
-                "'period' can be a floating-point number\n", argv[0]);
+                 "Creates one process per argument that reports "
+                 "CPU time each 'period' CPU seconds\n"
+                 "'period' can be a floating-point number\n",
+            argv[0]);
 
     nproc = argc - 1;
 
@@ -91,7 +87,7 @@ main(int argc, char *argv[])
         case 0:
             sscanf(argv[j + 1], "%f", &period);
             burnCPU(period);
-            exit(EXIT_SUCCESS);         /* NOTREACHED */
+            exit(EXIT_SUCCESS); /* NOTREACHED */
 
         case -1:
             errExit("fork");

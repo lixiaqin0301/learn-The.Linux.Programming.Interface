@@ -14,15 +14,15 @@
 
    Demonstrate the affect of umask() in conjunction with open() and mkdir().
 */
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "file_perms.h"
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #define MYFILE "myfile"
-#define MYDIR  "mydir"
-#define FILE_PERMS    (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
-#define DIR_PERMS     (S_IRWXU | S_IRWXG | S_IRWXO)
+#define MYDIR "mydir"
+#define FILE_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
+#define DIR_PERMS (S_IRWXU | S_IRWXG | S_IRWXO)
 #define UMASK_SETTING (S_IWGRP | S_IXGRP | S_IWOTH | S_IXOTH)
 
 int
@@ -40,7 +40,7 @@ main(int argc, char *argv[])
     if (mkdir(MYDIR, DIR_PERMS) == -1)
         errExit("mkdir-%s", MYDIR);
 
-    u = umask(0);               /* Retrieves (and clears) umask value */
+    u = umask(0); /* Retrieves (and clears) umask value */
 
     if (stat(MYFILE, &sb) == -1)
         errExit("stat-%s", MYFILE);

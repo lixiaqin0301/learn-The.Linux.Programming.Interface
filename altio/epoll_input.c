@@ -21,13 +21,14 @@
 
    This program is Linux (2.6 and later) specific.
 */
-#include <sys/epoll.h>
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/epoll.h>
 
-#define MAX_BUF     1000        /* Maximum bytes fetched by a single read() */
-#define MAX_EVENTS     5        /* Maximum number of events to be returned from
-                                   a single epoll_wait() call */
+#define MAX_BUF 1000 /* Maximum bytes fetched by a single read() */
+#define MAX_EVENTS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
+    5 /* Maximum number of events to be returned from                                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+         a single epoll_wait() call */
 
 int
 main(int argc, char *argv[])
@@ -53,7 +54,7 @@ main(int argc, char *argv[])
             errExit("open");
         printf("Opened \"%s\" on fd %d\n", argv[j], fd);
 
-        ev.events = EPOLLIN;            /* Only interested in input events */
+        ev.events = EPOLLIN; /* Only interested in input events */
         ev.data.fd = fd;
         if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
             errExit("epoll_ctl");
@@ -70,7 +71,7 @@ main(int argc, char *argv[])
         ready = epoll_wait(epfd, evlist, MAX_EVENTS, -1);
         if (ready == -1) {
             if (errno == EINTR)
-                continue;               /* Restart if interrupted by signal */
+                continue; /* Restart if interrupted by signal */
             else
                 errExit("epoll_wait");
         }
@@ -80,10 +81,7 @@ main(int argc, char *argv[])
         /* Deal with returned list of events */
 
         for (j = 0; j < ready; j++) {
-            printf("  fd=%d; events: %s%s%s\n", evlist[j].data.fd,
-                    (evlist[j].events & EPOLLIN)  ? "EPOLLIN "  : "",
-                    (evlist[j].events & EPOLLHUP) ? "EPOLLHUP " : "",
-                    (evlist[j].events & EPOLLERR) ? "EPOLLERR " : "");
+            printf("  fd=%d; events: %s%s%s\n", evlist[j].data.fd, (evlist[j].events & EPOLLIN) ? "EPOLLIN " : "", (evlist[j].events & EPOLLHUP) ? "EPOLLHUP " : "", (evlist[j].events & EPOLLERR) ? "EPOLLERR " : "");
 
             if (evlist[j].events & EPOLLIN) {
                 s = read(evlist[j].data.fd, buf, MAX_BUF);

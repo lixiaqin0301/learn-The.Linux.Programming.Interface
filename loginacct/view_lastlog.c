@@ -16,12 +16,12 @@
 
    This program is Linux-specific.
 */
-#include <time.h>
-#include <lastlog.h>
-#include <paths.h>                      /* Definition of _PATH_LASTLOG */
-#include <fcntl.h>
-#include "ugid_functions.h"             /* Declaration of userIdFromName() */
 #include "tlpi_hdr.h"
+#include "ugid_functions.h" /* Declaration of userIdFromName() */
+#include <fcntl.h>
+#include <lastlog.h>
+#include <paths.h> /* Definition of _PATH_LASTLOG */
+#include <time.h>
 
 int
 main(int argc, char *argv[])
@@ -48,13 +48,12 @@ main(int argc, char *argv[])
             errExit("lseek");
 
         if (read(fd, &llog, sizeof(struct lastlog)) <= 0) {
-            printf("read failed for %s\n", argv[j]);    /* EOF or error */
+            printf("read failed for %s\n", argv[j]); /* EOF or error */
             continue;
         }
 
         time_t ll_time = llog.ll_time;
-        printf("%-8.8s %-6.6s %-20.20s %s", argv[j], llog.ll_line,
-                llog.ll_host, ctime((time_t *) &ll_time));
+        printf("%-8.8s %-6.6s %-20.20s %s", argv[j], llog.ll_line, llog.ll_host, ctime((time_t *)&ll_time));
     }
 
     close(fd);

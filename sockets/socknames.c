@@ -15,15 +15,15 @@
    Demonstrate the use of getsockname() and getpeername() to retrieve the local
    and peer socket addresses.
 */
-#include "inet_sockets.h"               /* Declares our socket functions */
+#include "inet_sockets.h" /* Declares our socket functions */
 #include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
 {
     int listenFd, acceptFd, connFd;
-    socklen_t len;                      /* Size of socket address buffer */
-    void *addr;                         /* Buffer for socket address */
+    socklen_t len; /* Size of socket address buffer */
+    void *addr; /* Buffer for socket address */
     char addrStr[IS_ADDR_STR_LEN];
 
     if (argc != 2 || strcmp(argv[1], "--help") == 0)
@@ -49,24 +49,20 @@ main(int argc, char *argv[])
 
     if (getsockname(connFd, addr, &len) == -1)
         errExit("getsockname");
-    printf("getsockname(connFd):   %s\n",
-            inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
+    printf("getsockname(connFd):   %s\n", inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
 
     if (getsockname(acceptFd, addr, &len) == -1)
         errExit("getsockname");
-    printf("getsockname(acceptFd): %s\n",
-            inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
+    printf("getsockname(acceptFd): %s\n", inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
 
     if (getpeername(connFd, addr, &len) == -1)
         errExit("getpeername");
-    printf("getpeername(connFd):   %s\n",
-            inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
+    printf("getpeername(connFd):   %s\n", inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
 
     if (getpeername(acceptFd, addr, &len) == -1)
         errExit("getpeername");
-    printf("getpeername(acceptFd): %s\n",
-            inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
+    printf("getpeername(acceptFd): %s\n", inetAddressStr(addr, len, addrStr, IS_ADDR_STR_LEN));
 
-    sleep(30);                          /* Give us time to run netstat(8) */
+    sleep(30); /* Give us time to run netstat(8) */
     exit(EXIT_SUCCESS);
 }

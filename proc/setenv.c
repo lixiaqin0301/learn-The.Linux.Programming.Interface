@@ -15,10 +15,10 @@
    An implementation of setenv() and unsetenv() using environ, putenv(),
    and getenv().
 */
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 int
 unsetenv(const char *name)
@@ -34,7 +34,7 @@ unsetenv(const char *name)
 
     len = strlen(name);
 
-    for (ep = environ; *ep != NULL; )
+    for (ep = environ; *ep != NULL;)
         if (strncmp(*ep, name, len) == 0 && (*ep)[len] == '=') {
 
             /* Remove found entry by shifting all successive entries
@@ -57,8 +57,7 @@ setenv(const char *name, const char *value, int overwrite)
 {
     char *es;
 
-    if (name == NULL || name[0] == '\0' || strchr(name, '=') != NULL ||
-            value == NULL) {
+    if (name == NULL || name[0] == '\0' || strchr(name, '=') != NULL || value == NULL) {
         errno = EINVAL;
         return -1;
     }
@@ -66,10 +65,10 @@ setenv(const char *name, const char *value, int overwrite)
     if (getenv(name) != NULL && overwrite == 0)
         return 0;
 
-    unsetenv(name);             /* Remove all occurrences */
+    unsetenv(name); /* Remove all occurrences */
 
     es = malloc(strlen(name) + strlen(value) + 2);
-                                /* +2 for '=' and null terminator */
+    /* +2 for '=' and null terminator */
     if (es == NULL)
         return -1;
 
@@ -89,13 +88,13 @@ main()
         perror("putenv");
 
     system("echo '***** Environment before unsetenv(TT)'; "
-            "printenv | grep ^TT");
+           "printenv | grep ^TT");
     system("echo 'Total lines from printenv:' `printenv | wc -l`");
 
     unsetenv("TT");
 
     system("echo '***** Environment after unsetenv(TT)'; "
-            "printenv | grep ^TT");
+           "printenv | grep ^TT");
     system("echo 'Total lines from printenv:' `printenv | wc -l`");
 
     setenv("xyz", "one", 1);
@@ -103,7 +102,7 @@ main()
     setenv("xyz2", "222", 0);
 
     system("echo '***** Environment after setenv() calls'; "
-            "printenv | grep ^x");
+           "printenv | grep ^x");
     system("echo 'Total lines from printenv:' `printenv | wc -l`");
 
     exit(EXIT_SUCCESS);

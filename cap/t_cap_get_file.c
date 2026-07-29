@@ -14,14 +14,17 @@
 
    Display the capabilities attached to a file.
 */
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/capability.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 int
 main(int argc, char *argv[])

@@ -31,16 +31,15 @@
         orphaned_pgrp_SIGHUP s p
         orphaned_pgrp_SIGHUP p p
 */
-#define _GNU_SOURCE     /* Get declaration of strsignal() from <string.h> */
-#include <string.h>
-#include <signal.h>
+#define _GNU_SOURCE /* Get declaration of strsignal() from <string.h> */
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <string.h>
 
-static void             /* Signal handler */
+static void /* Signal handler */
 handler(int sig)
 {
-    printf("PID=%ld: caught signal %d (%s)\n", (long) getpid(),
-            sig, strsignal(sig));       /* UNSAFE (see Section 21.1.2) */
+    printf("PID=%ld: caught signal %d (%s)\n", (long)getpid(), sig, strsignal(sig)); /* UNSAFE (see Section 21.1.2) */
 }
 
 int
@@ -52,7 +51,7 @@ main(int argc, char *argv[])
     if (argc < 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s {s|p} ...\n", argv[0]);
 
-    setbuf(stdout, NULL);               /* Make stdout unbuffered */
+    setbuf(stdout, NULL); /* Make stdout unbuffered */
 
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
@@ -62,9 +61,7 @@ main(int argc, char *argv[])
     if (sigaction(SIGCONT, &sa, NULL) == -1)
         errExit("sigaction");
 
-    printf("parent: PID=%ld, PPID=%ld, PGID=%ld, SID=%ld\n",
-            (long) getpid(), (long) getppid(),
-            (long) getpgrp(), (long) getsid(0));
+    printf("parent: PID=%ld, PPID=%ld, PGID=%ld, SID=%ld\n", (long)getpid(), (long)getppid(), (long)getpgrp(), (long)getsid(0));
 
     /* Create one child for each command-line argument */
 
@@ -73,30 +70,28 @@ main(int argc, char *argv[])
         case -1:
             errExit("fork");
 
-        case 0:         /* Child */
-            printf("child:  PID=%ld, PPID=%ld, PGID=%ld, SID=%ld\n",
-                    (long) getpid(), (long) getppid(),
-                    (long) getpgrp(), (long) getsid(0));
+        case 0: /* Child */
+            printf("child:  PID=%ld, PPID=%ld, PGID=%ld, SID=%ld\n", (long)getpid(), (long)getppid(), (long)getpgrp(), (long)getsid(0));
 
-            if (argv[j][0] == 's') {    /* Stop via signal */
-                printf("PID=%ld stopping\n", (long) getpid());
+            if (argv[j][0] == 's') { /* Stop via signal */
+                printf("PID=%ld stopping\n", (long)getpid());
                 raise(SIGSTOP);
-            } else {                    /* Wait for signal */
-                alarm(60);              /* So we die if not SIGHUPed */
-                printf("PID=%ld pausing\n", (long) getpid());
+            } else { /* Wait for signal */
+                alarm(60); /* So we die if not SIGHUPed */
+                printf("PID=%ld pausing\n", (long)getpid());
                 pause();
             }
 
             _exit(EXIT_SUCCESS);
 
-        default:        /* Parent carries on round loop */
+        default: /* Parent carries on round loop */
             break;
         }
     }
 
     /* Parent falls through to here after creating all children */
 
-    sleep(3);                           /* Give children a chance to start */
+    sleep(3); /* Give children a chance to start */
     printf("parent exiting\n");
-    exit(EXIT_SUCCESS);                 /* And orphan them and their group */
+    exit(EXIT_SUCCESS); /* And orphan them and their group */
 }

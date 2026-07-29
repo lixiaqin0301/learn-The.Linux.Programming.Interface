@@ -46,12 +46,12 @@ main(int argc, char *argv[])
        requirements of any type. */
 
     union {
-        char   buf[CMSG_SPACE(sizeof(int))];
-                        /* Space large enough to hold an 'int' */
+        char buf[CMSG_SPACE(sizeof(int))];
+        /* Space large enough to hold an 'int' */
         struct cmsghdr align;
     } controlMsg;
-    struct cmsghdr *cmsgp;      /* Pointer used to iterate through
-                                   headers in ancillary data */
+    struct cmsghdr *cmsgp; /* Pointer used to iterate through
+                              headers in ancillary data */
 
     /* Parse command-line options */
 
@@ -65,7 +65,8 @@ main(int argc, char *argv[])
 
         default:
             usageErr("%s [-d] file\n"
-                     "        -d    use datagram socket\n", argv[0]);
+                     "        -d    use datagram socket\n",
+                argv[0]);
         }
     }
 
@@ -116,7 +117,7 @@ main(int argc, char *argv[])
     cmsgp->cmsg_len = CMSG_LEN(sizeof(int));
     cmsgp->cmsg_level = SOL_SOCKET;
     cmsgp->cmsg_type = SCM_RIGHTS;
-    *((int *) CMSG_DATA(cmsgp)) = fd;
+    *((int *)CMSG_DATA(cmsgp)) = fd;
 
     /* Connect to the peer socket */
 
@@ -132,7 +133,7 @@ main(int argc, char *argv[])
     if (ns == -1)
         errExit("sendmsg");
 
-    fprintf(stderr, "sendmsg() returned %ld\n", (long) ns);
+    fprintf(stderr, "sendmsg() returned %ld\n", (long)ns);
 
     /* Once the file descriptor has been sent, it is no longer necessary
        to keep it open in the sending process */

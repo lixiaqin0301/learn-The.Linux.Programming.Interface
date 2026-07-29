@@ -18,20 +18,20 @@
    unless you construct a suitably formatted input file, it can't be
    usefully executed.)
 */
+#include "tlpi_hdr.h"
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
-#include <fcntl.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
 {
     int fd;
     struct iovec iov[3];
-    struct stat myStruct;       /* First buffer */
-    int x;                      /* Second buffer */
+    struct stat myStruct; /* First buffer */
+    int x; /* Second buffer */
 #define STR_SIZE 100
-    char str[STR_SIZE];         /* Third buffer */
+    char str[STR_SIZE]; /* Third buffer */
     ssize_t numRead, totRequired;
 
     if (argc != 2 || strcmp(argv[1], "--help") == 0)
@@ -62,7 +62,6 @@ main(int argc, char *argv[])
     if (numRead < totRequired)
         printf("Read fewer bytes than requested\n");
 
-    printf("total bytes requested: %ld; bytes read: %ld\n",
-            (long) totRequired, (long) numRead);
+    printf("total bytes requested: %ld; bytes read: %ld\n", (long)totRequired, (long)numRead);
     exit(EXIT_SUCCESS);
 }

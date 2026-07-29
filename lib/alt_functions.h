@@ -15,10 +15,9 @@
    Header file for alt_functions.c.
 */
 #ifndef ALT_FUNCTIONS_H
-#define ALT_FUNCTIONS_H         /* Prevent accidental double inclusion */
+#define ALT_FUNCTIONS_H /* Prevent accidental double inclusion */
 
-#if defined(__osf__) || defined(__hpux) || defined(_AIX) || \
-        defined(__sgi) || defined(__APPLE__)
+#if defined(__osf__) || defined(__hpux) || defined(_AIX) || defined(__sgi) || defined(__APPLE__)
 #define strsignal(sig) ALT_strsignal(sig)
 #endif
 char *ALT_strsignal(int sig);

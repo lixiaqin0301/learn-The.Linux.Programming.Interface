@@ -14,22 +14,22 @@
 
    Demonstration System V message queue-based server.
 */
-#include <sys/types.h>
+#include "tlpi_hdr.h"
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <sys/stat.h>
-#include "tlpi_hdr.h"
+#include <sys/types.h>
 
 #define KEY_FILE "/some-path/some-file"
-                                /* Should be an existing file or one
-                                   that this program creates */
+/* Should be an existing file or one
+   that this program creates */
 
 int
 main(int argc, char *argv[])
 {
     int msqid;
     key_t key;
-    const int MQ_PERMS = S_IRUSR | S_IWUSR | S_IWGRP;   /* rw--w---- */
+    const int MQ_PERMS = S_IRUSR | S_IWUSR | S_IWGRP; /* rw--w---- */
 
     /* Optional code here to check if another server process is
        already running */
@@ -42,10 +42,9 @@ main(int argc, char *argv[])
 
     /* While msgget() fails, try creating the queue exclusively */
 
-    while ((msqid = msgget(key, IPC_CREAT | IPC_EXCL | MQ_PERMS)) ==
-            -1) {
-        if (errno == EEXIST) {          /* MQ with the same key already
-                                           exists - remove it and try again */
+    while ((msqid = msgget(key, IPC_CREAT | IPC_EXCL | MQ_PERMS)) == -1) {
+        if (errno == EEXIST) { /* MQ with the same key already
+                                  exists - remove it and try again */
             msqid = msgget(key, 0);
             if (msqid == -1)
                 errExit("msgget() failed to retrieve old queue ID");
@@ -53,7 +52,7 @@ main(int argc, char *argv[])
                 errExit("msgget() failed to delete old queue");
             printf("Removed old message queue (id=%d)\n", msqid);
 
-        } else {                        /* Some other error --> give up */
+        } else { /* Some other error --> give up */
             errExit("msgget() failed");
         }
     }

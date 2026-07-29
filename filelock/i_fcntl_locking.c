@@ -28,19 +28,19 @@
        3) allows the use of OFD locks, a type of file lock added in
           Linux 3.15.
 */
-#define _GNU_SOURCE     /* To get definitions of 'OFD' locking commands */
-#include <sys/stat.h>
-#include <fcntl.h>
+#define _GNU_SOURCE /* To get definitions of 'OFD' locking commands */
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #define MAX_LINE 100
 
 #ifdef __linux__
-#ifndef F_OFD_GETLK     /* In case we are on a system with glibc version
-                           earlier than 2.20 */
-#define F_OFD_GETLK     36
-#define F_OFD_SETLK     37
-#define F_OFD_SETLKW    38
+#ifndef F_OFD_GETLK /* In case we are on a system with glibc version                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+                       earlier than 2.20 */
+#define F_OFD_GETLK 36
+#define F_OFD_SETLK 37
+#define F_OFD_SETLKW 38
 #endif
 #endif
 
@@ -68,28 +68,25 @@ displayCmdFmt(int argc, char *argv[], const int fdList[])
 {
     int j;
 
-    if (argc == 2) {            /* Only a single filename argument */
+    if (argc == 2) { /* Only a single filename argument */
         printf("\nFormat: cmd lock start length [whence]\n\n");
     } else {
-        printf("\nFormat: %scmd lock start length [whence]\n\n",
-                (argc > 2) ? "file-num " : "");
+        printf("\nFormat: %scmd lock start length [whence]\n\n", (argc > 2) ? "file-num " : "");
         printf("    file-num is a number from the following list\n");
         for (j = 1; j < argc; j++)
-            printf("        %2d  %-10s [%s locking]\n", j, argv[j],
-                mandLockingEnabled(fdList[j]) ? "mandatory" :
-                                                "advisory");
+            printf("        %2d  %-10s [%s locking]\n", j, argv[j], mandLockingEnabled(fdList[j]) ? "mandatory" : "advisory");
     }
     printf("    'cmd' is 'g' (GETLK), 's' (SETLK), or 'w' (SETLKW)\n");
 #ifdef __linux__
     printf("        or for OFD locks: 'G' (OFD_GETLK), 'S' (OFD_SETLK), or "
-            "'W' (OFD_SETLKW)\n");
+           "'W' (OFD_SETLKW)\n");
 #endif
     printf("    'lock' is 'r' (READ), 'w' (WRITE), or 'u' (UNLOCK)\n");
     printf("    'start' and 'length' specify byte range to lock\n");
     printf("    'whence' is 's' (SEEK_SET, default), 'c' (SEEK_CUR), "
            "or 'e' (SEEK_END)\n\n");
-                /* Of course, SEEK_CUR is redundant since we can't
-                   change the file offset in this program... */
+    /* Of course, SEEK_CUR is redundant since we can't
+       change the file offset in this program... */
 }
 
 int
@@ -121,97 +118,91 @@ main(int argc, char *argv[])
     printf("----       -------\n");
 
     for (j = 1; j < argc; j++)
-        printf("%-10s %s\n", argv[j], mandLockingEnabled(fdList[j]) ?
-                "mandatory" : "advisory");
+        printf("%-10s %s\n", argv[j], mandLockingEnabled(fdList[j]) ? "mandatory" : "advisory");
     printf("\n");
 
     printf("Enter ? for help\n");
 
-    for (;;) {          /* Prompt for locking command and carry it out */
-        printf("PID=%ld> ", (long) getpid());
+    for (;;) { /* Prompt for locking command and carry it out */
+        printf("PID=%ld> ", (long)getpid());
         fflush(stdout);
 
-        if (fgets(line, MAX_LINE, stdin) == NULL)       /* EOF */
+        if (fgets(line, MAX_LINE, stdin) == NULL) /* EOF */
             exit(EXIT_SUCCESS);
-        line[strlen(line) - 1] = '\0';          /* Remove trailing '\n' */
+        line[strlen(line) - 1] = '\0'; /* Remove trailing '\n' */
 
         if (*line == '\0')
-            continue;                           /* Skip blank lines */
+            continue; /* Skip blank lines */
 
         if (line[0] == '?') {
             displayCmdFmt(argc, argv, fdList);
             continue;
         }
 
-        whence = 's';                   /* In case not otherwise filled in */
+        whence = 's'; /* In case not otherwise filled in */
 
-        if (argc == 2) {                /* Just 1 file arg on command line? */
-            fileNum = 1;                /* Then no need to read a file number */
-            numRead = sscanf(line, " %c %c %lld %lld %c",
-                    &cmdCh, &lock, &st, &len, &whence);
+        if (argc == 2) { /* Just 1 file arg on command line? */
+            fileNum = 1; /* Then no need to read a file number */
+            numRead = sscanf(line, " %c %c %lld %lld %c", &cmdCh, &lock, &st, &len, &whence);
         } else {
-            numRead = sscanf(line, "%d %c %c %lld %lld %c",
-                    &fileNum, &cmdCh, &lock, &st, &len, &whence);
+            numRead = sscanf(line, "%d %c %c %lld %lld %c", &fileNum, &cmdCh, &lock, &st, &len, &whence);
         }
 
         fl.l_start = st;
         fl.l_len = len;
 
         if (fileNum < 1 || fileNum >= argc) {
-            printf("File number must be in range 1 to %d\n", argc-1);
+            printf("File number must be in range 1 to %d\n", argc - 1);
             continue;
         }
 
         fd = fdList[fileNum];
 
-        if (!((numRead >= 4 && argc == 2) || (numRead >= 5 && argc > 2)) ||
-                strchr("gswGSW", cmdCh) == NULL ||
-                strchr("rwu", lock) == NULL || strchr("sce", whence) == NULL) {
+        if (!((numRead >= 4 && argc == 2) || (numRead >= 5 && argc > 2)) || strchr("gswGSW", cmdCh) == NULL || strchr("rwu", lock) == NULL || strchr("sce", whence) == NULL) {
             printf("Invalid command!\n");
             continue;
         }
 
         cmd =
 #ifdef __linux__
-              (cmdCh == 'G') ? F_OFD_GETLK : (cmdCh == 'S') ? F_OFD_SETLK :
-              (cmdCh == 'W') ? F_OFD_SETLKW :
+            (cmdCh == 'G')   ? F_OFD_GETLK
+            : (cmdCh == 'S') ? F_OFD_SETLK
+            : (cmdCh == 'W') ? F_OFD_SETLKW
+            :
 #endif
-              (cmdCh == 'g') ? F_GETLK : (cmdCh == 's') ? F_SETLK : F_SETLKW;
+            (cmdCh == 'g')   ? F_GETLK
+            : (cmdCh == 's') ? F_SETLK
+                             : F_SETLKW;
 #ifdef __linux__
-        fl.l_pid = 0;   /* Required for 'OFD' locking commands */
+        fl.l_pid = 0; /* Required for 'OFD' locking commands */
 #endif
         fl.l_type = (lock == 'r') ? F_RDLCK : (lock == 'w') ? F_WRLCK : F_UNLCK;
-        fl.l_whence = (whence == 'c') ? SEEK_CUR :
-                      (whence == 'e') ? SEEK_END : SEEK_SET;
+        fl.l_whence = (whence == 'c') ? SEEK_CUR : (whence == 'e') ? SEEK_END : SEEK_SET;
 
-        status = fcntl(fd, cmd, &fl);           /* Perform request... */
+        status = fcntl(fd, cmd, &fl); /* Perform request... */
 
         if (cmd == F_GETLK
 #ifdef __linux__
-                || cmd == F_OFD_GETLK
+            || cmd == F_OFD_GETLK
 #endif
-                ) {
+        ) {
             if (status == -1) {
                 errMsg("fcntl");
             } else {
                 if (fl.l_type == F_UNLCK)
-                    printf("[PID=%ld] Lock can be placed\n", (long) getpid());
-                else                            /* Locked out by someone else */
+                    printf("[PID=%ld] Lock can be placed\n", (long)getpid());
+                else /* Locked out by someone else */
                     printf("[PID=%ld] Denied by %s lock on %lld:%lld "
-                            "(held by PID %ld)\n", (long) getpid(),
-                            (fl.l_type == F_RDLCK) ? "READ" : "WRITE",
-                            (long long) fl.l_start,
-                            (long long) fl.l_len, (long) fl.l_pid);
+                           "(held by PID %ld)\n",
+                        (long)getpid(), (fl.l_type == F_RDLCK) ? "READ" : "WRITE", (long long)fl.l_start, (long long)fl.l_len, (long)fl.l_pid);
             }
         } else {
             if (status == 0)
-                printf("[PID=%ld] %s\n", (long) getpid(),
-                        (lock == 'u') ? "unlocked" : "got lock");
+                printf("[PID=%ld] %s\n", (long)getpid(), (lock == 'u') ? "unlocked" : "got lock");
             else if (errno == EAGAIN || errno == EACCES)
-                printf("[PID=%ld] failed (incompatible lock)\n",
-                        (long) getpid());
-            else if (errno == EDEADLK)                          /* F_SETLKW */
-                printf("[PID=%ld] failed (deadlock)\n", (long) getpid());
+                printf("[PID=%ld] failed (incompatible lock)\n", (long)getpid());
+            else if (errno == EDEADLK) /* F_SETLKW */
+                printf("[PID=%ld] failed (deadlock)\n", (long)getpid());
             else
                 errMsg("fcntl");
         }

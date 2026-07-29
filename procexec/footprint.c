@@ -20,11 +20,11 @@
    terminates, all of its memory is freed, and the memory consumption of
    the parent is left unaffected.
 */
-#define _BSD_SOURCE     /* To get sbrk() declaration from <unistd.h> in case
-                           _XOPEN_SOURCE >= 600; defining _SVID_SOURCE or
-                           _GNU_SOURCE also suffices */
-#include <sys/wait.h>
+#define _BSD_SOURCE /* To get sbrk() declaration from <unistd.h> in case                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+                       _XOPEN_SOURCE >= 600; defining _SVID_SOURCE or                                                                                                                                                                                                                                                                                                                                                                                                                                              \
+                       _GNU_SOURCE also suffices */
 #include "tlpi_hdr.h"
+#include <sys/wait.h>
 
 static int
 func(int arg)
@@ -46,7 +46,7 @@ main(int argc, char *argv[])
     pid_t childPid;
     int status;
 
-    setbuf(stdout, NULL);           /* Disable buffering of stdout */
+    setbuf(stdout, NULL); /* Disable buffering of stdout */
 
     printf("Program break in parent: %10p\n", sbrk(0));
 
@@ -54,8 +54,8 @@ main(int argc, char *argv[])
     if (childPid == -1)
         errExit("fork");
 
-    if (childPid == 0)              /* Child calls func() and */
-        exit(func(arg));            /* uses return value as exit status */
+    if (childPid == 0) /* Child calls func() and */
+        exit(func(arg)); /* uses return value as exit status */
 
     /* Parent waits for child to terminate. It can determine the
        result of func() by inspecting 'status' */

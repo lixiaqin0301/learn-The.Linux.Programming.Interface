@@ -16,16 +16,19 @@
    process's credentials and capabilities before and after setns().
 */
 #define _GNU_SOURCE
+#include "userns_functions.h"
 #include <fcntl.h>
 #include <sched.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/capability.h>
-#include "userns_functions.h"
+#include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 int
 main(int argc, char *argv[])
@@ -44,7 +47,7 @@ main(int argc, char *argv[])
     if (fd == -1)
         errExit("open");
 
-    if (setns(fd, CLONE_NEWUSER) == -1)  /* Join that namespace */
+    if (setns(fd, CLONE_NEWUSER) == -1) /* Join that namespace */
         errExit("setns-1");
 
     display_creds_and_caps("After setns():\n");

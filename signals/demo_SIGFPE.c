@@ -27,17 +27,17 @@
    below is likely to be optimized away completely, with the result that
    we don't get SIGFPE at all.
 */
-#define _GNU_SOURCE     /* Get strsignal() declaration from <string.h> */
-#include <string.h>
-#include <signal.h>
+#define _GNU_SOURCE /* Get strsignal() declaration from <string.h> */
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <string.h>
 
 static void
 sigfpeCatcher(int sig)
 {
     printf("Caught signal %d (%s)\n", sig, strsignal(sig));
-                                /* UNSAFE (see Section 21.1.2) */
-    sleep(1);                   /* Slow down execution of handler */
+    /* UNSAFE (see Section 21.1.2) */
+    sleep(1); /* Slow down execution of handler */
 }
 
 int
@@ -52,7 +52,8 @@ main(int argc, char *argv[])
 
     if (argc > 1 && strchr(argv[1], 'i') != NULL) {
         printf("Ignoring SIGFPE\n");
-        if (signal(SIGFPE, SIG_IGN) == SIG_ERR)     errExit("signal");
+        if (signal(SIGFPE, SIG_IGN) == SIG_ERR)
+            errExit("signal");
     } else {
         printf("Catching SIGFPE\n");
         sigemptyset(&sa.sa_mask);
@@ -74,7 +75,7 @@ main(int argc, char *argv[])
     printf("About to generate SIGFPE\n");
     y = 0;
     x = 1 / y;
-    y = x;      /* Avoid complaints from "gcc -Wunused-but-set-variable" */
+    y = x; /* Avoid complaints from "gcc -Wunused-but-set-variable" */
 
     if (blocking) {
         printf("Sleeping before unblocking\n");

@@ -15,10 +15,10 @@
    Demonstrate the use of sigwaitinfo() to synchronously wait for a signal.
 */
 #define _GNU_SOURCE
-#include <string.h>
-#include <signal.h>
-#include <time.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <string.h>
+#include <time.h>
 
 int
 main(int argc, char *argv[])
@@ -30,7 +30,7 @@ main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "--help") == 0)
         usageErr("%s [delay-secs]\n", argv[0]);
 
-    printf("%s: PID is %ld\n", argv[0], (long) getpid());
+    printf("%s: PID is %ld\n", argv[0], (long)getpid());
 
     /* Block all signals (except SIGKILL and SIGSTOP) */
 
@@ -39,13 +39,13 @@ main(int argc, char *argv[])
         errExit("sigprocmask");
     printf("%s: signals blocked\n", argv[0]);
 
-    if (argc > 1) {             /* Delay so that signals can be sent to us */
+    if (argc > 1) { /* Delay so that signals can be sent to us */
         printf("%s: about to delay %s seconds\n", argv[0], argv[1]);
         sleep(getInt(argv[1], GN_GT_0, "delay-secs"));
         printf("%s: finished delay\n", argv[0]);
     }
 
-    for (;;) {                  /* Fetch signals until SIGINT (^C) or SIGTERM */
+    for (;;) { /* Fetch signals until SIGINT (^C) or SIGTERM */
         sig = sigwaitinfo(&allSigs, &si);
         if (sig == -1)
             errExit("sigwaitinfo");
@@ -54,12 +54,7 @@ main(int argc, char *argv[])
             exit(EXIT_SUCCESS);
 
         printf("got signal: %d (%s)\n", sig, strsignal(sig));
-        printf("    si_signo=%d, si_code=%d (%s), si_value=%d\n",
-                si.si_signo, si.si_code,
-                (si.si_code == SI_USER) ? "SI_USER" :
-                    (si.si_code == SI_QUEUE) ? "SI_QUEUE" : "other",
-                si.si_value.sival_int);
-        printf("    si_pid=%ld, si_uid=%ld\n",
-                (long) si.si_pid, (long) si.si_uid);
+        printf("    si_signo=%d, si_code=%d (%s), si_value=%d\n", si.si_signo, si.si_code, (si.si_code == SI_USER) ? "SI_USER" : (si.si_code == SI_QUEUE) ? "SI_QUEUE" : "other", si.si_value.sival_int);
+        printf("    si_pid=%ld, si_uid=%ld\n", (long)si.si_pid, (long)si.si_uid);
     }
 }

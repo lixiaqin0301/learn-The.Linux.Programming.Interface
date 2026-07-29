@@ -11,8 +11,8 @@
 /* foo1.c
 
 */
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void
 xyz(void)

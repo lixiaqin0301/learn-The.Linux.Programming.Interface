@@ -28,9 +28,9 @@
    If compiled with -DUSE_FSYNC, perform an fsync() after each write, so that
    data and metadata are flushed to the disk.
 */
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int
 main(int argc, char *argv[])
@@ -59,8 +59,7 @@ main(int argc, char *argv[])
     if (fd == -1)
         errExit("open");
 
-    for (totWritten = 0; totWritten < numBytes;
-            totWritten += thisWrite) {
+    for (totWritten = 0; totWritten < numBytes; totWritten += thisWrite) {
         thisWrite = min(bufSize, numBytes - totWritten);
 
         if (write(fd, buf, thisWrite) != thisWrite)

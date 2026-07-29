@@ -18,14 +18,14 @@
    subdirectories underneath the pathname specified in its
    sole command-line argument.
 */
-#if ! defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 700
+#if !defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 700
 #undef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 500
 #endif
-#include <stdarg.h>
-#include <limits.h>
-#include <ftw.h>
 #include "tlpi_hdr.h"
+#include <ftw.h>
+#include <limits.h>
+#include <stdarg.h>
 
 #define DLIM 60
 
@@ -39,13 +39,12 @@ static int dlSize = 0;
 static const int D_INCR = 1000;
 
 static int
-traverseTree(const char *pathname, const struct stat *sb, int tflag,
-             struct FTW *ftwbuf)
+traverseTree(const char *pathname, const struct stat *sb, int tflag, struct FTW *ftwbuf)
 {
-    if (! S_ISDIR(sb->st_mode))
+    if (!S_ISDIR(sb->st_mode))
         return 0;
 
-    //printf("%s\n", pathname);
+    // printf("%s\n", pathname);
 
     if (dcnt >= dlSize) {
         dlSize += D_INCR;
@@ -91,19 +90,23 @@ static void
 usageError(char *pname)
 {
     fprintf(stderr, "Usage: %s [options] dirpath {c|d|m}\n\n", pname);
-    fprintf(stderr, "Perform random operations in the "
-            "directory tree 'dirpath'\n");
+    fprintf(stderr,
+        "Perform random operations in the "
+        "directory tree 'dirpath'\n");
     fprintf(stderr, "    c == create directories\n");
     fprintf(stderr, "    d == delete directories\n");
     fprintf(stderr, "    m == rename directories\n\n");
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "    -l logfile     Record activity in log file\n");
-    fprintf(stderr, "    -m maxops      Do at most 'maxops' operations "
-            "(default is unlimited)\n");
-    fprintf(stderr, "    -s usecs       Sleep 'usecs' microseconds "
-            "between each operation\n");
-    fprintf(stderr, "    -z stopfile    Immediately stop when the file "
-            "'stopfile' is created\n");
+    fprintf(stderr,
+        "    -m maxops      Do at most 'maxops' operations "
+        "(default is unlimited)\n");
+    fprintf(stderr,
+        "    -s usecs       Sleep 'usecs' microseconds "
+        "between each operation\n");
+    fprintf(stderr,
+        "    -z stopfile    Immediately stop when the file "
+        "'stopfile' is created\n");
     exit(EXIT_FAILURE);
 }
 
@@ -171,9 +174,7 @@ main(int argc, char *argv[])
 
         switch (argv[optind + 1][0]) {
         case 'c':
-            snprintf(path, sizeof(path), "%s/%ld%s%s_%d",
-                    dirList[random() % dcnt],
-                    (long) getpid() % 100, MARKER_STRING, "cr", opcnt);
+            snprintf(path, sizeof(path), "%s/%ld%s%s_%d", dirList[random() % dcnt], (long)getpid() % 100, MARKER_STRING, "cr", opcnt);
             if (strlen(path) > DLIM)
                 continue;
             nslashes = 0;
@@ -190,9 +191,7 @@ main(int argc, char *argv[])
 
             scnt = 1;
             while ((random() % 3) < 2) {
-                s = snprintf(spath, sizeof(path), "%s/%ld%s%s%d_%d", path,
-                        (long) getpid() % 100,
-                        MARKER_STRING, "scr", scnt, opcnt);
+                s = snprintf(spath, sizeof(path), "%s/%ld%s%s%d_%d", path, (long)getpid() % 100, MARKER_STRING, "scr", scnt, opcnt);
                 if (s > DLIM)
                     break;
 
@@ -237,9 +236,7 @@ main(int argc, char *argv[])
                 if (p != NULL)
                     *p = '\0';
 
-                s = snprintf(target, sizeof(target), "%s/%s__ren%04d-%ld",
-                        dirList[random() % dcnt],
-                        tfile, opcnt, (long) getpid());
+                s = snprintf(target, sizeof(target), "%s/%s__ren%04d-%ld", dirList[random() % dcnt], tfile, opcnt, (long)getpid());
 
                 if (s > DLIM)
                     break;

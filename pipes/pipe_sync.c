@@ -24,20 +24,20 @@
    write end of the pipe; the parent can see that all children have finished
    their work when it sees end-of-file on the read end of the pipe.
 */
-#include "curr_time.h"                      /* Declaration of currTime() */
+#include "curr_time.h" /* Declaration of currTime() */
 #include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
 {
-    int pfd[2];                             /* Process synchronization pipe */
+    int pfd[2]; /* Process synchronization pipe */
     int j, dummy;
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s sleep-time...\n", argv[0]);
 
-    setbuf(stdout, NULL);                   /* Make stdout unbuffered, since we
-                                               terminate child with _exit() */
+    setbuf(stdout, NULL); /* Make stdout unbuffered, since we
+                             terminate child with _exit() */
     printf("%s  Parent started\n", currTime("%T"));
 
     if (pipe(pfd) == -1)
@@ -49,15 +49,14 @@ main(int argc, char *argv[])
             errExit("fork %d", j);
 
         case 0: /* Child */
-            if (close(pfd[0]) == -1)        /* Read end is unused */
+            if (close(pfd[0]) == -1) /* Read end is unused */
                 errExit("close");
 
             /* Child does some work, and lets parent know it's done */
 
             sleep(getInt(argv[j], GN_NONNEG, "sleep-time"));
-                                            /* Simulate processing */
-            printf("%s  Child %d (PID=%ld) closing pipe\n",
-                    currTime("%T"), j, (long) getpid());
+            /* Simulate processing */
+            printf("%s  Child %d (PID=%ld) closing pipe\n", currTime("%T"), j, (long)getpid());
             if (close(pfd[1]) == -1)
                 errExit("close");
 
@@ -72,7 +71,7 @@ main(int argc, char *argv[])
 
     /* Parent comes here; close write end of pipe so we can see EOF */
 
-    if (close(pfd[1]) == -1)                /* Write end is unused */
+    if (close(pfd[1]) == -1) /* Write end is unused */
         errExit("close");
 
     /* Parent may do other work, then synchronizes with children */

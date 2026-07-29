@@ -20,20 +20,20 @@
    Usage: unbuffer prog [arg ...]
 */
 #include <termios.h>
-#if ! defined(__hpux)
+#if !defined(__hpux)
 /* HP-UX 11 doesn't have this header file */
 #include <sys/select.h>
 #endif
-#include "pty_fork.h"           /* Declaration of ptyFork() */
-#include "tty_functions.h"      /* Declaration of ttySetRaw() */
+#include "pty_fork.h" /* Declaration of ptyFork() */
 #include "tlpi_hdr.h"
+#include "tty_functions.h" /* Declaration of ttySetRaw() */
 
 #define BUF_SIZE 256
 #define MAX_SNAME 1000
 
 struct termios ttyOrig;
 
-static void             /* Reset terminal mode on program exit */
+static void /* Reset terminal mode on program exit */
 ttyReset(void)
 {
     if (tcsetattr(STDIN_FILENO, TCSANOW, &ttyOrig) == -1)
@@ -54,7 +54,7 @@ main(int argc, char *argv[])
 
     if (tcgetattr(STDIN_FILENO, &ttyOrig) == -1)
         errExit("tcgetattr");
-    if (ioctl(STDIN_FILENO, TIOCGWINSZ, (char *) &ws) < 0)
+    if (ioctl(STDIN_FILENO, TIOCGWINSZ, (char *)&ws) < 0)
         errExit("TIOCGWINSZ error");
 
     /* Create a child process, with parent and child connected via a
@@ -65,11 +65,11 @@ main(int argc, char *argv[])
     case -1:
         errExit("ptyFork");
 
-    case 0:     /* Child executes command given in argv[1]... */
+    case 0: /* Child executes command given in argv[1]... */
         execvp(argv[1], &argv[1]);
         errExit("execvp");
 
-    default:    /* Parent relays data between terminal and pty master */
+    default: /* Parent relays data between terminal and pty master */
 
         /* Place terminal in raw mode so that we can pass all
            terminal input to the pseudoterminal master untouched */

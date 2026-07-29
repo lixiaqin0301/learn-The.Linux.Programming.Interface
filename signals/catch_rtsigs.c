@@ -34,15 +34,15 @@
    SIGINT) or sending it SIGTERM.
 */
 #define _GNU_SOURCE
-#include <string.h>
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <string.h>
 
 static volatile int handlerSleepTime;
-static volatile int sigCnt = 0;         /* Number of signals received */
+static volatile int sigCnt = 0; /* Number of signals received */
 static volatile sig_atomic_t allDone = 0;
 
-static void             /* Handler for signals established using SA_SIGINFO */
+static void /* Handler for signals established using SA_SIGINFO */
 siginfoHandler(int sig, siginfo_t *si, void *ucontext)
 {
     /* UNSAFE: This handler uses non-async-signal-safe functions
@@ -58,12 +58,9 @@ siginfoHandler(int sig, siginfo_t *si, void *ucontext)
     sigCnt++;
     printf("caught signal %d\n", sig);
 
-    printf("    si_signo=%d, si_code=%d (%s), ", si->si_signo, si->si_code,
-            (si->si_code == SI_USER) ? "SI_USER" :
-            (si->si_code == SI_QUEUE) ? "SI_QUEUE" : "other");
+    printf("    si_signo=%d, si_code=%d (%s), ", si->si_signo, si->si_code, (si->si_code == SI_USER) ? "SI_USER" : (si->si_code == SI_QUEUE) ? "SI_QUEUE" : "other");
     printf("si_value=%d\n", si->si_value.sival_int);
-    printf("    si_pid=%ld, si_uid=%ld\n",
-            (long) si->si_pid, (long) si->si_uid);
+    printf("    si_pid=%ld, si_uid=%ld\n", (long)si->si_pid, (long)si->si_uid);
 
     sleep(handlerSleepTime);
 }
@@ -78,10 +75,9 @@ main(int argc, char *argv[])
     if (argc > 1 && strcmp(argv[1], "--help") == 0)
         usageErr("%s [block-time [handler-sleep-time]]\n", argv[0]);
 
-    printf("%s: PID is %ld\n", argv[0], (long) getpid());
+    printf("%s: PID is %ld\n", argv[0], (long)getpid());
 
-    handlerSleepTime = (argc > 2) ?
-                getInt(argv[2], GN_NONNEG, "handler-sleep-time") : 1;
+    handlerSleepTime = (argc > 2) ? getInt(argv[2], GN_NONNEG, "handler-sleep-time") : 1;
 
     /* Establish handler for most signals. During execution of the handler,
        mask all other signals to prevent handlers recursively interrupting
@@ -114,7 +110,7 @@ main(int argc, char *argv[])
             errExit("sigprocmask");
     }
 
-    while (!allDone)                    /* Wait for incoming signals */
+    while (!allDone) /* Wait for incoming signals */
         pause();
 
     printf("Caught %d signals\n", sigCnt);

@@ -24,15 +24,14 @@
    verify the process's capabilities before executing the command.
 */
 #define _GNU_SOURCE
-#include <unistd.h>
-#include "userns_functions.h"
 #include "tlpi_hdr.h"
+#include "userns_functions.h"
+#include <unistd.h>
 
 static void
 usage(char *pname)
 {
-    fprintf(stderr, "Usage: %s [-u UID] [-g GID] [-v] command [arg...]\n",
-            pname);
+    fprintf(stderr, "Usage: %s [-u UID] [-g GID] [-v] command [arg...]\n", pname);
     exit(EXIT_FAILURE);
 }
 
@@ -48,10 +47,17 @@ main(int argc, char *argv[])
     verbose = 0;
     while ((opt = getopt(argc, argv, "g:u:v")) != -1) {
         switch (opt) {
-        case 'g': newgid = atoi(optarg);        break;
-        case 'u': newuid = atoi(optarg);        break;
-        case 'v': verbose = 1;                  break;
-        default:  usage(argv[0]);
+        case 'g':
+            newgid = atoi(optarg);
+            break;
+        case 'u':
+            newuid = atoi(optarg);
+            break;
+        case 'v':
+            verbose = 1;
+            break;
+        default:
+            usage(argv[0]);
         }
     }
 

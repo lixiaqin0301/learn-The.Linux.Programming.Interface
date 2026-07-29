@@ -20,8 +20,8 @@
    If a fourth command-line argument is supplied, send one instance of that
    signal, after sending the previous signals.
 */
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 int
 main(int argc, char *argv[])
@@ -38,8 +38,7 @@ main(int argc, char *argv[])
 
     /* Send signals to receiver */
 
-    printf("%s: sending signal %d to process %ld %d times\n",
-            argv[0], sig, (long) pid, numSigs);
+    printf("%s: sending signal %d to process %ld %d times\n", argv[0], sig, (long)pid, numSigs);
 
     for (j = 0; j < numSigs; j++)
         if (kill(pid, sig) == -1)

@@ -20,9 +20,9 @@
    function being replaced. (#defines are used elsewhere to convert the
    standard names into these alternate forms.)
 */
-#include <stdio.h>
-#include <fcntl.h>
 #include "alt_functions.h"
+#include <fcntl.h>
+#include <stdio.h>
 
 /* A very minimal implementation of strsignal()... */
 
@@ -31,7 +31,7 @@
 char *
 ALT_strsignal(int sig)
 {
-    static char buf[BUF_SIZE];          /* Not thread-safe */
+    static char buf[BUF_SIZE]; /* Not thread-safe */
 
     snprintf(buf, BUF_SIZE, "SIG-%d", sig);
     return buf;
@@ -42,7 +42,7 @@ ALT_strsignal(int sig)
 char *
 ALT_hstrerror(int err)
 {
-    static char buf[BUF_SIZE];          /* Not thread-safe */
+    static char buf[BUF_SIZE]; /* Not thread-safe */
 
     snprintf(buf, BUF_SIZE, "hstrerror-%d", err);
     return buf;

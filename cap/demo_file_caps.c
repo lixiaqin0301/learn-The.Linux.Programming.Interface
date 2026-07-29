@@ -23,17 +23,20 @@
    then it can open any file for reading.
 */
 #define _GNU_SOURCE
-#include <sys/capability.h>
-#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <errno.h>
 #include <string.h>
-#include <fcntl.h>
+#include <sys/capability.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 int
 main(int argc, char *argv[])

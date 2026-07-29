@@ -18,11 +18,11 @@
    This program is Linux-specific. The timerfd API is supported since kernel
    2.6.25. Library support is provided since glibc 2.8.
 */
+#include "itimerspec_from_str.h" /* Declares itimerspecFromStr() */
+#include "tlpi_hdr.h"
+#include <stdint.h> /* Definition of uint64_t */
 #include <sys/timerfd.h>
 #include <time.h>
-#include <stdint.h>                     /* Definition of uint64_t */
-#include "itimerspec_from_str.h"        /* Declares itimerspecFromStr() */
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -71,9 +71,7 @@ main(int argc, char *argv[])
             nanosecs += 1000000000;
         }
 
-        printf("%d.%03d: expirations read: %llu; total=%llu\n",
-                secs, (nanosecs + 500000) / 1000000,
-                (unsigned long long) numExp, (unsigned long long) totalExp);
+        printf("%d.%03d: expirations read: %llu; total=%llu\n", secs, (nanosecs + 500000) / 1000000, (unsigned long long)numExp, (unsigned long long)totalExp);
     }
 
     exit(EXIT_SUCCESS);

@@ -27,8 +27,8 @@
    the cgroup membership of the parent process before any child processes
    are created.
 */
-#include <sys/wait.h>
 #include "tlpi_hdr.h"
+#include <sys/wait.h>
 
 int
 main(int argc, char *argv[])
@@ -38,15 +38,14 @@ main(int argc, char *argv[])
     int childSleepTime, parentSleepTime;
 
     if (argc < 2) {
-        usageErr("%s num-children [parent-sleep-secs [child-sleep-secs]]\n",
-                argv[0]);
+        usageErr("%s num-children [parent-sleep-secs [child-sleep-secs]]\n", argv[0]);
     }
 
     numChildren = atoi(argv[1]);
     parentSleepTime = (argc > 2) ? atoi(argv[2]) : 0;
     childSleepTime = (argc > 3) ? atoi(argv[3]) : 300;
 
-    printf("Parent PID = %ld\n", (long) getpid());
+    printf("Parent PID = %ld\n", (long)getpid());
 
     /* If a parent sleep time was specified, show the user the parent's
        PID in case they want to write it to a cgroup.procs file */
@@ -56,8 +55,7 @@ main(int argc, char *argv[])
         sleep(parentSleepTime);
     }
 
-    printf("Creating %d children that will sleep %d seconds\n",
-            numChildren, childSleepTime);
+    printf("Creating %d children that will sleep %d seconds\n", numChildren, childSleepTime);
 
     failed = 0;
     for (int j = 1; j <= numChildren && !failed; j++) {
@@ -70,7 +68,7 @@ main(int argc, char *argv[])
             sleep(childSleepTime);
             exit(EXIT_SUCCESS);
         default:
-            printf("Child %d: PID = %ld\n", j, (long) childPid);
+            printf("Child %d: PID = %ld\n", j, (long)childPid);
             break;
         }
     }

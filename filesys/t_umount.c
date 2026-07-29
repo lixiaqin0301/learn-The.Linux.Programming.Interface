@@ -18,8 +18,8 @@
 
    This program is Linux-specific.
 */
-#include <sys/mount.h>
 #include "tlpi_hdr.h"
+#include <sys/mount.h>
 
 int
 main(int argc, char *argv[])

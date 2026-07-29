@@ -17,20 +17,20 @@
    command line.  The program relies on the use of ambient capabilities,
    a feature that first appeared in Linux 4.3.
 */
-#define _GNU_SOURCE         /* See feature_test_macros(7) */
-#include <string.h>
-#include <unistd.h>
-#include <sys/prctl.h>
-#include <sys/capability.h>
-#include <linux/securebits.h>
-#include <sys/types.h>
-#include <pwd.h>
-#include <grp.h>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
+#define _GNU_SOURCE /* See feature_test_macros(7) */
 #include "cap_functions.h"
 #include "tlpi_hdr.h"
+#include <errno.h>
+#include <grp.h>
+#include <linux/securebits.h>
+#include <pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/capability.h>
+#include <sys/prctl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 static void
 usage(char *pname)
@@ -120,16 +120,20 @@ setAmbientCapabilities(char *capList)
            that capability must also be in the inheritable set */
 
         if (modifyCapSetting(CAP_INHERITABLE, cap, CAP_SET) == -1) {
-            fprintf(stderr, "Could not raise '%s' inheritable "
-                    "capability (%s)\n", p, strerror(errno));
+            fprintf(stderr,
+                "Could not raise '%s' inheritable "
+                "capability (%s)\n",
+                p, strerror(errno));
             exit(EXIT_FAILURE);
         }
 
         /* Raise the capability in the ambient set */
 
         if (prctl(PR_CAP_AMBIENT, PR_CAP_AMBIENT_RAISE, cap, 0, 0) == -1) {
-            fprintf(stderr, "Could not raise '%s' ambient "
-                    "capability (%s)\n", p, strerror(errno));
+            fprintf(stderr,
+                "Could not raise '%s' ambient "
+                "capability (%s)\n",
+                p, strerror(errno));
             exit(EXIT_FAILURE);
         }
     }

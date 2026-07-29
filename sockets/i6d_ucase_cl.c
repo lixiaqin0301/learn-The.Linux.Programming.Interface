@@ -31,7 +31,7 @@ main(int argc, char *argv[])
 
     /* Create a datagram socket; send to an address in the IPv6 domain */
 
-    sfd = socket(AF_INET6, SOCK_DGRAM, 0);      /* Create client socket */
+    sfd = socket(AF_INET6, SOCK_DGRAM, 0); /* Create client socket */
     if (sfd == -1)
         errExit("socket");
 
@@ -45,15 +45,14 @@ main(int argc, char *argv[])
 
     for (j = 2; j < argc; j++) {
         msgLen = strlen(argv[j]);
-        if (sendto(sfd, argv[j], msgLen, 0, (struct sockaddr *) &svaddr,
-                    sizeof(struct sockaddr_in6)) != msgLen)
+        if (sendto(sfd, argv[j], msgLen, 0, (struct sockaddr *)&svaddr, sizeof(struct sockaddr_in6)) != msgLen)
             fatal("sendto");
 
         numBytes = recvfrom(sfd, resp, BUF_SIZE, 0, NULL, NULL);
         if (numBytes == -1)
             errExit("recvfrom");
 
-        printf("Response %d: %.*s\n", j - 1, (int) numBytes, resp);
+        printf("Response %d: %.*s\n", j - 1, (int)numBytes, resp);
     }
 
     exit(EXIT_SUCCESS);

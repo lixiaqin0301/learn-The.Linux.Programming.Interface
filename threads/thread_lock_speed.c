@@ -32,8 +32,8 @@
    values), mutexes will perform better, while in others (few threads,
    small "inner loop" value), spin locks are likely to be better.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
 static volatile int glob = 0;
 static pthread_spinlock_t splock;
@@ -79,12 +79,11 @@ static void
 usageError(char *pname)
 {
     fprintf(stderr,
-            "Usage: %s [-s] num-threads "
-            "[num-inner-loops [num-outer-loops]]\n", pname);
-    fprintf(stderr,
-            "    -q   Don't print verbose messages\n");
-    fprintf(stderr,
-            "    -s   Use spin locks (instead of the default mutexes)\n");
+        "Usage: %s [-s] num-threads "
+        "[num-inner-loops [num-outer-loops]]\n",
+        pname);
+    fprintf(stderr, "    -q   Don't print verbose messages\n");
+    fprintf(stderr, "    -s   Use spin locks (instead of the default mutexes)\n");
     exit(EXIT_FAILURE);
 }
 
@@ -98,7 +97,7 @@ main(int argc, char *argv[])
 
     /* Prevent runaway/forgotten process from burning up CPU time forever */
 
-    alarm(120);         /* Unhandled SIGALRM will kill process */
+    alarm(120); /* Unhandled SIGALRM will kill process */
 
     useMutex = 1;
     verbose = 1;
@@ -124,8 +123,7 @@ main(int argc, char *argv[])
 
     if (verbose) {
         printf("Using %s\n", useMutex ? "mutexes" : "spin locks");
-        printf("\tthreads: %d; outer loops: %d; inner loops: %d\n",
-                numThreads, numOuterLoops, numInnerLoops);
+        printf("\tthreads: %d; outer loops: %d; inner loops: %d\n", numThreads, numOuterLoops, numInnerLoops);
     }
 
     thread = calloc(numThreads, sizeof(pthread_t));

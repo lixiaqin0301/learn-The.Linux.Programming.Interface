@@ -19,6 +19,7 @@ int test1[250000] = { 1, 2, 3 };
 #endif
 
 void
-x1(void) {
+x1(void)
+{
     printf("Called mod1-x1 " VERSION "\n");
 }

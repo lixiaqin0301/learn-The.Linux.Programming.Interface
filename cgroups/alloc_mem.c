@@ -16,9 +16,9 @@
   program is useful for small experiments with the 'memory' cgroup controller.
 */
 #define _GNU_SOURCE
+#include "tlpi_hdr.h"
 #include <pthread.h>
 #include <sys/syscall.h>
-#include "tlpi_hdr.h"
 
 static size_t blockSize;
 static int sleepUsecs, numAllocs, numThreads;
@@ -40,8 +40,8 @@ allocMem(int numAllocs, size_t blockSize, int sleepUsecs)
 
         char ch;
         printf("Hit ENTER when ready to start memory allocation "
-                "(PID = %ld; TID = %ld)\n", (long) getpid(),
-                syscall(SYS_gettid));
+               "(PID = %ld; TID = %ld)\n",
+            (long)getpid(), syscall(SYS_gettid));
         read(STDIN_FILENO, &ch, 1);
     }
 
@@ -57,8 +57,7 @@ allocMem(int numAllocs, size_t blockSize, int sleepUsecs)
             p[k] = 0;
 
         totalMem += blockSize;
-        printf("%4d: address = %p; total = 0x%zx (%zd MiB)\n",
-                j, p, totalMem, totalMem / (1024 * 1024));
+        printf("%4d: address = %p; total = 0x%zx (%zd MiB)\n", j, p, totalMem, totalMem / (1024 * 1024));
 
         /* If the user requested, slow things down by sleeping
            for some microseconds between each allocation */
@@ -76,7 +75,7 @@ allocMem(int numAllocs, size_t blockSize, int sleepUsecs)
 static void *
 threadFunc(void *arg)
 {
-    int doAlloc = (long) arg;
+    int doAlloc = (long)arg;
 
     if (doAlloc)
         allocMem(numAllocs, blockSize, sleepUsecs);
@@ -88,15 +87,19 @@ threadFunc(void *arg)
 static void
 usageError(char *pname)
 {
-    fprintf(stderr, "Usage: %s block-size sleep-usecs num-allocs "
-            "[tflag...]\n\n", pname);
-    fprintf(stderr, "One additional thread is created for each 'tflag' "
-            "argument\n\n");
-    fprintf(stderr, "'tflag' is either '+' or '.'. At most one 'tflag' can be "
-            "'+', and memory\n"
-            "         allocation is done in that thread, or otherwise in the "
-            "main thread\n"
-            "         if no 'tflag' was '+'.\n");
+    fprintf(stderr,
+        "Usage: %s block-size sleep-usecs num-allocs "
+        "[tflag...]\n\n",
+        pname);
+    fprintf(stderr,
+        "One additional thread is created for each 'tflag' "
+        "argument\n\n");
+    fprintf(stderr,
+        "'tflag' is either '+' or '.'. At most one 'tflag' can be "
+        "'+', and memory\n"
+        "         allocation is done in that thread, or otherwise in the "
+        "main thread\n"
+        "         if no 'tflag' was '+'.\n");
     exit(EXIT_FAILURE);
 }
 
@@ -127,7 +130,7 @@ main(int argc, char *argv[])
             if (doAlloc && allocated)
                 fatal("Can only specify one '+' argument");
 
-            int s = pthread_create(&thr, NULL, threadFunc, (void *) doAlloc);
+            int s = pthread_create(&thr, NULL, threadFunc, (void *)doAlloc);
             if (s != 0)
                 errExitEN(s, "pthread_create");
 
@@ -138,7 +141,7 @@ main(int argc, char *argv[])
         printf("All threads created\n");
     }
 
-    if ( ! allocated)
+    if (!allocated)
         allocMem(numAllocs, blockSize, sleepUsecs);
 
     pause();

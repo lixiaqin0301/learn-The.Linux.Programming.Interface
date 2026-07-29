@@ -17,9 +17,9 @@
 
    See also svshm_lock.c.
 */
-#include <sys/types.h>
-#include <sys/shm.h>
 #include "tlpi_hdr.h"
+#include <sys/shm.h>
+#include <sys/types.h>
 
 int
 main(int argc, char *argv[])

@@ -20,16 +20,16 @@
 
    See also pty_master_open.c.
 */
-#include <fcntl.h>
-#include "pty_master_open.h"            /* Declares ptyMasterOpen() */
+#include "pty_master_open.h" /* Declares ptyMasterOpen() */
 #include "tlpi_hdr.h"
+#include <fcntl.h>
 
-#define PTYM_PREFIX     "/dev/pty"
-#define PTYS_PREFIX     "/dev/tty"
-#define PTY_PREFIX_LEN  (sizeof(PTYM_PREFIX) - 1)
-#define PTY_NAME_LEN    (PTY_PREFIX_LEN + sizeof("XY"))
-#define X_RANGE         "pqrstuvwxyzabcde"
-#define Y_RANGE         "0123456789abcdef"
+#define PTYM_PREFIX "/dev/pty"
+#define PTYS_PREFIX "/dev/tty"
+#define PTY_PREFIX_LEN (sizeof(PTYM_PREFIX) - 1)
+#define PTY_NAME_LEN (PTY_PREFIX_LEN + sizeof("XY"))
+#define X_RANGE "pqrstuvwxyzabcde"
+#define Y_RANGE "0123456789abcdef"
 
 /* Open a BSD pty master, returning file descriptor, or -1 on error.
    On successful completion, the name of the corresponding pty slave
@@ -63,12 +63,12 @@ ptyMasterOpen(char *slaveName, size_t snLen)
             masterFd = open(masterName, O_RDWR);
 
             if (masterFd == -1) {
-                if (errno == ENOENT)    /* No such file */
-                    return -1;          /* Probably no more pty devices */
-                else                    /* Other error (e.g., pty busy) */
+                if (errno == ENOENT) /* No such file */
+                    return -1; /* Probably no more pty devices */
+                else /* Other error (e.g., pty busy) */
                     continue;
 
-            } else {            /* Return slave name corresponding to master */
+            } else { /* Return slave name corresponding to master */
                 n = snprintf(slaveName, snLen, "%s%c%c", PTYS_PREFIX, *x, *y);
                 if (n >= snLen) {
                     errno = EOVERFLOW;
@@ -82,5 +82,5 @@ ptyMasterOpen(char *slaveName, size_t snLen)
         }
     }
 
-    return -1;                  /* Tried all ptys without success */
+    return -1; /* Tried all ptys without success */
 }

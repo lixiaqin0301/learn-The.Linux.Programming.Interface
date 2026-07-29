@@ -17,9 +17,9 @@
 
    See also prod_condvar.c.
 */
-#include <time.h>
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
+#include <time.h>
 
 static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
 
@@ -28,7 +28,7 @@ static int avail = 0;
 static void *
 threadFunc(void *arg)
 {
-    int cnt = atoi((char *) arg);
+    int cnt = atoi((char *)arg);
     int s, j;
 
     for (j = 0; j < cnt; j++) {
@@ -40,7 +40,7 @@ threadFunc(void *arg)
         if (s != 0)
             errExitEN(s, "pthread_mutex_lock");
 
-        avail++;        /* Let consumer know another unit is available */
+        avail++; /* Let consumer know another unit is available */
 
         s = pthread_mutex_unlock(&mtx);
         if (s != 0)
@@ -55,9 +55,9 @@ main(int argc, char *argv[])
 {
     pthread_t tid;
     int s, j;
-    int totRequired;            /* Total number of units that all
-                                   threads will produce */
-    int numConsumed;            /* Total units so far consumed */
+    int totRequired; /* Total number of units that all
+                        threads will produce */
+    int numConsumed; /* Total units so far consumed */
     Boolean done;
     time_t t;
 
@@ -84,14 +84,13 @@ main(int argc, char *argv[])
         if (s != 0)
             errExitEN(s, "pthread_mutex_lock");
 
-        while (avail > 0) {             /* Consume all available units */
+        while (avail > 0) { /* Consume all available units */
 
             /* Do something with produced unit */
 
-            numConsumed ++;
+            numConsumed++;
             avail--;
-            printf("T=%ld: numConsumed=%d\n", (long) (time(NULL) - t),
-                    numConsumed);
+            printf("T=%ld: numConsumed=%d\n", (long)(time(NULL) - t), numConsumed);
 
             done = numConsumed >= totRequired;
         }
@@ -104,7 +103,6 @@ main(int argc, char *argv[])
             break;
 
         /* Perhaps do other work here that does not require mutex lock */
-
     }
 
     exit(EXIT_SUCCESS);

@@ -17,19 +17,19 @@
    of the main program continues.
 */
 #define _GNU_SOURCE
-#include <stddef.h>
-#include <signal.h>
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <linux/audit.h>
-#include <sys/syscall.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>
+#include <signal.h>
+#include <stddef.h>
 #include <sys/prctl.h>
-#include "tlpi_hdr.h"
+#include <sys/syscall.h>
 
 /* For the x32 ABI, all system call numbers have bit 30 set */
 
-#define X32_SYSCALL_BIT         0x40000000
+#define X32_SYSCALL_BIT 0x40000000
 
 static int
 seccomp(unsigned int operation, unsigned int flags, void *args)
@@ -40,36 +40,29 @@ seccomp(unsigned int operation, unsigned int flags, void *args)
 static void
 install_filter(void)
 {
-    struct sock_filter filter[] = {
-        /* Load architecture */
+    struct sock_filter filter[] = { /* Load architecture */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                (offsetof(struct seccomp_data, arch))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, arch))),
 
         /* Kill process if the architecture is not what we expect */
 
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_X86_64, 1, 0),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL),
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_X86_64, 1, 0), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL),
 
         /* Load system call number */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, nr))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, nr))),
 
         /* Kill the process if this is an x32 system call (bit 30 is set) */
 
-        BPF_JUMP(BPF_JMP | BPF_JGE | BPF_K, X32_SYSCALL_BIT, 0, 1),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
+        BPF_JUMP(BPF_JMP | BPF_JGE | BPF_K, X32_SYSCALL_BIT, 0, 1), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
 
         /* getppid() results in SIGSYS; all other system calls are allowed */
 
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_getppid, 0, 1),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_TRAP),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW)
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_getppid, 0, 1), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_TRAP), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW)
     };
 
     struct sock_fprog prog = {
-        .len = (unsigned short) (sizeof(filter) / sizeof(filter[0])),
+        .len = (unsigned short)(sizeof(filter) / sizeof(filter[0])),
         .filter = filter,
     };
 
@@ -81,10 +74,10 @@ install_filter(void)
     */
 }
 
-static void             /* Handler for SIGINT signal */
+static void /* Handler for SIGINT signal */
 sigHandler(int sig)
 {
-    printf("SIGSYS!\n");        /* UNSAFE (see Section 21.1.2) */
+    printf("SIGSYS!\n"); /* UNSAFE (see Section 21.1.2) */
 }
 
 int
@@ -109,7 +102,7 @@ main(int argc, char **argv)
 
     printf("About to call getppid()\n");
 
-    (void) getppid();   /* Results in SIGSYS; system call is not executed */
+    (void)getppid(); /* Results in SIGSYS; system call is not executed */
 
     /* After the SIGSYS handler returns, execution continues in main() */
 

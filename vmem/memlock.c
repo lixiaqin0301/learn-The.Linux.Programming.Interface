@@ -20,10 +20,10 @@
 
    The madvise() system call is supported on Linux since kernel 2.4.
 */
-#define _BSD_SOURCE             /* Get mincore() declaration and MAP_ANONYMOUS
-                                   definition from <sys/mman.h> */
-#include <sys/mman.h>
+#define _BSD_SOURCE /* Get mincore() declaration and MAP_ANONYMOUS                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
+                       definition from <sys/mman.h> */
 #include "tlpi_hdr.h"
+#include <sys/mman.h>
 
 /* Display residency of pages in range [addr .. (addr + length - 1)] */
 
@@ -34,7 +34,7 @@ displayMincore(char *addr, size_t length)
     long pageSize, numPages, j;
 
 #ifndef _SC_PAGESIZE
-    pageSize = getpagesize();   /* Some systems don't have _SC_PAGESIZE */
+    pageSize = getpagesize(); /* Some systems don't have _SC_PAGESIZE */
 #else
     pageSize = sysconf(_SC_PAGESIZE);
 #endif
@@ -77,16 +77,15 @@ main(int argc, char *argv[])
         errExit("sysconf(_SC_PAGESIZE)");
 #endif
 
-    len =      getInt(argv[1], GN_GT_0, "num-pages") * pageSize;
+    len = getInt(argv[1], GN_GT_0, "num-pages") * pageSize;
     stepSize = getInt(argv[2], GN_GT_0, "lock-page-step") * pageSize;
-    lockLen =  getInt(argv[3], GN_GT_0, "lock-page-len") * pageSize;
+    lockLen = getInt(argv[3], GN_GT_0, "lock-page-len") * pageSize;
 
     addr = mmap(NULL, len, PROT_READ, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
     if (addr == MAP_FAILED)
         errExit("mmap");
 
-    printf("Allocated %ld (%#lx) bytes starting at %p\n",
-            (long) len, (unsigned long) len, addr);
+    printf("Allocated %ld (%#lx) bytes starting at %p\n", (long)len, (unsigned long)len, addr);
 
     printf("Before mlock:\n");
     displayMincore(addr, len);

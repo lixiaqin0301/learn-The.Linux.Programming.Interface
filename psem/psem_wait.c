@@ -19,8 +19,8 @@
    On Linux, named semaphores are supported with kernel 2.6 or later, and
    a glibc that provides the NPTL threading implementation.
 */
-#include <semaphore.h>
 #include "tlpi_hdr.h"
+#include <semaphore.h>
 
 int
 main(int argc, char *argv[])
@@ -37,6 +37,6 @@ main(int argc, char *argv[])
     if (sem_wait(sem) == -1)
         errExit("sem_wait");
 
-    printf("%ld sem_wait() succeeded\n", (long) getpid());
+    printf("%ld sem_wait() succeeded\n", (long)getpid());
     exit(EXIT_SUCCESS);
 }

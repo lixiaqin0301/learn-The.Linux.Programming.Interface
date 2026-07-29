@@ -35,7 +35,7 @@ main(int argc, char *argv[])
     if (listen(sfd, 5) == -1)
         errExit("listen");
 
-    for (;;) {          /* Handle client connections iteratively */
+    for (;;) { /* Handle client connections iteratively */
         cfd = accept(sfd, NULL, NULL);
         if (cfd == -1)
             errExit("accept");

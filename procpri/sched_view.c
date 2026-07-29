@@ -17,8 +17,8 @@
 
    See also sched_set.c.
 */
-#include <sched.h>
 #include "tlpi_hdr.h"
+#include <sched.h>
 
 int
 main(int argc, char *argv[])
@@ -35,16 +35,19 @@ main(int argc, char *argv[])
             errExit("sched_getparam");
 
         printf("%s: %-5s ", argv[j],
-                (pol == SCHED_OTHER) ? "OTHER" :
-                (pol == SCHED_RR) ? "RR" :
-                (pol == SCHED_FIFO) ? "FIFO" :
-#ifdef SCHED_BATCH              /* Linux-specific */
-                (pol == SCHED_BATCH) ? "BATCH" :
+            (pol == SCHED_OTHER)      ? "OTHER"
+                : (pol == SCHED_RR)   ? "RR"
+                : (pol == SCHED_FIFO) ? "FIFO"
+                :
+#ifdef SCHED_BATCH /* Linux-specific */
+                (pol == SCHED_BATCH) ? "BATCH"
+                :
 #endif
-#ifdef SCHED_IDLE               /* Linux-specific */
-                (pol == SCHED_IDLE) ? "IDLE" :
+#ifdef SCHED_IDLE /* Linux-specific */
+                (pol == SCHED_IDLE) ? "IDLE"
+                                    :
 #endif
-                "???");
+                                    "???");
         printf("%2d\n", sp.sched_priority);
     }
 

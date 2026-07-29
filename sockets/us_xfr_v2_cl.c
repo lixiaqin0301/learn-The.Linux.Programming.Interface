@@ -40,5 +40,5 @@ main(int argc, char *argv[])
 
     if (numRead == -1)
         errExit("read");
-    exit(EXIT_SUCCESS);     /* Closes our socket; server sees EOF */
+    exit(EXIT_SUCCESS); /* Closes our socket; server sees EOF */
 }

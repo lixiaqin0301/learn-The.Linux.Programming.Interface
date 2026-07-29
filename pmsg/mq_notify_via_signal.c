@@ -19,14 +19,14 @@
 
    See also mq_notify_sig.c.
 */
-#include <signal.h>
-#include <mqueue.h>
-#include <fcntl.h>              /* For definition of O_NONBLOCK */
 #include "tlpi_hdr.h"
+#include <fcntl.h> /* For definition of O_NONBLOCK */
+#include <mqueue.h>
+#include <signal.h>
 
 #define NOTIFY_SIG SIGUSR1
 
-static volatile sig_atomic_t gotSig = 1;        /* See comment in main() */
+static volatile sig_atomic_t gotSig = 1; /* See comment in main() */
 
 /* Handler for message notification signal */
 
@@ -53,7 +53,7 @@ main(int argc, char *argv[])
        messages from it without blocking once the queue has been emptied */
 
     mqd = mq_open(argv[1], O_RDONLY | O_NONBLOCK);
-    if (mqd == (mqd_t) -1)
+    if (mqd == (mqd_t)-1)
         errExit("mq_open");
 
     /* Establish handler for notification signal */
@@ -79,7 +79,7 @@ main(int argc, char *argv[])
        program to make the initial registration for notification and force
        the queue to be drained of any messages on the first loop iteration. */
 
-    for (int j = 0; ; j++) {
+    for (int j = 0;; j++) {
         if (gotSig) {
             gotSig = 0;
 
@@ -92,17 +92,16 @@ main(int argc, char *argv[])
 
             /* Drain all messages from the queue */
 
-            while ((numRead = mq_receive(mqd, msg,
-                                attr.mq_msgsize, NULL)) >= 0) {
+            while ((numRead = mq_receive(mqd, msg, attr.mq_msgsize, NULL)) >= 0) {
                 /* Do whatever processing is required for each message */
 
-                printf("Read %ld bytes\n", (long) numRead);
+                printf("Read %ld bytes\n", (long)numRead);
             }
-            if (errno != EAGAIN)        /* Unexpected error */
+            if (errno != EAGAIN) /* Unexpected error */
                 errExit("mq_receive");
         }
 
         printf("j = %d\n", j);
-        sleep(5);               /* Do some "work" */
+        sleep(5); /* Do some "work" */
     }
 }

@@ -21,17 +21,17 @@
    See also tty_functions.c.
 */
 
-#include <termios.h>
-#include <signal.h>
-#include <ctype.h>
-#include "tty_functions.h"              /* Declarations of ttySetCbreak()
+#include "tty_functions.h" /* Declarations of ttySetCbreak()
                                            and ttySetRaw() */
+#include <ctype.h>
+#include <signal.h>
+#include <termios.h>
 #include "tlpi_hdr.h"
 
 static struct termios userTermios;
-                        /* Terminal settings as defined by user */
+/* Terminal settings as defined by user */
 
-static void             /* General handler: restore tty settings and exit */
+static void /* General handler: restore tty settings and exit */
 handler(int sig)
 {
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &userTermios) == -1)
@@ -39,15 +39,15 @@ handler(int sig)
     _exit(EXIT_SUCCESS);
 }
 
-static void             /* Handler for SIGTSTP */
+static void /* Handler for SIGTSTP */
 tstpHandler(int sig)
 {
-    struct termios ourTermios;          /* To save our tty settings */
+    struct termios ourTermios; /* To save our tty settings */
     sigset_t tstpMask, prevMask;
     struct sigaction sa;
     int savedErrno;
 
-    savedErrno = errno;                 /* We might change 'errno' here */
+    savedErrno = errno; /* We might change 'errno' here */
 
     /* Save current terminal settings, restore terminal to
        state at time of program startup */
@@ -72,9 +72,9 @@ tstpHandler(int sig)
     /* Execution resumes here after SIGCONT */
 
     if (sigprocmask(SIG_SETMASK, &prevMask, NULL) == -1)
-        errExit("sigprocmask");         /* Reblock SIGTSTP */
+        errExit("sigprocmask"); /* Reblock SIGTSTP */
 
-    sigemptyset(&sa.sa_mask);           /* Reestablish handler */
+    sigemptyset(&sa.sa_mask); /* Reestablish handler */
     sa.sa_flags = SA_RESTART;
     sa.sa_handler = tstpHandler;
     if (sigaction(SIGTSTP, &sa, NULL) == -1)
@@ -104,7 +104,7 @@ main(int argc, char *argv[])
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
 
-    if (argc > 1) {                     /* Use cbreak mode */
+    if (argc > 1) { /* Use cbreak mode */
         if (ttySetCbreak(STDIN_FILENO, &userTermios) == -1)
             errExit("ttySetCbreak");
 
@@ -133,7 +133,7 @@ main(int argc, char *argv[])
         if (prev.sa_handler != SIG_IGN)
             if (sigaction(SIGTSTP, &sa, NULL) == -1)
                 errExit("sigaction");
-    } else {                            /* Use raw mode */
+    } else { /* Use raw mode */
         if (ttySetRaw(STDIN_FILENO, &userTermios) == -1)
             errExit("ttySetRaw");
     }
@@ -142,28 +142,28 @@ main(int argc, char *argv[])
     if (sigaction(SIGTERM, &sa, NULL) == -1)
         errExit("sigaction");
 
-    setbuf(stdout, NULL);               /* Disable stdout buffering */
+    setbuf(stdout, NULL); /* Disable stdout buffering */
 
-    for (;;) {                          /* Read and echo stdin */
+    for (;;) { /* Read and echo stdin */
         n = read(STDIN_FILENO, &ch, 1);
         if (n == -1) {
             errMsg("read");
             break;
         }
 
-        if (n == 0)                     /* Can occur after terminal disconnect */
+        if (n == 0) /* Can occur after terminal disconnect */
             break;
 
-        if (isalpha((unsigned char) ch))        /* Letters --> lowercase */
-            putchar(tolower((unsigned char) ch));
+        if (isalpha((unsigned char)ch)) /* Letters --> lowercase */
+            putchar(tolower((unsigned char)ch));
         else if (ch == '\n' || ch == '\r')
             putchar(ch);
-        else if (iscntrl((unsigned char) ch))
-            printf("^%c", ch ^ 64);     /* Echo Control-A as ^A, etc. */
+        else if (iscntrl((unsigned char)ch))
+            printf("^%c", ch ^ 64); /* Echo Control-A as ^A, etc. */
         else
-            putchar('*');               /* All other chars as '*' */
+            putchar('*'); /* All other chars as '*' */
 
-        if (ch == 'q')                  /* Quit loop */
+        if (ch == 'q') /* Quit loop */
             break;
     }
 

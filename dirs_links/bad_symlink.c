@@ -17,9 +17,9 @@
    call fails. Note: symbolic links are interpreted relative to the directory
    in which they reside, not the current directory of the process.
 */
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int
 main(int argc, char *argv[])

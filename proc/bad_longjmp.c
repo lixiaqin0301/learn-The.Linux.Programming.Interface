@@ -22,10 +22,10 @@
    function that establishes the jump point, and the one that does
    the jump. Each case results in a different erroneous behaviour.
 */
-#include <setjmp.h>
 #include "tlpi_hdr.h"
+#include <setjmp.h>
 
-static jmp_buf env;     /* Global buffer for saving environment */
+static jmp_buf env; /* Global buffer for saving environment */
 
 static void
 doJump(void)

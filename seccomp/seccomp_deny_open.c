@@ -16,18 +16,18 @@
    if open() or openat() is called.
 */
 #define _GNU_SOURCE
-#include <stddef.h>
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <linux/audit.h>
-#include <sys/syscall.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>
+#include <stddef.h>
 #include <sys/prctl.h>
-#include "tlpi_hdr.h"
+#include <sys/syscall.h>
 
 /* For the x32 ABI, all system call numbers have bit 30 set */
 
-#define X32_SYSCALL_BIT         0x40000000
+#define X32_SYSCALL_BIT 0x40000000
 
 /* The following is a hack to allow for systems (pre-Linux 4.14) that don't
    provide SECCOMP_RET_KILL_PROCESS, which kills (all threads in) a process.
@@ -47,38 +47,30 @@ seccomp(unsigned int operation, unsigned int flags, void *args)
 static void
 install_filter(void)
 {
-    struct sock_filter filter[] = {
-        /* Load architecture */
+    struct sock_filter filter[] = { /* Load architecture */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                (offsetof(struct seccomp_data, arch))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, arch))),
 
         /* Kill process if the architecture is not what we expect */
 
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_X86_64, 1, 0),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_X86_64, 1, 0), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
 
         /* Load system call number */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, nr))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, nr))),
 
         /* Kill the process if this is an x32 system call (bit 30 is set) */
 
-        BPF_JUMP(BPF_JMP | BPF_JGE | BPF_K, X32_SYSCALL_BIT, 0, 1),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
+        BPF_JUMP(BPF_JMP | BPF_JGE | BPF_K, X32_SYSCALL_BIT, 0, 1), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS),
 
         /* Allow system calls other than open() and openat() */
 
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_open, 2, 0),
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_openat, 1, 0),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW),
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS)
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_open, 2, 0), BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, __NR_openat, 1, 0), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ALLOW), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS)
 
     };
 
     struct sock_fprog prog = {
-        .len = (unsigned short) (sizeof(filter) / sizeof(filter[0])),
+        .len = (unsigned short)(sizeof(filter) / sizeof(filter[0])),
         .filter = filter,
     };
 

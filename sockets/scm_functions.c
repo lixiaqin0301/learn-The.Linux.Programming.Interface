@@ -41,8 +41,8 @@ sendfd(int sockfd, int fd)
        of any type. However, if we employ that approach, we must ensure
        that we free() the buffer on all return paths from this function. */
     union {
-        char   buf[CMSG_SPACE(sizeof(int))];
-                        /* Space large enough to hold an 'int' */
+        char buf[CMSG_SPACE(sizeof(int))];
+        /* Space large enough to hold an 'int' */
         struct cmsghdr align;
     } controlMsg;
 
@@ -75,7 +75,7 @@ sendfd(int sockfd, int fd)
     cmsgp->cmsg_level = SOL_SOCKET;
     cmsgp->cmsg_type = SCM_RIGHTS;
     cmsgp->cmsg_len = CMSG_LEN(sizeof(int));
-    *((int *) CMSG_DATA(cmsgp)) = fd;
+    *((int *)CMSG_DATA(cmsgp)) = fd;
 
     /* Send real plus ancillary data */
 
@@ -99,7 +99,7 @@ recvfd(int sockfd)
     /* Allocate a char buffer for the ancillary data. See the comments
        in sendfd() */
     union {
-        char   buf[CMSG_SPACE(sizeof(int))];
+        char buf[CMSG_SPACE(sizeof(int))];
         struct cmsghdr align;
     } controlMsg;
     struct cmsghdr *cmsgp;
@@ -114,7 +114,7 @@ recvfd(int sockfd)
 
     msgh.msg_iov = &iov;
     msgh.msg_iovlen = 1;
-    iov.iov_base = &data;       /* Real data is an 'int' */
+    iov.iov_base = &data; /* Real data is an 'int' */
     iov.iov_len = sizeof(int);
 
     /* Set 'msghdr' fields that describe ancillary data */
@@ -132,15 +132,12 @@ recvfd(int sockfd)
 
     /* Check the validity of the 'cmsghdr' */
 
-    if (cmsgp == NULL ||
-            cmsgp->cmsg_len != CMSG_LEN(sizeof(int)) ||
-            cmsgp->cmsg_level != SOL_SOCKET ||
-            cmsgp->cmsg_type != SCM_RIGHTS) {
+    if (cmsgp == NULL || cmsgp->cmsg_len != CMSG_LEN(sizeof(int)) || cmsgp->cmsg_level != SOL_SOCKET || cmsgp->cmsg_type != SCM_RIGHTS) {
         errno = EINVAL;
         return -1;
     }
 
     /* Return the received file descriptor to our caller */
 
-    return *((int *) CMSG_DATA(cmsgp));
+    return *((int *)CMSG_DATA(cmsgp));
 }

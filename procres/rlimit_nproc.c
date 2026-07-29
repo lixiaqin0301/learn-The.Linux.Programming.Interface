@@ -18,9 +18,9 @@
 
    NOTE: Only Linux and the BSDs support the RLIMIT_NPROC resource limit.
 */
-#include <sys/resource.h>
-#include "print_rlimit.h"               /* Declaration of printRlimit() */
+#include "print_rlimit.h" /* Declaration of printRlimit() */
 #include "tlpi_hdr.h"
+#include <sys/resource.h>
 
 int
 main(int argc, char *argv[])
@@ -36,11 +36,8 @@ main(int argc, char *argv[])
 
     /* Set new process limits (hard == soft if not specified) */
 
-    rl.rlim_cur = (argv[1][0] == 'i') ? RLIM_INFINITY :
-                                getInt(argv[1], 0, "soft-limit");
-    rl.rlim_max = (argc == 2) ? rl.rlim_cur :
-                (argv[2][0] == 'i') ? RLIM_INFINITY :
-                                getInt(argv[2], 0, "hard-limit");
+    rl.rlim_cur = (argv[1][0] == 'i') ? RLIM_INFINITY : getInt(argv[1], 0, "soft-limit");
+    rl.rlim_max = (argc == 2) ? rl.rlim_cur : (argv[2][0] == 'i') ? RLIM_INFINITY : getInt(argv[2], 0, "hard-limit");
     if (setrlimit(RLIMIT_NPROC, &rl) == -1)
         errExit("setrlimit");
 
@@ -48,15 +45,17 @@ main(int argc, char *argv[])
 
     /* Create as many children as possible */
 
-    for (j = 1; ; j++) {
+    for (j = 1;; j++) {
         switch (childPid = fork()) {
-        case -1: errExit("fork");
+        case -1:
+            errExit("fork");
 
-        case 0: _exit(EXIT_SUCCESS);            /* Child */
+        case 0:
+            _exit(EXIT_SUCCESS); /* Child */
 
-        default:        /* Parent: display message about each new child
-                           and let the resulting zombies accumulate */
-            printf("Child %d (PID=%ld) started\n", j, (long) childPid);
+        default: /* Parent: display message about each new child
+                    and let the resulting zombies accumulate */
+            printf("Child %d (PID=%ld) started\n", j, (long)childPid);
             break;
         }
     }

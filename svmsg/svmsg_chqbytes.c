@@ -17,9 +17,9 @@
    Change the 'msg_qbytes' setting of the System V message queue identified
    by 'msqid'.
 */
-#include <sys/types.h>
-#include <sys/msg.h>
 #include "tlpi_hdr.h"
+#include <sys/msg.h>
+#include <sys/types.h>
 
 int
 main(int argc, char *argv[])

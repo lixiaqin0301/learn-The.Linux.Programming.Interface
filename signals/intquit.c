@@ -18,8 +18,8 @@
    Note that although we use signal() to establish signal handlers in this
    program, the use of sigaction() is always preferable for this task.
 */
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 static void
 sigHandler(int sig)
@@ -32,7 +32,7 @@ sigHandler(int sig)
     if (sig == SIGINT) {
         count++;
         printf("Caught SIGINT (%d)\n", count);
-        return;                 /* Resume execution at point of interruption */
+        return; /* Resume execution at point of interruption */
     }
 
     /* Must be SIGQUIT - print a message and terminate the process */
@@ -54,6 +54,6 @@ main(int argc, char *argv[])
     if (signal(SIGQUIT, sigHandler) == SIG_ERR)
         errExit("signal");
 
-    for (;;)                    /* Loop forever, waiting for signals */
-        pause();                /* Block until a signal is caught */
+    for (;;) /* Loop forever, waiting for signals */
+        pause(); /* Block until a signal is caught */
 }

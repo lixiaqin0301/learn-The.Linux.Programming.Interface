@@ -14,11 +14,11 @@
 
    An implementation of system(3).
 */
-#include <unistd.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 #include <errno.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int
 system(const char *command)
@@ -28,7 +28,7 @@ system(const char *command)
     pid_t childPid;
     int status, savedErrno;
 
-    if (command == NULL)                /* Is a shell available? */
+    if (command == NULL) /* Is a shell available? */
         return system(":") == 0;
 
     /* The parent process (the caller of system()) blocks SIGCHLD
@@ -37,11 +37,11 @@ system(const char *command)
        possible race conditions. This means that we must undo the
        effects of the following in the child after fork(). */
 
-    sigemptyset(&blockMask);            /* Block SIGCHLD */
+    sigemptyset(&blockMask); /* Block SIGCHLD */
     sigaddset(&blockMask, SIGCHLD);
     sigprocmask(SIG_BLOCK, &blockMask, &origMask);
 
-    saIgnore.sa_handler = SIG_IGN;      /* Ignore SIGINT and SIGQUIT */
+    saIgnore.sa_handler = SIG_IGN; /* Ignore SIGINT and SIGQUIT */
     saIgnore.sa_flags = 0;
     sigemptyset(&saIgnore.sa_mask);
     sigaction(SIGINT, &saIgnore, &saOrigInt);
@@ -50,7 +50,7 @@ system(const char *command)
     switch (childPid = fork()) {
     case -1: /* fork() failed */
         status = -1;
-        break;          /* Carry on to reset signal attributes */
+        break; /* Carry on to reset signal attributes */
 
     case 0: /* Child: exec command */
 
@@ -69,8 +69,8 @@ system(const char *command)
 
         sigprocmask(SIG_SETMASK, &origMask, NULL);
 
-        execl("/bin/sh", "sh", "-c", command, (char *) NULL);
-        _exit(127);                     /* We could not exec the shell */
+        execl("/bin/sh", "sh", "-c", command, (char *)NULL);
+        _exit(127); /* We could not exec the shell */
 
     default: /* Parent: wait for our child to terminate */
 
@@ -78,9 +78,9 @@ system(const char *command)
            collect the status of one of the caller's other children */
 
         while (waitpid(childPid, &status, 0) == -1) {
-            if (errno != EINTR) {       /* Error other than EINTR */
+            if (errno != EINTR) { /* Error other than EINTR */
                 status = -1;
-                break;                  /* So exit loop */
+                break; /* So exit loop */
             }
         }
         break;
@@ -88,7 +88,7 @@ system(const char *command)
 
     /* Unblock SIGCHLD, restore dispositions of SIGINT and SIGQUIT */
 
-    savedErrno = errno;                 /* The following may change 'errno' */
+    savedErrno = errno; /* The following may change 'errno' */
 
     sigprocmask(SIG_SETMASK, &origMask, NULL);
     sigaction(SIGINT, &saOrigInt, NULL);

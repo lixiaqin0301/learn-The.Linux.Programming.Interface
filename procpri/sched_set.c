@@ -23,8 +23,8 @@
    as originally shown in the book. See the erratum for page 743
    (http://man7.org/tlpi/errata/index.html#p_743).
 */
-#include <sched.h>
 #include "tlpi_hdr.h"
+#include <sched.h>
 
 int
 main(int argc, char *argv[])
@@ -32,34 +32,40 @@ main(int argc, char *argv[])
     int j, pol;
     struct sched_param sp;
 
-    if (argc < 3 || strchr("rfo"
-#ifdef SCHED_BATCH              /* Linux-specific */
-                "b"
+    if (argc < 3
+        || strchr("rfo"
+#ifdef SCHED_BATCH /* Linux-specific */
+                  "b"
 #endif
-#ifdef SCHED_IDLE               /* Linux-specific */
-                "i"
+#ifdef SCHED_IDLE /* Linux-specific */
+                  "i"
 #endif
-                , argv[1][0]) == NULL)
+               ,
+               argv[1][0])
+            == NULL)
         usageErr("%s policy priority [pid...]\n"
-                "    policy is 'r' (RR), 'f' (FIFO), "
-#ifdef SCHED_BATCH              /* Linux-specific */
-                "'b' (BATCH), "
+                 "    policy is 'r' (RR), 'f' (FIFO), "
+#ifdef SCHED_BATCH /* Linux-specific */
+                 "'b' (BATCH), "
 #endif
-#ifdef SCHED_IDLE               /* Linux-specific */
-                "'i' (IDLE), "
+#ifdef SCHED_IDLE /* Linux-specific */
+                 "'i' (IDLE), "
 #endif
-                "or 'o' (OTHER)\n",
-                argv[0]);
+                 "or 'o' (OTHER)\n",
+            argv[0]);
 
-    pol = (argv[1][0] == 'r') ? SCHED_RR :
-                (argv[1][0] == 'f') ? SCHED_FIFO :
-#ifdef SCHED_BATCH              /* Linux-specific, since kernel 2.6.16 */
-                (argv[1][0] == 'b') ? SCHED_BATCH :
+    pol = (argv[1][0] == 'r') ? SCHED_RR
+        : (argv[1][0] == 'f') ? SCHED_FIFO
+        :
+#ifdef SCHED_BATCH /* Linux-specific, since kernel 2.6.16 */
+        (argv[1][0] == 'b') ? SCHED_BATCH
+        :
 #endif
-#ifdef SCHED_IDLE               /* Linux-specific, since kernel 2.6.23 */
-                (argv[1][0] == 'i') ? SCHED_IDLE :
+#ifdef SCHED_IDLE /* Linux-specific, since kernel 2.6.23 */
+        (argv[1][0] == 'i') ? SCHED_IDLE
+                            :
 #endif
-                SCHED_OTHER;
+                            SCHED_OTHER;
 
     sp.sched_priority = getInt(argv[2], 0, "priority");
 

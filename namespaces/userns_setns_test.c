@@ -21,24 +21,27 @@
    See https://lwn.net/Articles/540087/
 */
 #define _GNU_SOURCE
-#include <fcntl.h>
-#include <sched.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <limits.h>
+#include "userns_functions.h"
 #include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <sched.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 #include <sys/capability.h>
 #include <sys/mman.h>
-#include "userns_functions.h"
+#include <sys/wait.h>
+#include <unistd.h>
 
 /* A simple error-handling function: print an error message based
    on the value in 'errno' and terminate the calling process */
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 static void
 display_symlink(char *pname, char *link)
@@ -50,7 +53,7 @@ display_symlink(char *pname, char *link)
     if (s == -1)
         errExit("readlink");
 
-    printf("%s%s ==> %*s\n", pname, link, (int) s, path);
+    printf("%s%s ==> %*s\n", pname, link, (int)s, path);
 }
 
 /* Try to join the user namespace identified by the file
@@ -75,12 +78,12 @@ test_setns(char *pname, int fd)
     }
 }
 
-static int              /* Start function for cloned child */
+static int /* Start function for cloned child */
 childFunc(void *arg)
 {
-    long fd = (long) arg;
+    long fd = (long)arg;
 
-    usleep(100000);     /* Avoid intermingling with parent's output */
+    usleep(100000); /* Avoid intermingling with parent's output */
 
     /* Test whether setns() is possible from the child user namespace */
 
@@ -111,14 +114,12 @@ main(int argc, char *argv[])
 
     /* Create child process in new user namespace */
 
-    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
     if (stack == MAP_FAILED)
         errExit("mmap");
 
-    child_pid = clone(childFunc,
-                      stack + STACK_SIZE, /* Assume stack grows downward */
-                      CLONE_NEWUSER | SIGCHLD, (void *) fd);
+    child_pid = clone(childFunc, stack + STACK_SIZE, /* Assume stack grows downward */
+        CLONE_NEWUSER | SIGCHLD, (void *)fd);
     if (child_pid == -1)
         errExit("clone");
 
@@ -127,7 +128,7 @@ main(int argc, char *argv[])
     test_setns("parent: ", fd);
     printf("\n");
 
-    if (waitpid(child_pid, NULL, 0) == -1)      /* Wait for child */
+    if (waitpid(child_pid, NULL, 0) == -1) /* Wait for child */
         errExit("waitpid");
 
     exit(EXIT_SUCCESS);

@@ -20,8 +20,8 @@
    The program calls dirname() and basename() for each of the pathnames
    supplied on the command-line.
 */
-#include <libgen.h>
 #include "tlpi_hdr.h"
+#include <libgen.h>
 
 int
 main(int argc, char *argv[])
@@ -29,7 +29,7 @@ main(int argc, char *argv[])
     char *t1, *t2;
     int j;
 
-    for (j = 1; j < argc; j++)  {
+    for (j = 1; j < argc; j++) {
         t1 = strdup(argv[j]);
         if (t1 == NULL)
             errExit("strdup");

@@ -17,14 +17,14 @@
    Demonstrate dynamic loading of libraries. The program loads the
    named library and then executes the named function in that library.
 */
-#include <dlfcn.h>
 #include "tlpi_hdr.h"
+#include <dlfcn.h>
 
 int
 main(int argc, char *argv[])
 {
-    void *libHandle;            /* Handle for shared library */
-    void (*funcp)(void);        /* Pointer to function with no arguments */
+    void *libHandle; /* Handle for shared library */
+    void (*funcp)(void); /* Pointer to function with no arguments */
     const char *err;
 
     if (argc != 3 || strcmp(argv[1], "--help") == 0)
@@ -38,10 +38,10 @@ main(int argc, char *argv[])
 
     /* Search library for symbol named in argv[2] */
 
-    (void) dlerror();                           /* Clear dlerror() */
+    (void)dlerror(); /* Clear dlerror() */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
-    funcp = (void (*)(void)) dlsym(libHandle, argv[2]);
+    funcp = (void (*)(void))dlsym(libHandle, argv[2]);
 #pragma GCC diagnostic pop
 
     /* In the book, instead of the preceding line, the code uses a
@@ -76,7 +76,7 @@ main(int argc, char *argv[])
 
     (*funcp)();
 
-    dlclose(libHandle);                         /* Close the library */
+    dlclose(libHandle); /* Close the library */
 
     exit(EXIT_SUCCESS);
 }

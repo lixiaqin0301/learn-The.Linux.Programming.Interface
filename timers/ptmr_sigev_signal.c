@@ -27,13 +27,13 @@
    was provided in glibc.
 */
 #define _POSIX_C_SOURCE 199309
+#include "curr_time.h" /* Declares currTime() */
+#include "itimerspec_from_str.h" /* Declares itimerspecFromStr() */
+#include "tlpi_hdr.h"
 #include <signal.h>
 #include <time.h>
-#include "curr_time.h"                  /* Declares currTime() */
-#include "itimerspec_from_str.h"        /* Declares itimerspecFromStr() */
-#include "tlpi_hdr.h"
 
-#define TIMER_SIG SIGRTMAX              /* Our timer notification signal */
+#define TIMER_SIG SIGRTMAX /* Our timer notification signal */
 
 static void
 handler(int sig, siginfo_t *si, void *uc)
@@ -46,7 +46,7 @@ handler(int sig, siginfo_t *si, void *uc)
        (printf(); see Section 21.1.2) */
 
     printf("[%s] Got signal %d\n", currTime("%T"), sig);
-    printf("    *sival_ptr         = %ld\n", (long) *tidptr);
+    printf("    *sival_ptr         = %ld\n", (long)*tidptr);
     printf("    timer_getoverrun() = %d\n", timer_getoverrun(*tidptr));
 }
 
@@ -54,8 +54,8 @@ int
 main(int argc, char *argv[])
 {
     struct itimerspec ts;
-    struct sigaction  sa;
-    struct sigevent   sev;
+    struct sigaction sa;
+    struct sigevent sev;
     timer_t *tidlist;
     int j;
 
@@ -76,23 +76,23 @@ main(int argc, char *argv[])
 
     /* Create and start one timer for each command-line argument */
 
-    sev.sigev_notify = SIGEV_SIGNAL;    /* Notify via signal */
-    sev.sigev_signo = TIMER_SIG;        /* Notify using this signal */
+    sev.sigev_notify = SIGEV_SIGNAL; /* Notify via signal */
+    sev.sigev_signo = TIMER_SIG; /* Notify using this signal */
 
     for (j = 0; j < argc - 1; j++) {
         itimerspecFromStr(argv[j + 1], &ts);
 
         sev.sigev_value.sival_ptr = &tidlist[j];
-                /* Allows handler to get ID of this timer */
+        /* Allows handler to get ID of this timer */
 
         if (timer_create(CLOCK_REALTIME, &sev, &tidlist[j]) == -1)
             errExit("timer_create");
-        printf("Timer ID: %ld (%s)\n", (long) tidlist[j], argv[j + 1]);
+        printf("Timer ID: %ld (%s)\n", (long)tidlist[j], argv[j + 1]);
 
         if (timer_settime(tidlist[j], 0, &ts, NULL) == -1)
             errExit("timer_settime");
     }
 
-    for (;;)                            /* Wait for incoming timer signals */
+    for (;;) /* Wait for incoming timer signals */
         pause();
 }

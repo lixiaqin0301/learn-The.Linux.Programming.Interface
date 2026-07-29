@@ -23,19 +23,19 @@
    See also list_files_readdir.c.
 */
 #if defined(__APPLE__)
-        /* Darwin requires this header before including <dirent.h> */
+/* Darwin requires this header before including <dirent.h> */
 #include <sys/types.h>
 #endif
-#include <limits.h>
-#include <dirent.h>
-#include <stddef.h>
 #include "tlpi_hdr.h"
+#include <dirent.h>
+#include <limits.h>
+#include <stddef.h>
 
-static void             /* List all files in directory 'dirpath' */
+static void /* List all files in directory 'dirpath' */
 listFiles(const char *dirpath)
 {
     DIR *dirp;
-    Boolean isCurrent;          /* True if 'dirpath' is "." */
+    Boolean isCurrent; /* True if 'dirpath' is "." */
     struct dirent *result, *entryp;
     int nameMax;
 
@@ -46,8 +46,8 @@ listFiles(const char *dirpath)
        to find the true limit for this file system. */
 
     nameMax = pathconf(dirpath, _PC_NAME_MAX);
-    if (nameMax == -1)          /* Indeterminate or error */
-        nameMax = 255;          /* So take a guess */
+    if (nameMax == -1) /* Indeterminate or error */
+        nameMax = 255; /* So take a guess */
 
     entryp = malloc(offsetof(struct dirent, d_name) + nameMax + 1);
     if (entryp == NULL)
@@ -69,18 +69,18 @@ listFiles(const char *dirpath)
         if (errno != 0)
             errExit("readdir_r");
 
-        if (result == NULL)     /* End of stream */
+        if (result == NULL) /* End of stream */
             break;
 
         /* Skip . and .. */
 
-        if (strcmp(entryp->d_name, ".") == 0 ||
-                strcmp(entryp->d_name, "..") == 0)
+        if (strcmp(entryp->d_name, ".") == 0 || strcmp(entryp->d_name, "..") == 0)
             continue;
 
         /* Print directory + filename */
 
-        if (!isCurrent) printf("%s/", dirpath);
+        if (!isCurrent)
+            printf("%s/", dirpath);
         printf("%s\n", entryp->d_name);
     }
 
@@ -91,7 +91,7 @@ listFiles(const char *dirpath)
 int
 main(int argc, char *argv[])
 {
-    if (argc == 1)              /* No arguments - use current directory */
+    if (argc == 1) /* No arguments - use current directory */
         listFiles(".");
     else
         for (argv++; *argv; argv++)

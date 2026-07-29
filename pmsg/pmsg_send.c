@@ -21,9 +21,9 @@
 
    Linux supports POSIX message queues since kernel 2.6.6.
 */
-#include <mqueue.h>
-#include <fcntl.h>              /* For definition of O_NONBLOCK */
 #include "tlpi_hdr.h"
+#include <fcntl.h> /* For definition of O_NONBLOCK */
+#include <mqueue.h>
 
 static void
 usageError(const char *progName)
@@ -43,8 +43,11 @@ main(int argc, char *argv[])
     flags = O_WRONLY;
     while ((opt = getopt(argc, argv, "n")) != -1) {
         switch (opt) {
-        case 'n':   flags |= O_NONBLOCK;        break;
-        default:    usageError(argv[0]);
+        case 'n':
+            flags |= O_NONBLOCK;
+            break;
+        default:
+            usageError(argv[0]);
         }
     }
 
@@ -52,7 +55,7 @@ main(int argc, char *argv[])
         usageError(argv[0]);
 
     mqd = mq_open(argv[optind], flags);
-    if (mqd == (mqd_t) -1)
+    if (mqd == (mqd_t)-1)
         errExit("mq_open");
 
     prio = (argc > optind + 2) ? atoi(argv[optind + 2]) : 0;

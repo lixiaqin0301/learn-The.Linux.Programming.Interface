@@ -17,15 +17,15 @@
 
    This program is Linux-specific.
 */
-#define _BSD_SOURCE         /* Get MAP_ANONYMOUS definition from <sys/mman.h> */
-#include <sys/mman.h>
+#define _BSD_SOURCE /* Get MAP_ANONYMOUS definition from <sys/mman.h> */
 #include "tlpi_hdr.h"
+#include <sys/mman.h>
 
 #define LEN (1024 * 1024)
 
 #define SHELL_FMT "cat /proc/%ld/maps | grep zero"
 #define CMD_SIZE (sizeof(SHELL_FMT) + 20)
-                            /* Allow extra space for integer string */
+/* Allow extra space for integer string */
 
 int
 main(int argc, char *argv[])
@@ -42,7 +42,7 @@ main(int argc, char *argv[])
     /* Display line from /proc/self/maps corresponding to mapping */
 
     printf("Before mprotect()\n");
-    snprintf(cmd, CMD_SIZE, SHELL_FMT, (long) getpid());
+    snprintf(cmd, CMD_SIZE, SHELL_FMT, (long)getpid());
     system(cmd);
 
     /* Change protection on memory to allow read and write access */
@@ -51,7 +51,7 @@ main(int argc, char *argv[])
         errExit("mprotect");
 
     printf("After mprotect()\n");
-    system(cmd);                /* Review protection via /proc/self/maps */
+    system(cmd); /* Review protection via /proc/self/maps */
 
     exit(EXIT_SUCCESS);
 }

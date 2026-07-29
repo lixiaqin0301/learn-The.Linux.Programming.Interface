@@ -11,8 +11,8 @@
 /* prog.c
 
 */
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void
 xyz(void)
@@ -21,7 +21,7 @@ xyz(void)
 }
 
 int
-main(int argc, char*argv[])
+main(int argc, char *argv[])
 {
     void func1(void), func2(void), func3(void);
 

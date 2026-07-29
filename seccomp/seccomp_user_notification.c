@@ -63,27 +63,30 @@
    target process.
 */
 #define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/prctl.h>
+#include "scm_functions.h"
 #include <fcntl.h>
 #include <limits.h>
-#include <signal.h>
-#include <sys/wait.h>
-#include <stddef.h>
-#include <stdbool.h>
 #include <linux/audit.h>
-#include <sys/syscall.h>
-#include <sys/stat.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>
-#include <sys/ioctl.h>
+#include <signal.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/ioctl.h>
+#include <sys/prctl.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
-#include "scm_functions.h"
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 static int
 seccomp(unsigned int operation, unsigned int flags, void *args)
@@ -94,9 +97,9 @@ seccomp(unsigned int operation, unsigned int flags, void *args)
 /* Values from command-line options */
 
 struct cmdLineOpts {
-    int  delaySecs;     /* Delay time for responding to notifications */
-    int  secondFilter;  /* Install a second BPF filter? */
-    bool killTracer;    /* Kill tracer when target has died? */
+    int delaySecs; /* Delay time for responding to notifications */
+    int secondFilter; /* Install a second BPF filter? */
+    bool killTracer; /* Kill tracer when target has died? */
 };
 
 /* The following is the x86-64-specific BPF boilerplate code for checking that
@@ -105,16 +108,9 @@ struct cmdLineOpts {
 
 /* For the x32 ABI, all system call numbers have bit 30 set */
 
-#define X32_SYSCALL_BIT         0x40000000
+#define X32_SYSCALL_BIT 0x40000000
 
-#define X86_64_CHECK_ARCH_AND_LOAD_SYSCALL_NR \
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, \
-                (offsetof(struct seccomp_data, arch))), \
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_X86_64, 0, 2), \
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, \
-                 (offsetof(struct seccomp_data, nr))), \
-        BPF_JUMP(BPF_JMP | BPF_JGE | BPF_K, X32_SYSCALL_BIT, 0, 1), \
-        BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS)
+#define X86_64_CHECK_ARCH_AND_LOAD_SYSCALL_NR BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, arch))), BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, AUDIT_ARCH_X86_64, 0, 2), BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, nr))), BPF_JUMP(BPF_JMP | BPF_JGE | BPF_K, X32_SYSCALL_BIT, 0, 1), BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_KILL_PROCESS)
 
 /* installNotifyFilter() installs a seccomp filter that generates user-space
    notifications (SECCOMP_RET_USER_NOTIF) when the process calls mkdir(2); the
@@ -140,7 +136,7 @@ installNotifyFilter(void)
     };
 
     struct sock_fprog prog = {
-        .len = (unsigned short) (sizeof(filter) / sizeof(filter[0])),
+        .len = (unsigned short)(sizeof(filter) / sizeof(filter[0])),
         .filter = filter,
     };
 
@@ -149,8 +145,7 @@ installNotifyFilter(void)
     /* Install the filter with the SECCOMP_FILTER_FLAG_NEW_LISTENER flag; as
        a result, seccomp() returns a notification file descriptor. */
 
-    notifyFd = seccomp(SECCOMP_SET_MODE_FILTER,
-                        SECCOMP_FILTER_FLAG_NEW_LISTENER, &prog);
+    notifyFd = seccomp(SECCOMP_SET_MODE_FILTER, SECCOMP_FILTER_FLAG_NEW_LISTENER, &prog);
     if (notifyFd == -1)
         errExit("seccomp-install-notify-filter");
 
@@ -183,7 +178,7 @@ installFilter2(struct cmdLineOpts *opts)
     };
 
     struct sock_fprog prog = {
-        .len = (unsigned short) (sizeof(filter) / sizeof(filter[0])),
+        .len = (unsigned short)(sizeof(filter) / sizeof(filter[0])),
         .filter = filter,
     };
 
@@ -195,13 +190,10 @@ installFilter2(struct cmdLineOpts *opts)
        notification will not occur. By contrast, SECCOMP_RET_TRACE has lower
        precedence (so that the user-space notification does occur). */
 
-    const struct sock_filter retTrace = BPF_STMT(BPF_RET + BPF_K,
-                                              SECCOMP_RET_TRACE);
-    const struct sock_filter retErrno = BPF_STMT(BPF_RET + BPF_K,
-                                              SECCOMP_RET_ERRNO | ENOTSUP);
+    const struct sock_filter retTrace = BPF_STMT(BPF_RET + BPF_K, SECCOMP_RET_TRACE);
+    const struct sock_filter retErrno = BPF_STMT(BPF_RET + BPF_K, SECCOMP_RET_ERRNO | ENOTSUP);
 
-    filter[prog.len - 1] = (opts->secondFilter == SECCOMP_RET_ERRNO) ?
-                                        retErrno : retTrace;
+    filter[prog.len - 1] = (opts->secondFilter == SECCOMP_RET_ERRNO) ? retErrno : retTrace;
 
     if (seccomp(SECCOMP_SET_MODE_FILTER, 0, &prog) == -1)
         errExit("seccomp-install-filter-2");
@@ -251,12 +243,12 @@ targetProcess(int sockPair[2], char *argv[], struct cmdLineOpts *opts)
     if (targetPid == -1)
         errExit("fork");
 
-    if (targetPid > 0)          /* In parent, return PID of child */
+    if (targetPid > 0) /* In parent, return PID of child */
         return targetPid;
 
     /* Child falls through to here */
 
-    printf("Target process: PID = %ld\n", (long) getpid());
+    printf("Target process: PID = %ld\n", (long)getpid());
 
     /* Install a handler for the SIGINT signal */
 
@@ -315,8 +307,10 @@ static void
 checkNotificationIdIsValid(int notifyFd, __u64 id, char *tag)
 {
     if (ioctl(notifyFd, SECCOMP_IOCTL_NOTIF_ID_VALID, &id) == -1) {
-        fprintf(stderr, "Tracer: notification ID check (%s): "
-                "target has died!!!!!!!!!!!\n", tag);
+        fprintf(stderr,
+            "Tracer: notification ID check (%s): "
+            "target has died!!!!!!!!!!!\n",
+            tag);
     }
 }
 
@@ -330,7 +324,7 @@ watchForNotifications(int notifyFd, struct cmdLineOpts *opts)
     struct seccomp_notif_resp *resp;
     struct seccomp_notif_sizes sizes;
     char path[PATH_MAX];
-    int procMem;        /* FD for /proc/PID/mem of target process */
+    int procMem; /* FD for /proc/PID/mem of target process */
 
     /* Discover the sizes of the structures that are used to receive
        notifications and send notification responses, and allocate
@@ -356,8 +350,7 @@ watchForNotifications(int notifyFd, struct cmdLineOpts *opts)
         if (ioctl(notifyFd, SECCOMP_IOCTL_NOTIF_RECV, req) == -1)
             errExit("Tracer: ioctlSECCOMP_IOCTL_NOTIF_RECV");
 
-        printf("Tracer: got notification for PID %d; ID is %llx\n",
-                req->pid, req->id);
+        printf("Tracer: got notification for PID %d; ID is %llx\n", req->pid, req->id);
 
         /* If a delay interval was specified on the command line, then delay
            for the specified number of seconds. This can be used to demonstrate
@@ -432,7 +425,7 @@ watchForNotifications(int notifyFd, struct cmdLineOpts *opts)
         /* The response to the notification includes the notification ID */
 
         resp->id = req->id;
-        resp->flags = 0;        /* Must be zero as at Linux 5.0 */
+        resp->flags = 0; /* Must be zero as at Linux 5.0 */
 
         /* Success return value is the length of the pathname given to
            mkdir() */
@@ -454,7 +447,7 @@ watchForNotifications(int notifyFd, struct cmdLineOpts *opts)
         if (ioctl(notifyFd, SECCOMP_IOCTL_NOTIF_SEND, resp) == -1) {
             if (errno == ENOENT)
                 printf("Tracer: response failed with ENOENT; perhaps target "
-                        "process's syscall was interrupted by signal?\n");
+                       "process's syscall was interrupted by signal?\n");
             else
                 perror("ioctl-SECCOMP_IOCTL_NOTIF_SEND");
         }
@@ -486,12 +479,12 @@ tracerProcess(int sockPair[2], struct cmdLineOpts *opts)
     if (tracerPid == -1)
         errExit("fork");
 
-    if (tracerPid > 0)          /* In parent, return PID of child */
+    if (tracerPid > 0) /* In parent, return PID of child */
         return tracerPid;
 
     /* Child falls through to here */
 
-    printf("Tracer: PID = %ld\n", (long) getpid());
+    printf("Tracer: PID = %ld\n", (long)getpid());
 
     /* Receive the notification file descriptor from the target process */
 
@@ -499,13 +492,13 @@ tracerProcess(int sockPair[2], struct cmdLineOpts *opts)
     if (notifyFd == -1)
         errExit("recvfd");
 
-    closeSocketPair(sockPair);  /* We no longer need the socket pair */
+    closeSocketPair(sockPair); /* We no longer need the socket pair */
 
     /* Handle notifications */
 
     watchForNotifications(notifyFd, opts);
 
-    exit(EXIT_SUCCESS);         /* NOTREACHED */
+    exit(EXIT_SUCCESS); /* NOTREACHED */
 }
 
 /* Diagnose an error in command-line option or argument usage */
@@ -541,11 +534,11 @@ parseCommandLineOptions(int argc, char *argv[], struct cmdLineOpts *opts)
     while ((opt = getopt(argc, argv, "d:Kf:")) != -1) {
         switch (opt) {
 
-        case 'K':       /* Don't kill tracer when target process terminates */
+        case 'K': /* Don't kill tracer when target process terminates */
             opts->killTracer = false;
             break;
 
-        case 'f':       /* Install a second BPF filter */
+        case 'f': /* Install a second BPF filter */
             if (optarg[0] == 'e')
                 opts->secondFilter = SECCOMP_RET_ERRNO;
             else if (optarg[0] == 't')
@@ -554,7 +547,7 @@ parseCommandLineOptions(int argc, char *argv[], struct cmdLineOpts *opts)
                 usageError("Bad value for -f", argv[0]);
             break;
 
-        case 'd':       /* Delay time before sending notification response */
+        case 'd': /* Delay time before sending notification response */
             opts->delaySecs = atoi(optarg);
             break;
 
@@ -567,8 +560,7 @@ parseCommandLineOptions(int argc, char *argv[], struct cmdLineOpts *opts)
     /* There should be at least one command-line argument after the options */
 
     if (optind >= argc)
-        usageError("At least one pathname argument should be supplied",
-                argv[0]);
+        usageError("At least one pathname argument should be supplied", argv[0]);
 }
 
 int

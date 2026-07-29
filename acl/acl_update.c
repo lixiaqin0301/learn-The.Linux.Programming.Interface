@@ -20,16 +20,16 @@
    To build this program, you must have the ACL library (libacl) installed
    on your system.
 */
-#include <sys/acl.h>
-#include "ugid_functions.h"
 #include "tlpi_hdr.h"
+#include "ugid_functions.h"
+#include <sys/acl.h>
 
-#define MAX_ENTRIES 10000   /* Maximum entries that we can handle in an ACL */
+#define MAX_ENTRIES 10000 /* Maximum entries that we can handle in an ACL */
 
-struct AccessControlEntry {     /* Represent a single ACL entry */
-    acl_tag_t   tag;            /* Tag type */
-    id_t        qual;           /* Optional tag qualifier (UID or GID) */
-    int         perms;          /* Permissions bit mask */
+struct AccessControlEntry { /* Represent a single ACL entry */
+    acl_tag_t tag; /* Tag type */
+    id_t qual; /* Optional tag qualifier (UID or GID) */
+    int perms; /* Permissions bit mask */
 };
 
 static void
@@ -77,12 +77,11 @@ usageError(char *progName, char *msg, Boolean shortUsage)
    Return TRUE if the specification parsed okay, or FALSE otherwise. */
 
 static Boolean
-parseEntrySpec(char *entryStr, struct AccessControlEntry *ace,
-               Boolean permsReqd)
+parseEntrySpec(char *entryStr, struct AccessControlEntry *ace, Boolean permsReqd)
 {
     char *colon1, *colon2;
-    Boolean hasQual;            /* Is optional qualifier present? */
-    Boolean hasPerms;           /* Are permissions specified? */
+    Boolean hasQual; /* Is optional qualifier present? */
+    Boolean hasPerms; /* Are permissions specified? */
 
     colon1 = strchr(entryStr, ':');
     if (colon1 == NULL) {
@@ -92,7 +91,7 @@ parseEntrySpec(char *entryStr, struct AccessControlEntry *ace,
 
     hasQual = *(colon1 + 1) != '\0' && *(colon1 + 1) != ':';
 
-    *colon1 = '\0';     /* Add terminator to tag type */
+    *colon1 = '\0'; /* Add terminator to tag type */
 
     colon2 = strchr(colon1 + 1, ':');
     hasPerms = colon2 != NULL && *(colon2 + 1) != '\0';
@@ -126,7 +125,7 @@ parseEntrySpec(char *entryStr, struct AccessControlEntry *ace,
     /* For ACL_USER and ACL_GROUP tags, extract a UID / GID from qualifier */
 
     if (colon2 != NULL)
-        *colon2 = '\0';         /* Add terminator to qualifier */
+        *colon2 = '\0'; /* Add terminator to qualifier */
 
     ace->qual = 0;
 
@@ -163,8 +162,10 @@ parseEntrySpec(char *entryStr, struct AccessControlEntry *ace,
             else if (*p == 'x')
                 ace->perms |= ACL_EXECUTE;
             else if (*p != '-') {
-                fprintf(stderr, "Bad character in permissions "
-                        "string: %c\n", *p);
+                fprintf(stderr,
+                    "Bad character in permissions "
+                    "string: %c\n",
+                    *p);
                 return FALSE;
             }
         }
@@ -178,14 +179,13 @@ parseEntrySpec(char *entryStr, struct AccessControlEntry *ace,
    error return -1. */
 
 static int
-parseACL(char *aclStr, struct AccessControlEntry aclist[],
-        Boolean permsReqd)
+parseACL(char *aclStr, struct AccessControlEntry aclist[], Boolean permsReqd)
 {
     char *nextEntry, *comma;
     int n;
 
     n = 0;
-    for (nextEntry = aclStr; ; nextEntry = comma + 1) {
+    for (nextEntry = aclStr;; nextEntry = comma + 1) {
 
         if (n >= MAX_ENTRIES) {
             fprintf(stderr, "Too many entries in ACL\n");
@@ -199,7 +199,7 @@ parseACL(char *aclStr, struct AccessControlEntry aclist[],
         if (!parseEntrySpec(nextEntry, &aclist[n], permsReqd))
             return -1;
 
-        if (comma == NULL)              /* This was the last entry */
+        if (comma == NULL) /* This was the last entry */
             break;
 
         n++;
@@ -221,7 +221,7 @@ findEntry(acl_t acl, acl_tag_t tag, id_t qaul)
     gid_t *gidp;
     int ent, s;
 
-    for (ent = ACL_FIRST_ENTRY; ; ent = ACL_NEXT_ENTRY) {
+    for (ent = ACL_FIRST_ENTRY;; ent = ACL_NEXT_ENTRY) {
         s = acl_get_entry(acl, ent, &entry);
         if (s == -1)
             errExit("acl_get_entry");
@@ -406,7 +406,7 @@ main(int argc, char *argv[])
                         if (acl_delete_entry(acl, entry) == -1)
                             errExit("acl_delete_entry");
 
-                } else {        /* modifyACL */
+                } else { /* modifyACL */
 
                     if (entry == NULL) {
 
@@ -417,10 +417,8 @@ main(int argc, char *argv[])
                             errExit("acl_create_entry");
                         if (acl_set_tag_type(entry, aclist[en].tag) == -1)
                             errExit("acl_set_tag_type");
-                        if (aclist[en].tag == ACL_USER ||
-                                aclist[en].tag == ACL_GROUP)
-                            if (acl_set_qualifier(entry,
-                                        &aclist[en].qual) == -1)
+                        if (aclist[en].tag == ACL_USER || aclist[en].tag == ACL_GROUP)
+                            if (acl_set_qualifier(entry, &aclist[en].qual) == -1)
                                 errExit("acl_set_qualifier");
                     }
 

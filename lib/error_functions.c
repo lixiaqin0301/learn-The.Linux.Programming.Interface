@@ -14,14 +14,14 @@
 
    Some standard error handling routines used by various programs.
 */
-#include <stdarg.h>
 #include "error_functions.h"
+#include "ename.c.inc" /* Defines ename and MAX_ENAME */
 #include "tlpi_hdr.h"
-#include "ename.c.inc"          /* Defines ename and MAX_ENAME */
+#include <stdarg.h>
 
-#ifdef __GNUC__                 /* Prevent 'gcc -Wall' complaining  */
-__attribute__ ((__noreturn__))  /* if we call this function as last */
-#endif                          /* statement in a non-void function */
+#ifdef __GNUC__ /* Prevent 'gcc -Wall' complaining  */
+__attribute__((__noreturn__)) /* if we call this function as last */
+#endif /* statement in a non-void function */
 static void
 terminate(Boolean useExit3)
 {
@@ -51,8 +51,7 @@ terminate(Boolean useExit3)
         'format' and 'ap'. */
 
 static void
-outputError(Boolean useErr, int err, Boolean flushStdout,
-        const char *format, va_list ap)
+outputError(Boolean useErr, int err, Boolean flushStdout, const char *format, va_list ap)
 {
 #define BUF_SIZE 500
     char buf[BUF_SIZE], userMsg[BUF_SIZE], errText[BUF_SIZE];
@@ -60,9 +59,7 @@ outputError(Boolean useErr, int err, Boolean flushStdout,
     vsnprintf(userMsg, BUF_SIZE, format, ap);
 
     if (useErr)
-        snprintf(errText, BUF_SIZE, " [%s %s]",
-                (err > 0 && err <= MAX_ENAME) ?
-                ename[err] : "?UNKNOWN?", strerror(err));
+        snprintf(errText, BUF_SIZE, " [%s %s]", (err > 0 && err <= MAX_ENAME) ? ename[err] : "?UNKNOWN?", strerror(err));
     else
         snprintf(errText, BUF_SIZE, ":");
 
@@ -76,9 +73,9 @@ outputError(Boolean useErr, int err, Boolean flushStdout,
 #endif
 
     if (flushStdout)
-        fflush(stdout);       /* Flush any pending stdout */
+        fflush(stdout); /* Flush any pending stdout */
     fputs(buf, stderr);
-    fflush(stderr);           /* In case stderr is not line-buffered */
+    fflush(stderr); /* In case stderr is not line-buffered */
 }
 
 /* Display error message including 'errno' diagnostic, and
@@ -90,7 +87,7 @@ errMsg(const char *format, ...)
     va_list argList;
     int savedErrno;
 
-    savedErrno = errno;       /* In case we change it here */
+    savedErrno = errno; /* In case we change it here */
 
     va_start(argList, format);
     outputError(TRUE, errno, TRUE, format, argList);
@@ -177,14 +174,14 @@ usageErr(const char *format, ...)
 {
     va_list argList;
 
-    fflush(stdout);           /* Flush any pending stdout */
+    fflush(stdout); /* Flush any pending stdout */
 
     fprintf(stderr, "Usage: ");
     va_start(argList, format);
     vfprintf(stderr, format, argList);
     va_end(argList);
 
-    fflush(stderr);           /* In case stderr is not line-buffered */
+    fflush(stderr); /* In case stderr is not line-buffered */
     exit(EXIT_FAILURE);
 }
 
@@ -196,13 +193,13 @@ cmdLineErr(const char *format, ...)
 {
     va_list argList;
 
-    fflush(stdout);           /* Flush any pending stdout */
+    fflush(stdout); /* Flush any pending stdout */
 
     fprintf(stderr, "Command-line usage error: ");
     va_start(argList, format);
     vfprintf(stderr, format, argList);
     va_end(argList);
 
-    fflush(stderr);           /* In case stderr is not line-buffered */
+    fflush(stderr); /* In case stderr is not line-buffered */
     exit(EXIT_FAILURE);
 }

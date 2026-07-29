@@ -37,21 +37,20 @@ main(int argc, char *argv[])
     int optControlMsgSize;
     struct msghdr msgh;
     struct iovec iov;
-    char *controlMsg;           /* Ancillary data (control message) */
-    size_t controlMsgSize;      /* Size of ancillary data */
-    struct ucred *ucredp;       /* Pointer to data area of a 'cmsghdr' that
-                                   contains credentials */
-    int *fdList;                /* Pointer to data area of a 'cmsghdr' that
-                                   contains a list of file descriptors */
-    int fdCnt;                  /* Number of FDs in ancillary data */
+    char *controlMsg; /* Ancillary data (control message) */
+    size_t controlMsgSize; /* Size of ancillary data */
+    struct ucred *ucredp; /* Pointer to data area of a 'cmsghdr' that
+                             contains credentials */
+    int *fdList; /* Pointer to data area of a 'cmsghdr' that
+                    contains a list of file descriptors */
+    int fdCnt; /* Number of FDs in ancillary data */
 
     /* Allocate a buffer of suitable size to hold the ancillary data.
        This buffer is in reality treated as a 'struct cmsghdr',
        and so needs to be suitably aligned: malloc() provides a block
        with suitable alignment. */
 
-    controlMsgSize = CMSG_SPACE(sizeof(int[MAX_FDS])) +
-                     CMSG_SPACE(sizeof(struct ucred));
+    controlMsgSize = CMSG_SPACE(sizeof(int[MAX_FDS])) + CMSG_SPACE(sizeof(struct ucred));
     controlMsg = malloc(controlMsgSize);
     if (controlMsg == NULL)
         errExit("malloc");
@@ -75,7 +74,8 @@ main(int argc, char *argv[])
             usageErr("%s [-d]\n"
                      "        -d           use datagram socket\n"
                      "        -n nbytes    limit on size of received "
-                                          "ancillary data\n", argv[0]);
+                     "ancillary data\n",
+                argv[0]);
         }
     }
 
@@ -135,8 +135,7 @@ main(int argc, char *argv[])
        the excess file descriptors are automatically closed. */
 
     msgh.msg_control = controlMsg;
-    msgh.msg_controllen = (optControlMsgSize == -1) ?
-                          controlMsgSize : optControlMsgSize;
+    msgh.msg_controllen = (optControlMsgSize == -1) ? controlMsgSize : optControlMsgSize;
 
     /* Receive real plus ancillary data */
 
@@ -144,7 +143,7 @@ main(int argc, char *argv[])
     if (NumReceived == -1)
         errExit("recvmsg");
 
-    printf("recvmsg() returned %ld\n", (long) NumReceived);
+    printf("recvmsg() returned %ld\n", (long)NumReceived);
 
     if (NumReceived > 0)
         printf("Received data = %d\n", data);
@@ -156,7 +155,7 @@ main(int argc, char *argv[])
            /proc/PID/fd */
 
         printf("=================================\n");
-        snprintf(cbuf, sizeof(cbuf), "ls -l /proc/%ld/fd", (long) getpid());
+        snprintf(cbuf, sizeof(cbuf), "ls -l /proc/%ld/fd", (long)getpid());
         system(cbuf);
         printf("=================================\n");
     }
@@ -168,12 +167,10 @@ main(int argc, char *argv[])
 
     /* Walk through the series of headers in the ancillary data */
 
-    for (struct cmsghdr *cmsgp = CMSG_FIRSTHDR(&msgh);
-             cmsgp != NULL;
-             cmsgp = CMSG_NXTHDR(&msgh, cmsgp)) {
+    for (struct cmsghdr *cmsgp = CMSG_FIRSTHDR(&msgh); cmsgp != NULL; cmsgp = CMSG_NXTHDR(&msgh, cmsgp)) {
 
         printf("=================================\n");
-        printf("cmsg_len: %ld\n", (long) cmsgp->cmsg_len);
+        printf("cmsg_len: %ld\n", (long)cmsgp->cmsg_len);
 
         /* Check that 'cmsg_level' is as expected */
 
@@ -182,7 +179,7 @@ main(int argc, char *argv[])
 
         switch (cmsgp->cmsg_type) {
 
-        case SCM_RIGHTS:        /* Header containing file descriptors */
+        case SCM_RIGHTS: /* Header containing file descriptors */
 
             /* The number of file descriptors is the size of the control
                message block minus the size that would be allocated for
@@ -196,7 +193,7 @@ main(int argc, char *argv[])
             /* Set 'fdList' to point to the first descriptor in the
                control message data */
 
-            fdList = ((int *) CMSG_DATA(cmsgp));
+            fdList = ((int *)CMSG_DATA(cmsgp));
 
             /* For each of the received file descriptors, display the file
                descriptor number and read and display the file content */
@@ -223,7 +220,7 @@ main(int argc, char *argv[])
             }
             break;
 
-        case SCM_CREDENTIALS:   /* Header containing credentials */
+        case SCM_CREDENTIALS: /* Header containing credentials */
 
             /* Check validity of the 'cmsghdr' */
 
@@ -232,10 +229,8 @@ main(int argc, char *argv[])
 
             /* The data in this control message block is a 'struct ucred' */
 
-            ucredp = (struct ucred *) CMSG_DATA(cmsgp);
-            printf("SCM_CREDENTIALS: pid=%ld, uid=%ld, gid=%ld\n",
-                        (long) ucredp->pid, (long) ucredp->uid,
-                        (long) ucredp->gid);
+            ucredp = (struct ucred *)CMSG_DATA(cmsgp);
+            printf("SCM_CREDENTIALS: pid=%ld, uid=%ld, gid=%ld\n", (long)ucredp->pid, (long)ucredp->uid, (long)ucredp->gid);
             break;
 
         default:

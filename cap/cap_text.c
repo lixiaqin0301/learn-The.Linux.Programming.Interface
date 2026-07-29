@@ -30,13 +30,15 @@
    supplied text-form capability string. This enables the user to easily
    understand how the text-form capability string is interpreted.
 */
-#include <sys/capability.h>
 #include "tlpi_hdr.h"
+#include <sys/capability.h>
 
-#define PRCAP_SHOW_ALL          0x01    /* Also display capabilities that
-                                           are not enabled in any set */
-#define PRCAP_SHOW_UNRECOGNIZED 0x02    /* Display capabilities that are
-                                           unrecognized by libcap */
+#define PRCAP_SHOW_ALL                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             \
+    0x01 /* Also display capabilities that                                                                                                                                                                                                                                                                                                                                                                                                                                                                         \
+            are not enabled in any set */
+#define PRCAP_SHOW_UNRECOGNIZED                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    \
+    0x02 /* Display capabilities that are                                                                                                                                                                                                                                                                                                                                                                                                                                                                          \
+            unrecognized by libcap */
 
 static int
 capIsSet(cap_t capSets, cap_value_t cap, cap_flag_t set)
@@ -77,14 +79,8 @@ printCap(cap_t capSets, cap_value_t cap, char *capStrName, int flags)
     cap_flag_value_t dummy;
 
     if (cap_get_flag(capSets, cap, CAP_PERMITTED, &dummy) != -1) {
-        if ((flags & PRCAP_SHOW_ALL) ||
-                capIsPermitted(capSets, cap) ||
-                capIsEffective(capSets, cap) ||
-                capIsInheritable(capSets, cap))
-            printf("%-22s %s%s%s\n", capStrName,
-                   capIsPermitted(capSets, cap) ? "p" : " ",
-                   capIsEffective(capSets, cap) ? "e" : " ",
-                   capIsInheritable(capSets, cap) ? "i" : " ");
+        if ((flags & PRCAP_SHOW_ALL) || capIsPermitted(capSets, cap) || capIsEffective(capSets, cap) || capIsInheritable(capSets, cap))
+            printf("%-22s %s%s%s\n", capStrName, capIsPermitted(capSets, cap) ? "p" : " ", capIsEffective(capSets, cap) ? "e" : " ", capIsInheritable(capSets, cap) ? "i" : " ");
     } else {
         if (flags & PRCAP_SHOW_UNRECOGNIZED)
             printf("%-22s unrecognized by libcap\n", capStrName);
@@ -95,11 +91,11 @@ static void
 printAllCaps(cap_t capSets, int flags)
 {
     printCap(capSets, CAP_AUDIT_CONTROL, "CAP_AUDIT_CONTROL", flags);
-#ifdef CAP_AUDIT_READ           /* Since Linux 3.16 */
+#ifdef CAP_AUDIT_READ /* Since Linux 3.16 */
     printCap(capSets, CAP_AUDIT_READ, "CAP_AUDIT_READ", flags);
 #endif
     printCap(capSets, CAP_AUDIT_WRITE, "CAP_AUDIT_WRITE", flags);
-#ifdef CAP_BLOCK_SUSPEND        /* Since Linux 3.5 */
+#ifdef CAP_BLOCK_SUSPEND /* Since Linux 3.5 */
     printCap(capSets, CAP_BLOCK_SUSPEND, "CAP_BLOCK_SUSPEND", flags);
 #endif
     printCap(capSets, CAP_CHOWN, "CAP_CHOWN", flags);
@@ -112,10 +108,10 @@ printAllCaps(cap_t capSets, int flags)
     printCap(capSets, CAP_KILL, "CAP_KILL", flags);
     printCap(capSets, CAP_LEASE, "CAP_LEASE", flags);
     printCap(capSets, CAP_LINUX_IMMUTABLE, "CAP_LINUX_IMMUTABLE", flags);
-#ifdef CAP_MAC_ADMIN            /* Since Linux 2.6.25 */
+#ifdef CAP_MAC_ADMIN /* Since Linux 2.6.25 */
     printCap(capSets, CAP_MAC_ADMIN, "CAP_MAC_ADMIN", flags);
 #endif
-#ifdef CAP_MAC_OVERRIDE         /* Since Linux 2.6.25 */
+#ifdef CAP_MAC_OVERRIDE /* Since Linux 2.6.25 */
     printCap(capSets, CAP_MAC_OVERRIDE, "CAP_MAC_OVERRIDE", flags);
 #endif
     printCap(capSets, CAP_MKNOD, "CAP_MKNOD", flags);
@@ -138,10 +134,10 @@ printAllCaps(cap_t capSets, int flags)
     printCap(capSets, CAP_SYS_RESOURCE, "CAP_SYS_RESOURCE", flags);
     printCap(capSets, CAP_SYS_TIME, "CAP_SYS_TIME", flags);
     printCap(capSets, CAP_SYS_TTY_CONFIG, "CAP_SYS_TTY_CONFIG", flags);
-#ifdef CAP_SYSLOG               /* Since Linux 2.6.37 */
+#ifdef CAP_SYSLOG /* Since Linux 2.6.37 */
     printCap(capSets, CAP_SYSLOG, "CAP_SYSLOG", flags);
 #endif
-#ifdef CAP_WAKE_ALARM           /* Since Linux 3.0 */
+#ifdef CAP_WAKE_ALARM /* Since Linux 3.0 */
     printCap(capSets, CAP_WAKE_ALARM, "CAP_WAKE_ALARM", flags);
 #endif
 }

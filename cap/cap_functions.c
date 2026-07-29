@@ -15,8 +15,8 @@
    Useful functions for working with capabilities.
 */
 
-#include <stdio.h>
 #include "cap_functions.h"
+#include <stdio.h>
 
 /* Change the 'setting' of the specified 'capability' in the capability set
    specified by 'flag'.

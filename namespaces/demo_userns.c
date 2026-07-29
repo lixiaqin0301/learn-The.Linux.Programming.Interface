@@ -20,26 +20,28 @@
    See https://lwn.net/Articles/532593/
 */
 #define _GNU_SOURCE
-#include <sys/capability.h>
-#include <sys/wait.h>
 #include <sched.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
+#include <sys/capability.h>
 #include <sys/mman.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
-static int                      /* Startup function for cloned child */
+static int /* Startup function for cloned child */
 childFunc(void *arg)
 {
     cap_t caps;
     char *str;
 
     for (;;) {
-        printf("eUID = %ld; eGID = %ld; ",
-                (long) geteuid(), (long) getegid());
+        printf("eUID = %ld; eGID = %ld; ", (long)geteuid(), (long)getegid());
 
         caps = cap_get_proc();
         if (caps == NULL)
@@ -71,20 +73,18 @@ main(int argc, char *argv[])
     pid_t pid;
     char *stack;
 
-    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
     if (stack == MAP_FAILED)
         errExit("mmap");
 
     /* Create child; child commences execution in childFunc() */
 
-    pid = clone(childFunc,
-                stack + STACK_SIZE,     /* Assume stack grows downward */
-                CLONE_NEWUSER | SIGCHLD, argv[1]);
+    pid = clone(childFunc, stack + STACK_SIZE, /* Assume stack grows downward */
+        CLONE_NEWUSER | SIGCHLD, argv[1]);
     if (pid == -1)
         errExit("clone");
 
-    printf("PID of child: %ld\n", (long) pid);
+    printf("PID of child: %ld\n", (long)pid);
 
     /* Parent falls through to here.  Wait for child. */
 

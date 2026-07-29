@@ -19,28 +19,32 @@
 */
 #define _GNU_SOURCE
 #include <sched.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
-#ifndef CLONE_NEWCGROUP         /* Added in Linux 4.6 */
-#define CLONE_NEWCGROUP         0x02000000
+#ifndef CLONE_NEWCGROUP /* Added in Linux 4.6 */
+#define CLONE_NEWCGROUP 0x02000000
 #endif
 
 /* A simple error-handling function: print an error message based
    on the value in 'errno' and terminate the calling process */
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 static void
 usage(char *pname)
 {
     fprintf(stderr, "Usage: %s [options] cmd [arg...]\n", pname);
     fprintf(stderr, "Options can be:\n");
-    fprintf(stderr, "    -f   fork() before executing cmd "
-            "(useful when unsharing PID namespace)\n");
+    fprintf(stderr,
+        "    -f   fork() before executing cmd "
+        "(useful when unsharing PID namespace)\n");
     fprintf(stderr, "    -C   unshare cgroup namespace\n");
     fprintf(stderr, "    -i   unshare IPC namespace\n");
     fprintf(stderr, "    -m   unshare mount namespace\n");
@@ -60,15 +64,32 @@ main(int argc, char *argv[])
     do_fork = 0;
     while ((opt = getopt(argc, argv, "CfimnpuU")) != -1) {
         switch (opt) {
-        case 'f': do_fork = 1;                  break;
-        case 'C': flags |= CLONE_NEWCGROUP;     break;
-        case 'i': flags |= CLONE_NEWIPC;        break;
-        case 'm': flags |= CLONE_NEWNS;         break;
-        case 'n': flags |= CLONE_NEWNET;        break;
-        case 'p': flags |= CLONE_NEWPID;        break;
-        case 'u': flags |= CLONE_NEWUTS;        break;
-        case 'U': flags |= CLONE_NEWUSER;       break;
-        default:  usage(argv[0]);
+        case 'f':
+            do_fork = 1;
+            break;
+        case 'C':
+            flags |= CLONE_NEWCGROUP;
+            break;
+        case 'i':
+            flags |= CLONE_NEWIPC;
+            break;
+        case 'm':
+            flags |= CLONE_NEWNS;
+            break;
+        case 'n':
+            flags |= CLONE_NEWNET;
+            break;
+        case 'p':
+            flags |= CLONE_NEWPID;
+            break;
+        case 'u':
+            flags |= CLONE_NEWUTS;
+            break;
+        case 'U':
+            flags |= CLONE_NEWUSER;
+            break;
+        default:
+            usage(argv[0]);
         }
     }
 
@@ -87,7 +108,7 @@ main(int argc, char *argv[])
 
     if (do_fork) {
         if (fork()) {
-            wait(NULL);         /* Parent waits for child to complete */
+            wait(NULL); /* Parent waits for child to complete */
             exit(EXIT_SUCCESS);
         }
 

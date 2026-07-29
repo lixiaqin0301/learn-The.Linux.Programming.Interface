@@ -65,21 +65,24 @@
    limit) and slower (because of the added architecture checks).
 */
 #define _GNU_SOURCE
-#include <mqueue.h>
-#include <stddef.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <linux/audit.h>
-#include <sys/syscall.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>
-#include <sys/prctl.h>
+#include <mqueue.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/prctl.h>
+#include <sys/syscall.h>
 #include <unistd.h>
-#include <errno.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 /* The following is a hack to allow for systems (pre-Linux 4.14) that don't
    provide SECCOMP_RET_KILL_PROCESS, which kills (all threads in) a process.
@@ -145,12 +148,13 @@ seccomp(unsigned int operation, unsigned int flags, void *args)
 
 /* For the x32 ABI, all system call numbers have bit 30 set */
 
-#define X32_SYSCALL_BIT         0x40000000
+#define X32_SYSCALL_BIT 0x40000000
 
-#define NR_mq_notify_x86_64     244
-#define NR_mq_notify_i386       281
-#define NR_mq_notify_x32        527     /* Actual syscall will also have
-                                           X32_SYSCALL_BIT bit set */
+#define NR_mq_notify_x86_64 244
+#define NR_mq_notify_i386 281
+#define NR_mq_notify_x32                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+    527 /* Actual syscall will also have                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+           X32_SYSCALL_BIT bit set */
 
 static void
 install_filter(void)
@@ -166,8 +170,7 @@ install_filter(void)
 
         /* [0] Load the architecture value. */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                (offsetof(struct seccomp_data, arch))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, arch))),
 
         /* [1] Are we on x86-64 architecture? If it is not, jump forward
                to test whether this is the i386 architecture. */
@@ -176,8 +179,7 @@ install_filter(void)
 
         /* [2] Load the system call number. */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, nr))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, nr))),
 
         /* [3] Is this the x86-64 mq_notify() syscall? */
 
@@ -191,22 +193,21 @@ install_filter(void)
         /* [5] Is this the x32 mq_notify() syscall? If it is not, jump
                forward to allow the syscall. */
 
-        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K,
-                 (NR_mq_notify_x32 + X32_SYSCALL_BIT), 0, 5),
+        BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, (NR_mq_notify_x32 + X32_SYSCALL_BIT), 0, 5),
 
         /* [6] It is; make the call fail with an error equal to the
                syscall number. */
 
         BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | NR_mq_notify_x32),
-                /* Return NR_mq_notify_x32 as the error number, rather than
-                   (NR_mq_notify_x32 + X32_SYSCALL_BIT), because glibc only
-                   considers negative syscall return values in the range
-                   [-4096 < retval < 0] to be error values that should be
-                   (negated and) copied to 'errno'.  Note also that even
-                   allowing for the masking of the X32_SYSCALL_BIT,
-                   mq_notify() is an example of a system call that has a
-                   different number on x86-64 and x32 (this is *not* the
-                   case for all syscalls under these two ABIs). */
+        /* Return NR_mq_notify_x32 as the error number, rather than
+           (NR_mq_notify_x32 + X32_SYSCALL_BIT), because glibc only
+           considers negative syscall return values in the range
+           [-4096 < retval < 0] to be error values that should be
+           (negated and) copied to 'errno'.  Note also that even
+           allowing for the masking of the X32_SYSCALL_BIT,
+           mq_notify() is an example of a system call that has a
+           different number on x86-64 and x32 (this is *not* the
+           case for all syscalls under these two ABIs). */
 
         /* [7] Is this the i386 architecture? If it is not, jump forward
                to kill the process. */
@@ -215,8 +216,7 @@ install_filter(void)
 
         /* [8] Load the system call number. */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, nr))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, nr))),
 
         /* [9] Is this the i386 mq_notify() syscall? If it is not, jump
                forward to allow the syscall. */
@@ -239,7 +239,7 @@ install_filter(void)
     };
 
     struct sock_fprog prog = {
-        .len = (unsigned short) (sizeof(filter) / sizeof(filter[0])),
+        .len = (unsigned short)(sizeof(filter) / sizeof(filter[0])),
         .filter = filter,
     };
 
@@ -265,14 +265,11 @@ main(int argc, char **argv)
 
     /* Print some information about the execution environment */
 
-    printf("\targv[0] = %s; PID = %ld\n", argv[0], (long) getpid());
+    printf("\targv[0] = %s; PID = %ld\n", argv[0], (long)getpid());
     char buf[1024];
-    snprintf(buf, sizeof(buf), "echo -n '\t'; grep Seccomp /proc/%ld/status",
-            (long) getpid());
+    snprintf(buf, sizeof(buf), "echo -n '\t'; grep Seccomp /proc/%ld/status", (long)getpid());
     system(buf);
-    snprintf(buf, sizeof(buf),
-            "echo -n '\t'; file -L /proc/%ld/exe | sed 's/,.*//'",
-            (long) getpid());
+    snprintf(buf, sizeof(buf), "echo -n '\t'; file -L /proc/%ld/exe | sed 's/,.*//'", (long)getpid());
     system(buf);
 
     /* Call mq_notify() and check the result, which should be failure
@@ -285,8 +282,7 @@ main(int argc, char **argv)
         printf("mq_notify() failed with errno = %d\n", errno);
     } else {
         printf("mq_notify() was not failed by seccomp() filter!\n");
-        printf("*** Make sure that the %s environment variable is not set\n",
-                no_seccomp_filter_var);
+        printf("*** Make sure that the %s environment variable is not set\n", no_seccomp_filter_var);
         printf("    when running this program.\n");
         printf("*** Otherwise, check the syscall numbers in kernel headers\n");
         printf("    to see that they are correct\n");

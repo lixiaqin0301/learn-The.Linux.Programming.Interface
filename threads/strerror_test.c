@@ -14,10 +14,10 @@
 
    A program to test whether the implementation of strerror() thread-safe.
 */
-#include <stdio.h>
-#include <string.h>                 /* Get declaration of strerror() */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
+#include <stdio.h>
+#include <string.h> /* Get declaration of strerror() */
 
 static void *
 threadFunc(void *arg)

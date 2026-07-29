@@ -11,7 +11,8 @@
 /* modx1.c */
 
 void
-x1(void) {
+x1(void)
+{
     void x2(void);
 
     x2();

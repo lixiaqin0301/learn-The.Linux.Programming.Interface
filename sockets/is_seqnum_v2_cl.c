@@ -26,8 +26,8 @@
 int
 main(int argc, char *argv[])
 {
-    char *reqLenStr;                    /* Requested length of sequence */
-    char seqNumStr[INT_LEN];            /* Start of granted sequence */
+    char *reqLenStr; /* Requested length of sequence */
+    char seqNumStr[INT_LEN]; /* Start of granted sequence */
     int cfd;
     ssize_t numRead;
 
@@ -39,7 +39,7 @@ main(int argc, char *argv[])
         fatal("inetConnect() failed");
 
     reqLenStr = (argc > 2) ? argv[2] : "1";
-    if (write(cfd, reqLenStr, strlen(reqLenStr)) !=  strlen(reqLenStr))
+    if (write(cfd, reqLenStr, strlen(reqLenStr)) != strlen(reqLenStr))
         fatal("Partial/failed write (reqLenStr)");
     if (write(cfd, "\n", 1) != 1)
         fatal("Partial/failed write (newline)");
@@ -50,7 +50,7 @@ main(int argc, char *argv[])
     if (numRead == 0)
         fatal("Unexpected EOF from server");
 
-    printf("Sequence number: %s", seqNumStr);   /* Includes '\n' */
+    printf("Sequence number: %s", seqNumStr); /* Includes '\n' */
 
-    exit(EXIT_SUCCESS);                         /* Closes 'cfd' */
+    exit(EXIT_SUCCESS); /* Closes 'cfd' */
 }

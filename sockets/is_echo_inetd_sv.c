@@ -16,8 +16,8 @@
 
    Compare this program with is_echo_sv.c.
 */
-#include <syslog.h>
 #include "tlpi_hdr.h"
+#include <syslog.h>
 
 #define BUF_SIZE 4096
 

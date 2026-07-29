@@ -14,14 +14,14 @@
 
    A package of useful routines for Internet domain sockets.
 */
-#define _BSD_SOURCE             /* To get NI_MAXHOST and NI_MAXSERV
-                                   definitions from <netdb.h> */
-#include <sys/socket.h>
-#include <netinet/in.h>
+#define _BSD_SOURCE /* To get NI_MAXHOST and NI_MAXSERV                                                                                                                                                                                                                                                                                                                                                                                                                                                            \
+                       definitions from <netdb.h> */
+#include "inet_sockets.h" /* Declares functions defined here */
+#include "tlpi_hdr.h"
 #include <arpa/inet.h>
 #include <netdb.h>
-#include "inet_sockets.h"       /* Declares functions defined here */
-#include "tlpi_hdr.h"
+#include <netinet/in.h>
+#include <sys/socket.h>
 
 /* The following arguments are common to several of the routines
    below:
@@ -47,7 +47,7 @@ inetConnect(const char *host, const char *service, int type)
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
-    hints.ai_family = AF_UNSPEC;        /* Allows IPv4 or IPv6 */
+    hints.ai_family = AF_UNSPEC; /* Allows IPv4 or IPv6 */
     hints.ai_socktype = type;
 
     s = getaddrinfo(host, service, &hints, &result);
@@ -62,10 +62,10 @@ inetConnect(const char *host, const char *service, int type)
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (sfd == -1)
-            continue;                   /* On error, try next address */
+            continue; /* On error, try next address */
 
         if (connect(sfd, rp->ai_addr, rp->ai_addrlen) != -1)
-            break;                      /* Success */
+            break; /* Success */
 
         /* Connect failed: close this socket and try next address */
 
@@ -85,9 +85,8 @@ inetConnect(const char *host, const char *service, int type)
    address structure for the address family for this socket.
    Return the socket descriptor on success, or -1 on error. */
 
-static int              /* Public interfaces: inetBind() and inetListen() */
-inetPassiveSocket(const char *service, int type, socklen_t *addrlen,
-                  Boolean doListen, int backlog)
+static int /* Public interfaces: inetBind() and inetListen() */
+inetPassiveSocket(const char *service, int type, socklen_t *addrlen, Boolean doListen, int backlog)
 {
     struct addrinfo hints;
     struct addrinfo *result, *rp;
@@ -98,8 +97,8 @@ inetPassiveSocket(const char *service, int type, socklen_t *addrlen,
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
     hints.ai_socktype = type;
-    hints.ai_family = AF_UNSPEC;        /* Allows IPv4 or IPv6 */
-    hints.ai_flags = AI_PASSIVE;        /* Use wildcard IP address */
+    hints.ai_family = AF_UNSPEC; /* Allows IPv4 or IPv6 */
+    hints.ai_flags = AI_PASSIVE; /* Use wildcard IP address */
 
     s = getaddrinfo(NULL, service, &hints, &result);
     if (s != 0)
@@ -112,11 +111,10 @@ inetPassiveSocket(const char *service, int type, socklen_t *addrlen,
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         sfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (sfd == -1)
-            continue;                   /* On error, try next address */
+            continue; /* On error, try next address */
 
         if (doListen) {
-            if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optval,
-                    sizeof(optval)) == -1) {
+            if (setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1) {
                 close(sfd);
                 freeaddrinfo(result);
                 return -1;
@@ -124,7 +122,7 @@ inetPassiveSocket(const char *service, int type, socklen_t *addrlen,
         }
 
         if (bind(sfd, rp->ai_addr, rp->ai_addrlen) == 0)
-            break;                      /* Success */
+            break; /* Success */
 
         /* bind() failed: close this socket and try next address */
 
@@ -139,7 +137,7 @@ inetPassiveSocket(const char *service, int type, socklen_t *addrlen,
     }
 
     if (rp != NULL && addrlen != NULL)
-        *addrlen = rp->ai_addrlen;      /* Return address structure size */
+        *addrlen = rp->ai_addrlen; /* Return address structure size */
 
     freeaddrinfo(result);
 
@@ -173,13 +171,11 @@ inetBind(const char *service, int type, socklen_t *addrlen)
    size of the 'addrStr' buffer in 'addrStrLen'. */
 
 char *
-inetAddressStr(const struct sockaddr *addr, socklen_t addrlen,
-               char *addrStr, int addrStrLen)
+inetAddressStr(const struct sockaddr *addr, socklen_t addrlen, char *addrStr, int addrStrLen)
 {
     char host[NI_MAXHOST], service[NI_MAXSERV];
 
-    if (getnameinfo(addr, addrlen, host, NI_MAXHOST,
-                    service, NI_MAXSERV, NI_NUMERICSERV) == 0)
+    if (getnameinfo(addr, addrlen, host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICSERV) == 0)
         snprintf(addrStr, addrStrLen, "(%s, %s)", host, service);
     else
         snprintf(addrStr, addrStrLen, "(?UNKNOWN?)");

@@ -21,22 +21,25 @@
 */
 #define _GNU_SOURCE
 #include <sched.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <sys/wait.h>
 #include <signal.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/mman.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
-#ifndef CLONE_NEWCGROUP         /* Added in Linux 4.6 */
-#define CLONE_NEWCGROUP         0x02000000
+#ifndef CLONE_NEWCGROUP /* Added in Linux 4.6 */
+#define CLONE_NEWCGROUP 0x02000000
 #endif
 
 /* A simple error-handling function: print an error message based
    on the value in 'errno' and terminate the calling process */
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 static void
 usage(char *pname)
@@ -54,7 +57,7 @@ usage(char *pname)
     exit(EXIT_FAILURE);
 }
 
-static int              /* Start function for cloned child */
+static int /* Start function for cloned child */
 childFunc(void *arg)
 {
     char **argv = arg;
@@ -84,39 +87,52 @@ main(int argc, char *argv[])
 
     while ((opt = getopt(argc, argv, "+CimnpuUv")) != -1) {
         switch (opt) {
-        case 'C': flags |= CLONE_NEWCGROUP;     break;
-        case 'i': flags |= CLONE_NEWIPC;        break;
-        case 'm': flags |= CLONE_NEWNS;         break;
-        case 'n': flags |= CLONE_NEWNET;        break;
-        case 'p': flags |= CLONE_NEWPID;        break;
-        case 'u': flags |= CLONE_NEWUTS;        break;
-        case 'U': flags |= CLONE_NEWUSER;       break;
-        case 'v': verbose = 1;                  break;
-        default:  usage(argv[0]);
+        case 'C':
+            flags |= CLONE_NEWCGROUP;
+            break;
+        case 'i':
+            flags |= CLONE_NEWIPC;
+            break;
+        case 'm':
+            flags |= CLONE_NEWNS;
+            break;
+        case 'n':
+            flags |= CLONE_NEWNET;
+            break;
+        case 'p':
+            flags |= CLONE_NEWPID;
+            break;
+        case 'u':
+            flags |= CLONE_NEWUTS;
+            break;
+        case 'U':
+            flags |= CLONE_NEWUSER;
+            break;
+        case 'v':
+            verbose = 1;
+            break;
+        default:
+            usage(argv[0]);
         }
     }
 
     if (optind >= argc)
         usage(argv[0]);
 
-    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
     if (stack == MAP_FAILED)
         errExit("mmap");
 
-    child_pid = clone(childFunc,
-                      stack + STACK_SIZE,
-                      flags | SIGCHLD, &argv[optind]);
+    child_pid = clone(childFunc, stack + STACK_SIZE, flags | SIGCHLD, &argv[optind]);
     if (child_pid == -1)
         errExit("clone");
 
     if (verbose)
-        printf("%s: PID of child created by clone() is %ld\n",
-                argv[0], (long) child_pid);
+        printf("%s: PID of child created by clone() is %ld\n", argv[0], (long)child_pid);
 
     /* Parent falls through to here */
 
-    if (waitpid(child_pid, NULL, 0) == -1)      /* Wait for child */
+    if (waitpid(child_pid, NULL, 0) == -1) /* Wait for child */
         errExit("waitpid");
 
     if (verbose)

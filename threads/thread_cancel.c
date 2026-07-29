@@ -14,18 +14,18 @@
 
    Demonstrate the use of pthread_cancel() to cancel a POSIX thread.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
 static void *
 threadFunc(void *arg)
 {
     int j;
 
-    printf("New thread started\n");     /* May be a cancellation point */
-    for (j = 1; ; j++) {
-        printf("Loop %d\n", j);         /* May be a cancellation point */
-        sleep(1);                       /* A cancellation point */
+    printf("New thread started\n"); /* May be a cancellation point */
+    for (j = 1;; j++) {
+        printf("Loop %d\n", j); /* May be a cancellation point */
+        sleep(1); /* A cancellation point */
     }
 
     /* NOTREACHED */
@@ -43,7 +43,7 @@ main(int argc, char *argv[])
     if (s != 0)
         errExitEN(s, "pthread_create");
 
-    sleep(3);                           /* Allow new thread to run a while */
+    sleep(3); /* Allow new thread to run a while */
 
     s = pthread_cancel(thr);
     if (s != 0)

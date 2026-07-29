@@ -47,13 +47,14 @@
         Thread 1 completed epoll_wait(); ready = 1
         main() about to terminate
 */
-#include <sys/epoll.h>
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <pthread.h>
-#include "tlpi_hdr.h"
+#include <sys/epoll.h>
 
-#define MAX_EVENTS     5      /* Max. # of events we allow to be returned
-                                 from a single epoll_wait() call */
+#define MAX_EVENTS                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 \
+    5 /* Max. # of events we allow to be returned                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+         from a single epoll_wait() call */
 
 static int pipe1[2];
 static int epfd;
@@ -62,7 +63,7 @@ static void *
 threadFunc(void *arg)
 {
     struct epoll_event evlist[MAX_EVENTS];
-    long tnum = (long) arg;
+    long tnum = (long)arg;
     int ready;
 
     printf("Thread %ld about to epoll_wait()\n", tnum);
@@ -91,13 +92,13 @@ main(int argc, char *argv[])
     if (pipe(pipe1) == -1)
         errExit("pipe1");
 
-    ev.events = EPOLLIN | epollet;      /* Only interested in input events */
+    ev.events = EPOLLIN | epollet; /* Only interested in input events */
     ev.data.fd = pipe1[0];
     if (epoll_ctl(epfd, EPOLL_CTL_ADD, pipe1[0], &ev) == -1)
         errExit("epoll_ctl");
 
     for (long j = 0; j < 5; j++) {
-        s = pthread_create(&t1, NULL, threadFunc, (void *) j);
+        s = pthread_create(&t1, NULL, threadFunc, (void *)j);
         if (s != 0)
             errExitEN(s, "pthread_create");
     }
@@ -110,5 +111,4 @@ main(int argc, char *argv[])
     printf("main() about to terminate\n");
 
     exit(EXIT_SUCCESS);
-
 }

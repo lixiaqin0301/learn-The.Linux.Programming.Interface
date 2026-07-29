@@ -19,10 +19,10 @@
 
    This program is Linux-specific.
 */
-#define _GNU_SOURCE     /* Obtain O_DIRECT definition from <fcntl.h> */
+#define _GNU_SOURCE /* Obtain O_DIRECT definition from <fcntl.h> */
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <malloc.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -64,7 +64,7 @@ main(int argc, char *argv[])
     numRead = read(fd, buf, length);
     if (numRead == -1)
         errExit("read");
-    printf("Read %ld bytes\n", (long) numRead);
+    printf("Read %ld bytes\n", (long)numRead);
 
     exit(EXIT_SUCCESS);
 }

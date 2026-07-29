@@ -19,18 +19,18 @@
 
    Linux supports clock_nanosleep() since kernel 2.6.
 */
-#if ! defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600
+#if !defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 600
 #define _XOPEN_SOURCE 600
 #endif
+#include "tlpi_hdr.h"
+#include <signal.h>
 #include <sys/time.h>
 #include <time.h>
-#include <signal.h>
-#include "tlpi_hdr.h"
 
 static void
 sigintHandler(int sig)
 {
-    return;                             /* Just interrupt clock_nanosleep() */
+    return; /* Just interrupt clock_nanosleep() */
 }
 
 int
@@ -59,18 +59,17 @@ main(int argc, char *argv[])
     if (flags == TIMER_ABSTIME) {
         if (clock_gettime(CLOCK_REALTIME, &request) == -1)
             errExit("clock_gettime");
-        printf("Initial CLOCK_REALTIME value: %ld.%09ld\n",
-                (long) request.tv_sec, (long) request.tv_nsec);
+        printf("Initial CLOCK_REALTIME value: %ld.%09ld\n", (long)request.tv_sec, (long)request.tv_nsec);
 
-        request.tv_sec  += getLong(argv[1], 0, "secs");
+        request.tv_sec += getLong(argv[1], 0, "secs");
         request.tv_nsec += getLong(argv[2], 0, "nanosecs");
         if (request.tv_nsec >= 1000000000) {
             request.tv_sec += request.tv_nsec / 1000000000;
             request.tv_nsec %= 1000000000;
         }
 
-    } else {                    /* Relative sleep */
-        request.tv_sec  = getLong(argv[1], 0, "secs");
+    } else { /* Relative sleep */
+        request.tv_sec = getLong(argv[1], 0, "secs");
         request.tv_nsec = getLong(argv[2], 0, "nanosecs");
     }
 
@@ -87,15 +86,13 @@ main(int argc, char *argv[])
 
         if (gettimeofday(&finish, NULL) == -1)
             errExit("gettimeofday");
-        printf("Slept: %.6f secs", finish.tv_sec - start.tv_sec +
-                        (finish.tv_usec - start.tv_usec) / 1000000.0);
+        printf("Slept: %.6f secs", finish.tv_sec - start.tv_sec + (finish.tv_usec - start.tv_usec) / 1000000.0);
 
         if (s == 0)
-            break;                      /* sleep completed */
+            break; /* sleep completed */
 
         if (flags != TIMER_ABSTIME) {
-            printf("... Remaining: %ld.%09ld",
-                    (long) remain.tv_sec, remain.tv_nsec);
+            printf("... Remaining: %ld.%09ld", (long)remain.tv_sec, remain.tv_nsec);
 
             request = remain;
         }

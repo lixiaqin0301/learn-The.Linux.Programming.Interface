@@ -15,13 +15,16 @@
    Display process UIDs and GIDs.
 */
 #define _GNU_SOURCE
-#include <sys/capability.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/capability.h>
+#include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 int
 main(int argc, char *argv[])
@@ -34,8 +37,7 @@ main(int argc, char *argv[])
         if (caps == NULL)
             errExit("cap_get_proc");
 
-        printf("eUID = %ld;  eGID = %ld;  ",
-                (long) geteuid(), (long) getegid());
+        printf("eUID = %ld;  eGID = %ld;  ", (long)geteuid(), (long)getegid());
 
         s = cap_to_text(caps, NULL);
         if (s == NULL)

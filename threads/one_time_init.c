@@ -15,10 +15,10 @@
    The one_time_init() function implemented here performs the same task as
    the POSIX threads pthread_once() library function.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
-struct once_struct {            /* Our equivalent of pthread_once_t */
+struct once_struct { /* Our equivalent of pthread_once_t */
     pthread_mutex_t mtx;
     int called;
 };
@@ -78,11 +78,11 @@ main(int argc, char *argv[])
 
     /* Create two threads, both of which will call one_time_init() */
 
-    s = pthread_create(&t1, NULL, threadFunc, (void *) 1);
+    s = pthread_create(&t1, NULL, threadFunc, (void *)1);
     if (s != 0)
         errExitEN(s, "pthread_create");
 
-    s = pthread_create(&t2, NULL, threadFunc, (void *) 2);
+    s = pthread_create(&t2, NULL, threadFunc, (void *)2);
     if (s != 0)
         errExitEN(s, "pthread_create");
 

@@ -14,9 +14,9 @@
 
    Implement ttySetCbreak() and ttySetRaw().
 */
+#include "tty_functions.h" /* Declares functions defined here */
 #include <termios.h>
 #include <unistd.h>
-#include "tty_functions.h"              /* Declares functions defined here */
 
 /* Place terminal referred to by 'fd' in cbreak mode (noncanonical mode
    with echoing turned off). This function assumes that the terminal is
@@ -42,8 +42,8 @@ ttySetCbreak(int fd, struct termios *prevTermios)
 
     t.c_iflag &= ~ICRNL;
 
-    t.c_cc[VMIN] = 1;                   /* Character-at-a-time input */
-    t.c_cc[VTIME] = 0;                  /* with blocking */
+    t.c_cc[VMIN] = 1; /* Character-at-a-time input */
+    t.c_cc[VTIME] = 0; /* with blocking */
 
     if (tcsetattr(fd, TCSAFLUSH, &t) == -1)
         return -1;
@@ -68,19 +68,18 @@ ttySetRaw(int fd, struct termios *prevTermios)
         *prevTermios = t;
 
     t.c_lflag &= ~(ICANON | ISIG | IEXTEN | ECHO);
-                        /* Noncanonical mode, disable signals, extended
-                           input processing, and echoing */
+    /* Noncanonical mode, disable signals, extended
+       input processing, and echoing */
 
-    t.c_iflag &= ~(BRKINT | ICRNL | IGNBRK | IGNCR | INLCR |
-                      INPCK | ISTRIP | IXON | PARMRK);
-                        /* Disable special handling of CR, NL, and BREAK.
-                           No 8th-bit stripping or parity error handling.
-                           Disable START/STOP output flow control. */
+    t.c_iflag &= ~(BRKINT | ICRNL | IGNBRK | IGNCR | INLCR | INPCK | ISTRIP | IXON | PARMRK);
+    /* Disable special handling of CR, NL, and BREAK.
+       No 8th-bit stripping or parity error handling.
+       Disable START/STOP output flow control. */
 
-    t.c_oflag &= ~OPOST;                /* Disable all output processing */
+    t.c_oflag &= ~OPOST; /* Disable all output processing */
 
-    t.c_cc[VMIN] = 1;                   /* Character-at-a-time input */
-    t.c_cc[VTIME] = 0;                  /* with blocking */
+    t.c_cc[VMIN] = 1; /* Character-at-a-time input */
+    t.c_cc[VTIME] = 0; /* with blocking */
 
     if (tcsetattr(fd, TCSAFLUSH, &t) == -1)
         return -1;

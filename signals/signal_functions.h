@@ -17,8 +17,8 @@
 #ifndef SIGNAL_FUNCTIONS_H
 #define SIGNAL_FUNCTIONS_H
 
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 int printSigMask(FILE *of, const char *msg);
 

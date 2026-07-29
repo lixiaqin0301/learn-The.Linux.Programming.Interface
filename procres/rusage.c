@@ -17,10 +17,10 @@
 
    See also print_rudage.c.
 */
-#include <sys/resource.h>
-#include <sys/wait.h>
 #include "print_rusage.h"
 #include "tlpi_hdr.h"
+#include <sys/resource.h>
+#include <sys/wait.h>
 
 int
 main(int argc, char *argv[])
@@ -40,7 +40,7 @@ main(int argc, char *argv[])
         errExit("execvp");
 
     default:
-        printf("Command PID: %ld\n", (long) childPid);
+        printf("Command PID: %ld\n", (long)childPid);
         if (wait(NULL) == -1)
             errExit("wait");
         if (getrusage(RUSAGE_CHILDREN, &ru) == -1)

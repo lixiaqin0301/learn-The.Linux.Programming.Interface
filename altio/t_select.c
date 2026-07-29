@@ -18,7 +18,7 @@
    Usage as shown in usageError().
 */
 #include <sys/time.h>
-#if ! defined(__hpux)
+#if !defined(__hpux)
 /* HP-UX 11 doesn't have this header file */
 #include <sys/select.h>
 #endif
@@ -42,7 +42,7 @@ main(int argc, char *argv[])
     int ready, nfds, fd, numRead, j;
     struct timeval timeout;
     struct timeval *pto;
-    char buf[10];                       /* Large enough to hold "rw\0" */
+    char buf[10]; /* Large enough to hold "rw\0" */
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0)
         usageError(argv[0]);
@@ -50,11 +50,11 @@ main(int argc, char *argv[])
     /* Timeout for select() is specified in argv[1] */
 
     if (strcmp(argv[1], "-") == 0) {
-        pto = NULL;                     /* Infinite timeout */
+        pto = NULL; /* Infinite timeout */
     } else {
         pto = &timeout;
         timeout.tv_sec = getLong(argv[1], 0, "timeout");
-        timeout.tv_usec = 0;            /* No microseconds */
+        timeout.tv_usec = 0; /* No microseconds */
     }
 
     /* Process remaining arguments to build file descriptor sets */
@@ -71,7 +71,7 @@ main(int argc, char *argv[])
             cmdLineErr("file descriptor exceeds limit (%d)\n", FD_SETSIZE);
 
         if (fd >= nfds)
-            nfds = fd + 1;              /* Record maximum fd + 1 */
+            nfds = fd + 1; /* Record maximum fd + 1 */
         if (strchr(buf, 'r') != NULL)
             FD_SET(fd, &readfds);
         if (strchr(buf, 'w') != NULL)
@@ -81,7 +81,7 @@ main(int argc, char *argv[])
     /* We've built all of the arguments; now call select() */
 
     ready = select(nfds, &readfds, &writefds, NULL, pto);
-                                        /* Ignore exceptional events */
+    /* Ignore exceptional events */
     if (ready == -1)
         errExit("select");
 
@@ -89,11 +89,9 @@ main(int argc, char *argv[])
 
     printf("ready = %d\n", ready);
     for (fd = 0; fd < nfds; fd++)
-        printf("%d: %s%s\n", fd, FD_ISSET(fd, &readfds) ? "r" : "",
-                FD_ISSET(fd, &writefds) ? "w" : "");
+        printf("%d: %s%s\n", fd, FD_ISSET(fd, &readfds) ? "r" : "", FD_ISSET(fd, &writefds) ? "w" : "");
 
     if (pto != NULL)
-        printf("timeout after select(): %ld.%03ld\n",
-               (long) timeout.tv_sec, (long) timeout.tv_usec / 1000);
+        printf("timeout after select(): %ld.%03ld\n", (long)timeout.tv_sec, (long)timeout.tv_usec / 1000);
     exit(EXIT_SUCCESS);
 }

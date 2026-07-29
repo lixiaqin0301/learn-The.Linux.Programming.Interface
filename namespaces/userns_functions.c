@@ -15,16 +15,16 @@
    Some useful auxiliary functions when working with user namespaces.
 */
 #define _GNU_SOURCE
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <limits.h>
-#include <errno.h>
-#include <sys/capability.h>
 #include "userns_functions.h"
 #include "tlpi_hdr.h"
+#include <errno.h>
+#include <fcntl.h>
+#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/capability.h>
+#include <unistd.h>
 
 /* Display calling process's (effective) credentials and capabilities */
 
@@ -34,8 +34,7 @@ display_creds_and_caps(char *str)
     cap_t caps;
     char *s;
 
-    printf("%seUID = %ld; eGID=%ld;  ", str,
-            (long) geteuid(), (long) getegid());
+    printf("%seUID = %ld; eGID=%ld;  ", str, (long)geteuid(), (long)getegid());
 
     caps = cap_get_proc();
     if (caps == NULL)
@@ -68,7 +67,7 @@ int
 update_map(char *mapping, char *map_file)
 {
     int fd;
-    size_t map_len;     /* Length of 'mapping' */
+    size_t map_len; /* Length of 'mapping' */
     int status;
 
     /* Replace commas in mapping string with newlines */
@@ -87,8 +86,7 @@ update_map(char *mapping, char *map_file)
     status = 0;
 
     if (write(fd, mapping, map_len) != map_len) {
-        fprintf(stderr, "ERROR: writing to %s: %s\n",
-                map_file, strerror(errno));
+        fprintf(stderr, "ERROR: writing to %s: %s\n", map_file, strerror(errno));
         status = -1;
     }
 
@@ -121,8 +119,7 @@ proc_setgroups_write(pid_t child_pid, char *str)
     int fd;
     int status;
 
-    snprintf(setgroups_path, PATH_MAX, "/proc/%ld/setgroups",
-            (long) child_pid);
+    snprintf(setgroups_path, PATH_MAX, "/proc/%ld/setgroups", (long)child_pid);
 
     fd = open(setgroups_path, O_RDWR);
     if (fd == -1) {
@@ -138,8 +135,7 @@ proc_setgroups_write(pid_t child_pid, char *str)
         if (errno == ENOENT) {
             return 0;
         } else {
-            fprintf(stderr, "ERROR: open %s: %s\n", setgroups_path,
-                strerror(errno));
+            fprintf(stderr, "ERROR: open %s: %s\n", setgroups_path, strerror(errno));
             return -1;
         }
     }
@@ -147,8 +143,7 @@ proc_setgroups_write(pid_t child_pid, char *str)
     status = 0;
 
     if (write(fd, str, strlen(str)) == -1) {
-        fprintf(stderr, "ERROR: writing to %s: %s\n", setgroups_path,
-            strerror(errno));
+        fprintf(stderr, "ERROR: writing to %s: %s\n", setgroups_path, strerror(errno));
         status = -1;
     }
 

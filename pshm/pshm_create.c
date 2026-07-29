@@ -16,10 +16,10 @@
 
    Usage as shown in usageError().
 */
-#include <sys/stat.h>
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <sys/mman.h>
-#include "tlpi_hdr.h"
+#include <sys/stat.h>
 
 static void
 usageError(const char *progName)
@@ -41,9 +41,14 @@ main(int argc, char *argv[])
     flags = O_RDWR;
     while ((opt = getopt(argc, argv, "cx")) != -1) {
         switch (opt) {
-        case 'c':   flags |= O_CREAT;           break;
-        case 'x':   flags |= O_EXCL;            break;
-        default:    usageError(argv[0]);
+        case 'c':
+            flags |= O_CREAT;
+            break;
+        case 'x':
+            flags |= O_EXCL;
+            break;
+        default:
+            usageError(argv[0]);
         }
     }
 
@@ -51,8 +56,7 @@ main(int argc, char *argv[])
         usageError(argv[0]);
 
     size = getLong(argv[optind + 1], GN_ANY_BASE, "size");
-    perms = (argc <= optind + 2) ? (S_IRUSR | S_IWUSR) :
-                getLong(argv[optind + 2], GN_BASE_8, "octal-perms");
+    perms = (argc <= optind + 2) ? (S_IRUSR | S_IWUSR) : getLong(argv[optind + 2], GN_BASE_8, "octal-perms");
 
     /* Create shared memory object and set its size */
 

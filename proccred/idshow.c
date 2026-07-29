@@ -18,11 +18,11 @@
    file-system user and group IDs.
 */
 #define _GNU_SOURCE
-#include <unistd.h>
-#include <sys/fsuid.h>
-#include <limits.h>
-#include "ugid_functions.h"   /* userNameFromId() & groupNameFromId() */
 #include "tlpi_hdr.h"
+#include "ugid_functions.h" /* userNameFromId() & groupNameFromId() */
+#include <limits.h>
+#include <sys/fsuid.h>
+#include <unistd.h>
 
 #define SG_SIZE (NGROUPS_MAX + 1)
 
@@ -49,24 +49,24 @@ main(int argc, char *argv[])
 
     printf("UID: ");
     p = userNameFromId(ruid);
-    printf("real=%s (%ld); ", (p == NULL) ? "???" : p, (long) ruid);
+    printf("real=%s (%ld); ", (p == NULL) ? "???" : p, (long)ruid);
     p = userNameFromId(euid);
-    printf("eff=%s (%ld); ", (p == NULL) ? "???" : p, (long) euid);
+    printf("eff=%s (%ld); ", (p == NULL) ? "???" : p, (long)euid);
     p = userNameFromId(suid);
-    printf("saved=%s (%ld); ", (p == NULL) ? "???" : p, (long) suid);
+    printf("saved=%s (%ld); ", (p == NULL) ? "???" : p, (long)suid);
     p = userNameFromId(fsuid);
-    printf("fs=%s (%ld); ", (p == NULL) ? "???" : p, (long) fsuid);
+    printf("fs=%s (%ld); ", (p == NULL) ? "???" : p, (long)fsuid);
     printf("\n");
 
     printf("GID: ");
     p = groupNameFromId(rgid);
-    printf("real=%s (%ld); ", (p == NULL) ? "???" : p, (long) rgid);
+    printf("real=%s (%ld); ", (p == NULL) ? "???" : p, (long)rgid);
     p = groupNameFromId(egid);
-    printf("eff=%s (%ld); ", (p == NULL) ? "???" : p, (long) egid);
+    printf("eff=%s (%ld); ", (p == NULL) ? "???" : p, (long)egid);
     p = groupNameFromId(sgid);
-    printf("saved=%s (%ld); ", (p == NULL) ? "???" : p, (long) sgid);
+    printf("saved=%s (%ld); ", (p == NULL) ? "???" : p, (long)sgid);
     p = groupNameFromId(fsgid);
-    printf("fs=%s (%ld); ", (p == NULL) ? "???" : p, (long) fsgid);
+    printf("fs=%s (%ld); ", (p == NULL) ? "???" : p, (long)fsgid);
     printf("\n");
 
     numGroups = getgroups(SG_SIZE, suppGroups);
@@ -76,7 +76,7 @@ main(int argc, char *argv[])
     printf("Supplementary groups (%d): ", numGroups);
     for (j = 0; j < numGroups; j++) {
         p = groupNameFromId(suppGroups[j]);
-        printf("%s (%ld) ", (p == NULL) ? "???" : p, (long) suppGroups[j]);
+        printf("%s (%ld) ", (p == NULL) ? "???" : p, (long)suppGroups[j]);
     }
     printf("\n");
 

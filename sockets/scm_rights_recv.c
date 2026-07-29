@@ -48,12 +48,12 @@ main(int argc, char *argv[])
        requirements of any type */
 
     union {
-        char   buf[CMSG_SPACE(sizeof(int))];
-                        /* Space large enough to hold an 'int' */
+        char buf[CMSG_SPACE(sizeof(int))];
+        /* Space large enough to hold an 'int' */
         struct cmsghdr align;
     } controlMsg;
-    struct cmsghdr *cmsgp;      /* Pointer used to iterate through
-                                   headers in ancillary data */
+    struct cmsghdr *cmsgp; /* Pointer used to iterate through
+                              headers in ancillary data */
 
     /* Parse command-line options */
 
@@ -67,7 +67,8 @@ main(int argc, char *argv[])
 
         default:
             usageErr("%s [-d]\n"
-                     "        -d    use datagram socket\n", argv[0]);
+                     "        -d    use datagram socket\n",
+                argv[0]);
         }
     }
 
@@ -121,7 +122,7 @@ main(int argc, char *argv[])
     nr = recvmsg(sfd, &msgh, 0);
     if (nr == -1)
         errExit("recvmsg");
-    fprintf(stderr, "recvmsg() returned %ld\n", (long) nr);
+    fprintf(stderr, "recvmsg() returned %ld\n", (long)nr);
 
     if (nr > 0)
         fprintf(stderr, "Received data = %d\n", data);
@@ -145,7 +146,7 @@ main(int argc, char *argv[])
        is the received file descriptor (which is typically a different
        file descriptor number than was used in the sending process). */
 
-    fd = *((int *) CMSG_DATA(cmsgp));
+    fd = *((int *)CMSG_DATA(cmsgp));
     fprintf(stderr, "Received FD %d\n", fd);
 
     /* Having obtained the file descriptor, read the file's contents and

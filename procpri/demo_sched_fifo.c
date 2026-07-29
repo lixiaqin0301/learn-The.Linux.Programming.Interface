@@ -23,12 +23,12 @@
    with a suitable RLIMIT_RTPRIO resource limit.
 */
 #define _GNU_SOURCE
+#include "tlpi_hdr.h"
 #include <sched.h>
 #include <sys/resource.h>
 #include <sys/times.h>
-#include "tlpi_hdr.h"
 
-#define CSEC_STEP 25            /* CPU centiseconds between messages */
+#define CSEC_STEP 25 /* CPU centiseconds between messages */
 
 static void
 useCPU(char *msg)
@@ -41,19 +41,17 @@ useCPU(char *msg)
     for (;;) {
         if (times(&tms) == -1)
             errExit("times");
-        cpuCentisecs = (tms.tms_utime + tms.tms_stime) * 100 /
-                        sysconf(_SC_CLK_TCK);
+        cpuCentisecs = (tms.tms_utime + tms.tms_stime) * 100 / sysconf(_SC_CLK_TCK);
 
         if (cpuCentisecs >= prevStep + CSEC_STEP) {
             prevStep += CSEC_STEP;
-            printf("%s (PID %ld) cpu=%0.2f\n", msg, (long) getpid(),
-                    cpuCentisecs / 100.0);
+            printf("%s (PID %ld) cpu=%0.2f\n", msg, (long)getpid(), cpuCentisecs / 100.0);
         }
 
-        if (cpuCentisecs > 300)         /* Terminate after 3 seconds */
+        if (cpuCentisecs > 300) /* Terminate after 3 seconds */
             break;
 
-        if (cpuCentisecs >= prevSec + 100) {    /* Yield once/second */
+        if (cpuCentisecs >= prevSec + 100) { /* Yield once/second */
             prevSec = cpuCentisecs;
             sched_yield();
         }
@@ -67,7 +65,7 @@ main(int argc, char *argv[])
     struct sched_param sp;
     cpu_set_t set;
 
-    setbuf(stdout, NULL);               /* Disable buffering of stdout */
+    setbuf(stdout, NULL); /* Disable buffering of stdout */
 
     /* Confine all processes to a single CPU, so that the processes
        won't run in parallel on multi-CPU systems. */

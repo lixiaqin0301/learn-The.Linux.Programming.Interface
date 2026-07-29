@@ -19,20 +19,20 @@
    The program creates 'num-threads' threads, each of which loop
    'num-threads' times, waiting on the same barrier.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
 static pthread_barrier_t barrier;
-                                /* Barrier waited on by all threads */
+/* Barrier waited on by all threads */
 
-static int numBarriers;         /* Number of times the threads will
-                                   pass the barrier */
+static int numBarriers; /* Number of times the threads will
+                           pass the barrier */
 
 static void *
 threadFunc(void *arg)
 {
     int s, nsecs;
-    long threadNum = (long) arg;
+    long threadNum = (long)arg;
 
     printf("Thread %ld started\n", threadNum);
 
@@ -48,7 +48,7 @@ threadFunc(void *arg)
 
     for (int j = 0; j < numBarriers; j++) {
 
-        nsecs = random() % 5 + 1;       /* Sleep for 1 to 5 seconds */
+        nsecs = random() % 5 + 1; /* Sleep for 1 to 5 seconds */
         sleep(nsecs);
 
         /* Calling pthread_barrier_wait() causes each thread to block
@@ -56,7 +56,8 @@ threadFunc(void *arg)
            in the pthread_barrier_init() call. */
 
         printf("Thread %ld about to wait on barrier %d "
-                "after sleeping %d seconds\n", threadNum, j, nsecs);
+               "after sleeping %d seconds\n",
+            threadNum, j, nsecs);
         s = pthread_barrier_wait(&barrier);
 
         /* After the required number of threads have called
@@ -72,12 +73,12 @@ threadFunc(void *arg)
            once each time a barrier is passed. */
 
         if (s == 0) {
-            printf("Thread %ld passed barrier %d: return value was 0\n",
-                    threadNum, j);
+            printf("Thread %ld passed barrier %d: return value was 0\n", threadNum, j);
 
         } else if (s == PTHREAD_BARRIER_SERIAL_THREAD) {
             printf("Thread %ld passed barrier %d: return value was "
-                    "PTHREAD_BARRIER_SERIAL_THREAD\n", threadNum, j);
+                   "PTHREAD_BARRIER_SERIAL_THREAD\n",
+                threadNum, j);
 
             /* In the thread that gets the PTHREAD_BARRIER_SERIAL_THREAD
                return value, we briefly delay, and then print a newline
@@ -90,7 +91,7 @@ threadFunc(void *arg)
             usleep(100000);
             printf("\n");
 
-        } else {        /* Error */
+        } else { /* Error */
             errExitEN(s, "pthread_barrier_wait (%ld)", threadNum);
         }
     }
@@ -135,8 +136,7 @@ main(int argc, char *argv[])
     /* Create 'numThreads' threads */
 
     for (long threadNum = 0; threadNum < numThreads; threadNum++) {
-        s = pthread_create(&tid[threadNum], NULL, threadFunc,
-                (void *) threadNum);
+        s = pthread_create(&tid[threadNum], NULL, threadFunc, (void *)threadNum);
         if (s != 0)
             errExitEN(s, "pthread_create");
     }

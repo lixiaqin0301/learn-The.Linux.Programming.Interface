@@ -21,12 +21,12 @@
    This program is Linux-specific.
 */
 #define _GNU_SOURCE
+#include "tlpi_hdr.h"
+#include "ugid_functions.h"
+#include <ctype.h>
+#include <dirent.h>
 #include <limits.h>
 #include <sys/stat.h>
-#include <dirent.h>
-#include <ctype.h>
-#include "ugid_functions.h"
-#include "tlpi_hdr.h"
 
 #define MAX_LINE 1000
 
@@ -56,7 +56,7 @@ main(int argc, char *argv[])
     /* Scan entries under /proc directory */
 
     for (;;) {
-        errno = 0;              /* To distinguish error from end-of-directory */
+        errno = 0; /* To distinguish error from end-of-directory */
         dp = readdir(dirp);
         if (dp == NULL) {
             if (errno != 0)
@@ -68,15 +68,15 @@ main(int argc, char *argv[])
         /* Since we are looking for /proc/PID directories, skip entries
            that are not directories, or don't begin with a digit. */
 
-        if (dp->d_type != DT_DIR || !isdigit((unsigned char) dp->d_name[0]))
+        if (dp->d_type != DT_DIR || !isdigit((unsigned char)dp->d_name[0]))
             continue;
 
         snprintf(path, PATH_MAX, "/proc/%s/status", dp->d_name);
 
         fp = fopen(path, "r");
         if (fp == NULL)
-            continue;           /* Ignore errors: fopen() might fail if
-                                   process has just terminated */
+            continue; /* Ignore errors: fopen() might fail if
+                         process has just terminated */
 
         gotName = FALSE;
         gotUid = FALSE;
@@ -88,10 +88,10 @@ main(int argc, char *argv[])
                this process is running */
 
             if (strncmp(line, "Name:", 5) == 0) {
-                for (p = line + 5; *p != '\0' && isspace((unsigned char) *p); )
+                for (p = line + 5; *p != '\0' && isspace((unsigned char)*p);)
                     p++;
                 strncpy(cmd, p, MAX_LINE - 1);
-                cmd[MAX_LINE -1] = '\0';        /* Ensure null-terminated */
+                cmd[MAX_LINE - 1] = '\0'; /* Ensure null-terminated */
 
                 gotName = TRUE;
             }

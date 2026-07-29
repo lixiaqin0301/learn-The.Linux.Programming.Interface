@@ -15,11 +15,11 @@
    Implementation of readLineBuf(), a version of readLine() that is more
    efficient because it reads blocks of characters at a time.
 */
-#include <unistd.h>
-#include <errno.h>
 #include "read_line_buf.h"
+#include <errno.h>
+#include <unistd.h>
 
-void                    /* Initialize a ReadLineBuf structure */
+void /* Initialize a ReadLineBuf structure */
 readLineBufInit(int fd, struct ReadLineBuf *rlbuf)
 {
     rlbuf->fd = fd;
@@ -56,7 +56,7 @@ readLineBuf(struct ReadLineBuf *rlbuf, char *buffer, size_t n)
             if (rlbuf->len == -1)
                 return -1;
 
-            if (rlbuf->len == 0)        /* End of file */
+            if (rlbuf->len == 0) /* End of file */
                 break;
 
             rlbuf->next = 0;

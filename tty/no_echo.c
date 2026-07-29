@@ -15,8 +15,8 @@
    Demonstrate the use of tcgetattr() and tcsetattr() to change terminal
    attributes. In this case, we disable echoing of terminal input.
 */
-#include <termios.h>
 #include "tlpi_hdr.h"
+#include <termios.h>
 
 #define BUF_SIZE 100
 
@@ -30,8 +30,8 @@ main(int argc, char *argv[])
 
     if (tcgetattr(STDIN_FILENO, &tp) == -1)
         errExit("tcgetattr");
-    save = tp;                          /* So we can restore settings later */
-    tp.c_lflag &= ~ECHO;                /* ECHO off, other bits unchanged */
+    save = tp; /* So we can restore settings later */
+    tp.c_lflag &= ~ECHO; /* ECHO off, other bits unchanged */
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &tp) == -1)
         errExit("tcsetattr");
 

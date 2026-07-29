@@ -20,10 +20,10 @@
    was provided in glibc.
 */
 #define _POSIX_C_SOURCE 199309
+#include "curr_time.h" /* Declaration of currTime() */
+#include "tlpi_hdr.h"
 #include <signal.h>
 #include <time.h>
-#include "curr_time.h"          /* Declaration of currTime() */
-#include "tlpi_hdr.h"
 
 static void
 handler(int sig, siginfo_t *si, void *uc)
@@ -33,8 +33,7 @@ handler(int sig, siginfo_t *si, void *uc)
 #ifdef __linux__
     printf("    si_overrun         = %d\n", si->si_overrun);
 #endif
-    printf("    timer_getoverrun() = %d\n",
-            timer_getoverrun((timer_t) si->si_value.sival_ptr));
+    printf("    timer_getoverrun() = %d\n", timer_getoverrun((timer_t)si->si_value.sival_ptr));
 }
 
 int
@@ -56,7 +55,7 @@ main(int argc, char *argv[])
 
     if (timer_create(CLOCK_REALTIME, NULL, &tid) == -1)
         errExit("timer_create");
-    printf("timer ID = %ld\n", (long) tid);
+    printf("timer ID = %ld\n", (long)tid);
 
     ts.it_value.tv_sec = atoi(argv[1]);
     ts.it_value.tv_nsec = (argc > 2) ? atoi(argv[2]) : 0;
@@ -65,6 +64,6 @@ main(int argc, char *argv[])
     if (timer_settime(tid, 0, &ts, NULL) == -1)
         errExit("timer_settime");
 
-    for (j = 0; ; j++)
+    for (j = 0;; j++)
         pause();
 }

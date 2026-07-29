@@ -16,14 +16,14 @@
    given host name. Note that gethostbyname() is now obsolete; new programs
    should use getaddrinfo().
 */
-#if defined(_AIX)       /* AIX 5.1 needs this to get hstrerror() declaration */
+#if defined(_AIX) /* AIX 5.1 needs this to get hstrerror() declaration */
 #define _USE_IRS
 #endif
-#define _BSD_SOURCE     /* To get hstrerror() declaration from <netdb.h> */
+#define _BSD_SOURCE /* To get hstrerror() declaration from <netdb.h> */
+#include "tlpi_hdr.h"
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -35,8 +35,7 @@ main(int argc, char *argv[])
     for (argv++; *argv != NULL; argv++) {
         h = gethostbyname(*argv);
         if (h == NULL) {
-            fprintf(stderr, "gethostbyname() failed for '%s': %s\n",
-                    *argv, hstrerror(h_errno));
+            fprintf(stderr, "gethostbyname() failed for '%s': %s\n", *argv, hstrerror(h_errno));
             continue;
         }
 
@@ -47,15 +46,12 @@ main(int argc, char *argv[])
             printf(" %s", *pp);
         printf("\n");
 
-        printf("        address type:   %s\n",
-                (h->h_addrtype == AF_INET) ? "AF_INET" :
-                (h->h_addrtype == AF_INET6) ? "AF_INET6" : "???");
+        printf("        address type:   %s\n", (h->h_addrtype == AF_INET) ? "AF_INET" : (h->h_addrtype == AF_INET6) ? "AF_INET6" : "???");
 
         if (h->h_addrtype == AF_INET || h->h_addrtype == AF_INET6) {
             printf("        address(es):   ");
             for (pp = h->h_addr_list; *pp != NULL; pp++)
-                printf(" %s", inet_ntop(h->h_addrtype, *pp,
-                                        str, INET6_ADDRSTRLEN));
+                printf(" %s", inet_ntop(h->h_addrtype, *pp, str, INET6_ADDRSTRLEN));
             printf("\n");
         }
     }

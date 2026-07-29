@@ -17,10 +17,10 @@
    Demonstrate message notification via signals (catching the signals with
    a signal handler) on a POSIX message queue.
 */
-#include <signal.h>
-#include <mqueue.h>
-#include <fcntl.h>              /* For definition of O_NONBLOCK */
 #include "tlpi_hdr.h"
+#include <fcntl.h> /* For definition of O_NONBLOCK */
+#include <mqueue.h>
+#include <signal.h>
 
 #define NOTIFY_SIG SIGUSR1
 
@@ -50,7 +50,7 @@ main(int argc, char *argv[])
         usageErr("%s mq-name\n", argv[0]);
 
     mqd = mq_open(argv[1], O_RDONLY | O_NONBLOCK);
-    if (mqd == (mqd_t) -1)
+    if (mqd == (mqd_t)-1)
         errExit("mq_open");
 
     /* Determine mq_msgsize for message queue, and allocate an input buffer
@@ -86,7 +86,7 @@ main(int argc, char *argv[])
     sigemptyset(&emptyMask);
 
     for (;;) {
-        sigsuspend(&emptyMask);         /* Wait for notification signal */
+        sigsuspend(&emptyMask); /* Wait for notification signal */
 
         /* Reregister for message notification */
 
@@ -94,9 +94,9 @@ main(int argc, char *argv[])
             errExit("mq_notify");
 
         while ((numRead = mq_receive(mqd, buffer, attr.mq_msgsize, NULL)) >= 0)
-            printf("Read %ld bytes\n", (long) numRead);
+            printf("Read %ld bytes\n", (long)numRead);
 
-        if (errno != EAGAIN)            /* Unexpected error */
+        if (errno != EAGAIN) /* Unexpected error */
             errExit("mq_receive");
     }
 }

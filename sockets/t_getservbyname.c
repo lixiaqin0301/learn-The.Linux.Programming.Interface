@@ -16,8 +16,8 @@
    corresponding to a given service name. Note that getservbyname() is
    now obsolete; new programs should use getaddrinfo().
 */
-#include <netdb.h>
 #include "tlpi_hdr.h"
+#include <netdb.h>
 
 int
 main(int argc, char *argv[])

@@ -28,18 +28,18 @@
    for some useful helper macros for dealing with 64-bit arguments.
 */
 #define _GNU_SOURCE
-#include <stddef.h>
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <linux/audit.h>
-#include <sys/syscall.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>
+#include <stddef.h>
 #include <sys/prctl.h>
-#include "tlpi_hdr.h"
+#include <sys/syscall.h>
 
 /* For the x32 ABI, all system call numbers have bit 30 set */
 
-#define X32_SYSCALL_BIT         0x40000000
+#define X32_SYSCALL_BIT 0x40000000
 
 /* The following is a hack to allow for systems (pre-Linux 4.14) that don't
    provide SECCOMP_RET_KILL_PROCESS, which kills (all threads in) a process.
@@ -63,8 +63,7 @@ install_filter(void)
 
         /* Load architecture */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                (offsetof(struct seccomp_data, arch))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, arch))),
 
         /* Kill the process if the architecture is not what we expect */
 
@@ -72,8 +71,7 @@ install_filter(void)
 
         /* Load system call number */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, nr))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, nr))),
 
         /* Kill the process if this is an x32 system call (bit 30 is set) */
 
@@ -94,16 +92,14 @@ install_filter(void)
            how endianess differences can be abstracted away when dealing
            with 64-bit arguments. */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, args[1]) + sizeof(__u32))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, args[1]) + sizeof(__u32))),
         BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, 0, 1, 0),
         BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | 2),
 
         /* Load bottom 4 bytes of 'offset' argument; fail with errno==1
            if the value is > 1000; otherwise allow the system call */
 
-        BPF_STMT(BPF_LD | BPF_W | BPF_ABS,
-                 (offsetof(struct seccomp_data, args[1]))),
+        BPF_STMT(BPF_LD | BPF_W | BPF_ABS, (offsetof(struct seccomp_data, args[1]))),
         BPF_JUMP(BPF_JMP | BPF_JGT | BPF_K, 1000, 0, 1),
         BPF_STMT(BPF_RET | BPF_K, SECCOMP_RET_ERRNO | 1),
 
@@ -111,7 +107,7 @@ install_filter(void)
     };
 
     struct sock_fprog prog = {
-        .len = (unsigned short) (sizeof(filter) / sizeof(filter[0])),
+        .len = (unsigned short)(sizeof(filter) / sizeof(filter[0])),
         .filter = filter,
     };
 
@@ -128,7 +124,7 @@ seek_test(int fd, off_t offset)
 {
     off_t ret;
 
-    printf("Seek to byte %lld: ", (long long) offset);
+    printf("Seek to byte %lld: ", (long long)offset);
     ret = lseek(fd, offset, SEEK_SET);
     if (ret == 0)
         printf("succeeded\n");

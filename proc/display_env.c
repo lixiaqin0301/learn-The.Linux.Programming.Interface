@@ -17,7 +17,7 @@
 #include "tlpi_hdr.h"
 
 extern char **environ;
-                /* Or define _GNU_SOURCE to get it from <unistd.h> */
+/* Or define _GNU_SOURCE to get it from <unistd.h> */
 
 int
 main(int argc, char *argv[])

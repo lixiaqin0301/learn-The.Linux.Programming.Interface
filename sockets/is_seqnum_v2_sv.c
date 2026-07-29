@@ -28,8 +28,8 @@ int
 main(int argc, char *argv[])
 {
     uint32_t seqNum;
-    char reqLenStr[INT_LEN];            /* Length of requested sequence */
-    char seqNumStr[INT_LEN];            /* Start of granted sequence */
+    char reqLenStr[INT_LEN]; /* Length of requested sequence */
+    char seqNumStr[INT_LEN]; /* Start of granted sequence */
     struct sockaddr *claddr;
     int lfd, cfd, reqLen;
     socklen_t addrlen, alen;
@@ -43,7 +43,8 @@ main(int argc, char *argv[])
     /* Ignore the SIGPIPE signal, so that we find out about broken connection
        errors via a failure from write(). */
 
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)    errExit("signal");
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+        errExit("signal");
 
     lfd = inetListen(PORT_NUM_STR, 5, &addrlen);
     if (lfd == -1)
@@ -55,40 +56,39 @@ main(int argc, char *argv[])
     if (claddr == NULL)
         errExit("malloc");
 
-    for (;;) {                  /* Handle clients iteratively */
+    for (;;) { /* Handle clients iteratively */
 
         /* Accept a client connection, obtaining client's address */
 
         alen = addrlen;
-        cfd = accept(lfd, (struct sockaddr *) claddr, &alen);
+        cfd = accept(lfd, (struct sockaddr *)claddr, &alen);
         if (cfd == -1) {
             errMsg("accept");
             continue;
         }
 
-        printf("Connection from %s\n", inetAddressStr(claddr, alen,
-                        addrStr, IS_ADDR_STR_LEN));
+        printf("Connection from %s\n", inetAddressStr(claddr, alen, addrStr, IS_ADDR_STR_LEN));
 
         /* Read client request, send sequence number back */
 
         if (readLine(cfd, reqLenStr, INT_LEN) <= 0) {
             close(cfd);
-            continue;                   /* Failed read; skip request */
+            continue; /* Failed read; skip request */
         }
 
         reqLen = atoi(reqLenStr);
-        if (reqLen <= 0) {              /* Watch for misbehaving clients */
+        if (reqLen <= 0) { /* Watch for misbehaving clients */
             close(cfd);
-            continue;                   /* Bad request; skip it */
+            continue; /* Bad request; skip it */
         }
 
         snprintf(seqNumStr, INT_LEN, "%d\n", seqNum);
         if (write(cfd, seqNumStr, strlen(seqNumStr)) != strlen(seqNumStr))
             fprintf(stderr, "Error on write");
 
-        seqNum += reqLen;               /* Update sequence number */
+        seqNum += reqLen; /* Update sequence number */
 
-        if (close(cfd) == -1)           /* Close connection */
+        if (close(cfd) == -1) /* Close connection */
             errMsg("close");
     }
 }

@@ -19,9 +19,9 @@
    This program is Linux-specific. The signalfd API is supported since kernel
    2.6.22.
 */
-#include <sys/signalfd.h>
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <sys/signalfd.h>
 
 int
 main(int argc, char *argv[])
@@ -34,7 +34,7 @@ main(int argc, char *argv[])
     if (argc < 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s sig-num...\n", argv[0]);
 
-    printf("%s: PID = %ld\n", argv[0], (long) getpid());
+    printf("%s: PID = %ld\n", argv[0], (long)getpid());
 
     sigemptyset(&mask);
     for (j = 1; j < argc; j++)

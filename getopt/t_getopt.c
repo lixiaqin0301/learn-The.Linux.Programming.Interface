@@ -14,17 +14,17 @@
 
    Demonstrate the use of getopt(3) to parse command-line options.
 */
-#include <ctype.h>
 #include "tlpi_hdr.h"
+#include <ctype.h>
 
-#define printable(ch) (isprint((unsigned char) ch) ? ch : '#')
+#define printable(ch) (isprint((unsigned char)ch) ? ch : '#')
 
 #ifdef __GNUC__
-__attribute__((noreturn))       /* Prevent "this statement may fall through"
-                                   warnings from "gcc -Wimplicit-fallthrough"
-                                   in switch() statement in main(). */
+__attribute__((noreturn)) /* Prevent "this statement may fall through"
+                             warnings from "gcc -Wimplicit-fallthrough"
+                             in switch() statement in main(). */
 #endif
-static void             /* Print "usage" message and exit */
+static void /* Print "usage" message and exit */
 usageError(char *progName, char *msg, int opt)
 {
     if (msg != NULL && opt != 0)
@@ -49,11 +49,18 @@ main(int argc, char *argv[])
         printf("\n");
 
         switch (opt) {
-        case 'p': pstr = optarg;        break;
-        case 'x': xfnd++;               break;
-        case ':': usageError(argv[0], "Missing argument", optopt);
-        case '?': usageError(argv[0], "Unrecognized option", optopt);
-        default:  fatal("Unexpected case in switch()");
+        case 'p':
+            pstr = optarg;
+            break;
+        case 'x':
+            xfnd++;
+            break;
+        case ':':
+            usageError(argv[0], "Missing argument", optopt);
+        case '?':
+            usageError(argv[0], "Unrecognized option", optopt);
+        default:
+            fatal("Unexpected case in switch()");
         }
     }
 
@@ -62,7 +69,6 @@ main(int argc, char *argv[])
     if (pstr != NULL)
         printf("-p was specified with the value \"%s\"\n", pstr);
     if (optind < argc)
-        printf("First nonoption argument is \"%s\" at argv[%d]\n",
-                argv[optind], optind);
+        printf("First nonoption argument is \"%s\" at argv[%d]\n", argv[optind], optind);
     exit(EXIT_SUCCESS);
 }

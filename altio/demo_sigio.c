@@ -14,15 +14,15 @@
 
    A trivial example of the use of signal-driven I/O.
 */
-#include <signal.h>
+#include "tlpi_hdr.h"
+#include "tty_functions.h" /* Declaration of ttySetCbreak() */
 #include <ctype.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <termios.h>
-#include "tty_functions.h"      /* Declaration of ttySetCbreak() */
-#include "tlpi_hdr.h"
 
 static volatile sig_atomic_t gotSigio = 0;
-                                /* Set nonzero on receipt of SIGIO */
+/* Set nonzero on receipt of SIGIO */
 
 static void
 sigioHandler(int sig)
@@ -64,11 +64,11 @@ main(int argc, char *argv[])
     if (ttySetCbreak(STDIN_FILENO, &origTermios) == -1)
         errExit("ttySetCbreak");
 
-    for (done = FALSE, cnt = 0; !done ; cnt++) {
+    for (done = FALSE, cnt = 0; !done; cnt++) {
         for (j = 0; j < 100000000; j++)
-            continue;                   /* Slow main loop down a little */
+            continue; /* Slow main loop down a little */
 
-        if (gotSigio) {                 /* Is input available? */
+        if (gotSigio) { /* Is input available? */
             gotSigio = 0;
 
             /* Read all available input until error (probably EAGAIN)

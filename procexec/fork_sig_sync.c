@@ -15,13 +15,13 @@
    Demonstrate how signals can be used to synchronize the actions
    of a parent and child process.
 */
-#include <signal.h>
-#include "curr_time.h"                  /* Declaration of currTime() */
+#include "curr_time.h" /* Declaration of currTime() */
 #include "tlpi_hdr.h"
+#include <signal.h>
 
-#define SYNC_SIG SIGUSR1                /* Synchronization signal */
+#define SYNC_SIG SIGUSR1 /* Synchronization signal */
 
-static void             /* Signal handler - does nothing but return */
+static void /* Signal handler - does nothing but return */
 handler(int sig)
 {
 }
@@ -33,10 +33,10 @@ main(int argc, char *argv[])
     sigset_t blockMask, origMask, emptyMask;
     struct sigaction sa;
 
-    setbuf(stdout, NULL);               /* Disable buffering of stdout */
+    setbuf(stdout, NULL); /* Disable buffering of stdout */
 
     sigemptyset(&blockMask);
-    sigaddset(&blockMask, SYNC_SIG);    /* Block signal */
+    sigaddset(&blockMask, SYNC_SIG); /* Block signal */
     if (sigprocmask(SIG_BLOCK, &blockMask, &origMask) == -1)
         errExit("sigprocmask");
 
@@ -54,14 +54,12 @@ main(int argc, char *argv[])
 
         /* Child does some required action here... */
 
-        printf("[%s %ld] Child started - doing some work\n",
-                currTime("%T"), (long) getpid());
-        sleep(2);               /* Simulate time spent doing some work */
+        printf("[%s %ld] Child started - doing some work\n", currTime("%T"), (long)getpid());
+        sleep(2); /* Simulate time spent doing some work */
 
         /* And then signals parent that it's done */
 
-        printf("[%s %ld] Child about to signal parent\n",
-                currTime("%T"), (long) getpid());
+        printf("[%s %ld] Child about to signal parent\n", currTime("%T"), (long)getpid());
         if (kill(getppid(), SYNC_SIG) == -1)
             errExit("kill");
 
@@ -74,12 +72,11 @@ main(int argc, char *argv[])
         /* Parent may do some work here, and then waits for child to
            complete the required action */
 
-        printf("[%s %ld] Parent about to wait for signal\n",
-                currTime("%T"), (long) getpid());
+        printf("[%s %ld] Parent about to wait for signal\n", currTime("%T"), (long)getpid());
         sigemptyset(&emptyMask);
         if (sigsuspend(&emptyMask) == -1 && errno != EINTR)
             errExit("sigsuspend");
-        printf("[%s %ld] Parent got signal\n", currTime("%T"), (long) getpid());
+        printf("[%s %ld] Parent got signal\n", currTime("%T"), (long)getpid());
 
         /* If required, return signal mask to its original state */
 

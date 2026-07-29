@@ -22,38 +22,38 @@
    to the pipe, and the child uses a loop to read data from the pipe and
    print it on standard output.
 */
-#include <sys/wait.h>
 #include "tlpi_hdr.h"
+#include <sys/wait.h>
 
 #define BUF_SIZE 10
 
 int
 main(int argc, char *argv[])
 {
-    int pfd[2];                             /* Pipe file descriptors */
+    int pfd[2]; /* Pipe file descriptors */
     char buf[BUF_SIZE];
     ssize_t numRead;
 
     if (argc != 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s string\n", argv[0]);
 
-    if (pipe(pfd) == -1)                    /* Create the pipe */
+    if (pipe(pfd) == -1) /* Create the pipe */
         errExit("pipe");
 
     switch (fork()) {
     case -1:
         errExit("fork");
 
-    case 0:             /* Child  - reads from pipe */
-        if (close(pfd[1]) == -1)            /* Write end is unused */
+    case 0: /* Child  - reads from pipe */
+        if (close(pfd[1]) == -1) /* Write end is unused */
             errExit("close - child");
 
-        for (;;) {              /* Read data from pipe, echo on stdout */
+        for (;;) { /* Read data from pipe, echo on stdout */
             numRead = read(pfd[0], buf, BUF_SIZE);
             if (numRead == -1)
                 errExit("read");
             if (numRead == 0)
-                break;                      /* End-of-file */
+                break; /* End-of-file */
             if (write(STDOUT_FILENO, buf, numRead) != numRead)
                 fatal("child - partial/failed write");
         }
@@ -63,16 +63,16 @@ main(int argc, char *argv[])
             errExit("close");
         _exit(EXIT_SUCCESS);
 
-    default:            /* Parent - writes to pipe */
-        if (close(pfd[0]) == -1)            /* Read end is unused */
+    default: /* Parent - writes to pipe */
+        if (close(pfd[0]) == -1) /* Read end is unused */
             errExit("close - parent");
 
         if (write(pfd[1], argv[1], strlen(argv[1])) != strlen(argv[1]))
             fatal("parent - partial/failed write");
 
-        if (close(pfd[1]) == -1)            /* Child will see EOF */
+        if (close(pfd[1]) == -1) /* Child will see EOF */
             errExit("close");
-        wait(NULL);                         /* Wait for child to finish */
+        wait(NULL); /* Wait for child to finish */
         exit(EXIT_SUCCESS);
     }
 }

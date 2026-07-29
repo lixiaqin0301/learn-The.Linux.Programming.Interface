@@ -14,16 +14,16 @@
 
    List host's network interfaces and IP addresses.
 */
-#define _GNU_SOURCE     /* To get definition of NI_MAXHOST */
+#define _GNU_SOURCE /* To get definition of NI_MAXHOST */
 #include <arpa/inet.h>
-#include <sys/socket.h>
-#include <netdb.h>
 #include <ifaddrs.h>
-#include <string.h>
+#include <linux/if_link.h>
+#include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
 #include <unistd.h>
-#include <linux/if_link.h>
 
 int
 main(int argc, char *argv[])
@@ -52,10 +52,7 @@ main(int argc, char *argv[])
 
         /* Display interface name and address */
 
-        s = getnameinfo(ifaddr->ifa_addr,
-                    (family == AF_INET) ? sizeof(struct sockaddr_in) :
-                                          sizeof(struct sockaddr_in6),
-                    host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
+        s = getnameinfo(ifaddr->ifa_addr, (family == AF_INET) ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6), host, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
         if (s != 0) {
             printf("getnameinfo() failed: %s\n", gai_strerror(s));
             exit(EXIT_FAILURE);

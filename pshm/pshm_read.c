@@ -19,10 +19,10 @@
 
    See also pshm_write.c.
 */
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])
@@ -34,7 +34,7 @@ main(int argc, char *argv[])
     if (argc != 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s shm-name\n", argv[0]);
 
-    fd = shm_open(argv[1], O_RDONLY, 0);    /* Open existing object */
+    fd = shm_open(argv[1], O_RDONLY, 0); /* Open existing object */
     if (fd == -1)
         errExit("shm_open");
 
@@ -48,7 +48,7 @@ main(int argc, char *argv[])
     if (addr == MAP_FAILED)
         errExit("mmap");
 
-    if (close(fd) == -1)                    /* 'fd' is no longer needed */
+    if (close(fd) == -1) /* 'fd' is no longer needed */
         errExit("close");
 
     write(STDOUT_FILENO, addr, sb.st_size);

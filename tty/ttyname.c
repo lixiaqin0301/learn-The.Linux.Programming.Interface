@@ -15,11 +15,11 @@
    An implementation of ttyname(3).
 */
 #include <dirent.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 /* Helper function for ttyname(). We do most of the real work here.
    Look in 'devDir' for the terminal device name corresponding to the
@@ -34,14 +34,14 @@ ttynameCheckDir(const struct stat *fdStat, const char *devDir)
 {
     DIR *dirh;
     struct dirent *dent;
-    static char *ttyPath;               /* Currently checked entry; also used
-                                           to return tty name, if found */
-    static int ttyLen = 0;              /* Length of ttyPath */
-    struct stat devStat;                /* stat entry for ttyPath */
-    int found;                          /* True if we find device entry */
+    static char *ttyPath; /* Currently checked entry; also used
+                             to return tty name, if found */
+    static int ttyLen = 0; /* Length of ttyPath */
+    struct stat devStat; /* stat entry for ttyPath */
+    int found; /* True if we find device entry */
     int requiredLen;
 
-    if (ttyLen == 0) {                  /* First call - allocate ttyPath */
+    if (ttyLen == 0) { /* First call - allocate ttyPath */
         ttyPath = malloc(50);
         if (ttyPath == NULL)
             return NULL;
@@ -69,7 +69,7 @@ ttynameCheckDir(const struct stat *fdStat, const char *devDir)
     while ((dent = readdir(dirh)) != NULL) {
         requiredLen = strlen(devDir) + 1 + strlen(dent->d_name) + 1;
 
-        if (requiredLen > ttyLen) {     /* Resize ttyPath if required */
+        if (requiredLen > ttyLen) { /* Resize ttyPath if required */
             char *nttyPath;
 
             nttyPath = realloc(ttyPath, requiredLen);
@@ -83,10 +83,9 @@ ttynameCheckDir(const struct stat *fdStat, const char *devDir)
         snprintf(ttyPath, ttyLen, "%s/%s", devDir, dent->d_name);
 
         if (stat(ttyPath, &devStat) == -1)
-            continue;                   /* Ignore unstat-able entries */
+            continue; /* Ignore unstat-able entries */
 
-        if (S_ISCHR(devStat.st_mode) &&
-                fdStat->st_rdev == devStat.st_rdev) {
+        if (S_ISCHR(devStat.st_mode) && fdStat->st_rdev == devStat.st_rdev) {
             found = 1;
             break;
         }
@@ -105,15 +104,15 @@ char *
 ttyname(int fd)
 {
     char *d;
-    struct stat fdStat;                 /* stat entry for fd */
+    struct stat fdStat; /* stat entry for fd */
 
-    if (!isatty(fd))                    /* Is fd even a terminal? */
+    if (!isatty(fd)) /* Is fd even a terminal? */
         return NULL;
 
     if (fstat(fd, &fdStat) == -1)
         return NULL;
 
-    if (!S_ISCHR(fdStat.st_mode))       /* Is fd even a character device? */
+    if (!S_ISCHR(fdStat.st_mode)) /* Is fd even a character device? */
         return NULL;
 
     /* First check for a pseudoterminal entry in the /dev/pts

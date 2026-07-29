@@ -17,16 +17,16 @@
    consequence, updates are not lost. Compare with thread_incr.c,
    thread_incr_mutex.c, and thread_incr_spinlock.c.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
 static volatile int glob = 0;
 static pthread_rwlock_t rwlock;
 
-static void *                   /* Loop 'arg' times incrementing 'glob' */
+static void * /* Loop 'arg' times incrementing 'glob' */
 threadFunc(void *arg)
 {
-    int loops = *((int *) arg);
+    int loops = *((int *)arg);
     int loc, s;
 
     for (int j = 0; j < loops; j++) {

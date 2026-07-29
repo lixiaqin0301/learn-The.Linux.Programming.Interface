@@ -19,18 +19,22 @@
 */
 #define _GNU_SOURCE
 #include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/syscall.h>
 #include <linux/filter.h>
 #include <linux/seccomp.h>
-#include <sys/prctl.h>
-#include <stdio.h>
-#include <string.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/prctl.h>
+#include <sys/stat.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 static int
 seccomp(unsigned int operation, unsigned int flags, void *args)
@@ -48,7 +52,7 @@ loadFilter(char *filterPathname)
     struct stat sb;
     int fd;
 
-    if (!noNewPrivsAlreadySet) {        /* Only need to do this once */
+    if (!noNewPrivsAlreadySet) { /* Only need to do this once */
         if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0))
             errExit("prctl");
         noNewPrivsAlreadySet = true;
@@ -109,7 +113,7 @@ main(int argc, char *argv[])
     while ((opt = getopt(argc, argv, "f:")) != -1) {
         switch (opt) {
 
-        case 'f':               /* Install a filter */
+        case 'f': /* Install a filter */
             loadFilter(optarg);
             break;
 

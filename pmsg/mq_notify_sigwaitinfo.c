@@ -18,12 +18,12 @@
    sigwaitinfo()) on a POSIX message queue.
 */
 #define _POSIX_C_SOURCE 199309
-#include <signal.h>
-#include <mqueue.h>
-#include <fcntl.h>              /* For definition of O_NONBLOCK */
 #include "tlpi_hdr.h"
+#include <fcntl.h> /* For definition of O_NONBLOCK */
+#include <mqueue.h>
+#include <signal.h>
 
-#define NOTIFY_SIG SIGRTMIN     /* Signal used for message notifications */
+#define NOTIFY_SIG SIGRTMIN /* Signal used for message notifications */
 
 /* This program does not handle the case where a message already exists on
    the queue by the time the first attempt is made to register for message
@@ -46,7 +46,7 @@ main(int argc, char *argv[])
         usageErr("%s mq-name\n", argv[0]);
 
     mqd = mq_open(argv[1], O_RDONLY | O_NONBLOCK);
-    if (mqd == (mqd_t) -1)
+    if (mqd == (mqd_t)-1)
         errExit("mq_open");
 
     /* Determine mq_msgsize for message queue, and allocate an input buffer
@@ -70,8 +70,8 @@ main(int argc, char *argv[])
     sev.sigev_notify = SIGEV_SIGNAL;
     sev.sigev_signo = NOTIFY_SIG;
     sev.sigev_value.sival_ptr = &mqd;
-                /* This allows us to obtain a pointer to 'mqd' in the
-                   siginfo_t structure returned by sigwaitinfo() */
+    /* This allows us to obtain a pointer to 'mqd' in the
+       siginfo_t structure returned by sigwaitinfo() */
 
     if (mq_notify(mqd, &sev) == -1)
         errExit("mq_notify");
@@ -86,10 +86,9 @@ main(int argc, char *argv[])
 
         printf("Accepted signal:\n");
         printf("        si_signo   = %d\n", si.si_signo);
-        printf("        si_pid     = %ld\n", (long) si.si_pid);
-        printf("        si_uid     = %ld\n", (long) si.si_uid);
-        printf("        si_code    = %d (%s)\n", si.si_code,
-                (si.si_code == SI_MESGQ) ? "SI_MESGQ" : "???");
+        printf("        si_pid     = %ld\n", (long)si.si_pid);
+        printf("        si_uid     = %ld\n", (long)si.si_uid);
+        printf("        si_code    = %d (%s)\n", si.si_code, (si.si_code == SI_MESGQ) ? "SI_MESGQ" : "???");
         printf("        *sival_ptr = %p\n\n", si.si_value.sival_ptr);
 
         /* Reestablish message notification */
@@ -103,9 +102,9 @@ main(int argc, char *argv[])
            as many messages as possible. */
 
         while ((numRead = mq_receive(mqd, buffer, attr.mq_msgsize, NULL)) >= 0)
-            printf("Read %ld bytes\n", (long) numRead);
+            printf("Read %ld bytes\n", (long)numRead);
 
-        if (errno != EAGAIN)            /* Unexpected error */
+        if (errno != EAGAIN) /* Unexpected error */
             errExit("mq_receive");
     }
 }

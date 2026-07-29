@@ -16,9 +16,9 @@
 
    Remove the POSIX shared memory object identified by 'name'
 */
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <sys/mman.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])

@@ -16,19 +16,19 @@
 */
 #include "tlpi_hdr.h"
 
-static void             /* Print 'msg' plus sysconf() value for 'name' */
+static void /* Print 'msg' plus sysconf() value for 'name' */
 sysconfPrint(const char *msg, int name)
 {
     long lim;
 
     errno = 0;
     lim = sysconf(name);
-    if (lim != -1) {        /* Call succeeded, limit determinate */
+    if (lim != -1) { /* Call succeeded, limit determinate */
         printf("%s %ld\n", msg, lim);
     } else {
-        if (errno == 0)     /* Call succeeded, limit indeterminate */
+        if (errno == 0) /* Call succeeded, limit indeterminate */
             printf("%s (indeterminate)\n", msg);
-        else                /* Call failed */
+        else /* Call failed */
             errExit("sysconf %s", msg);
     }
 }

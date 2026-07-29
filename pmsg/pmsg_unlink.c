@@ -18,8 +18,8 @@
 
    Linux supports POSIX message queues since kernel 2.6.6.
 */
-#include <mqueue.h>
 #include "tlpi_hdr.h"
+#include <mqueue.h>
 
 int
 main(int argc, char *argv[])

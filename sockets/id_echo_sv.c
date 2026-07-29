@@ -22,9 +22,9 @@
 
    See also id_echo_cl.c.
 */
-#include <syslog.h>
-#include "id_echo.h"
 #include "become_daemon.h"
+#include "id_echo.h"
+#include <syslog.h>
 
 int
 main(int argc, char *argv[])
@@ -49,16 +49,11 @@ main(int argc, char *argv[])
 
     for (;;) {
         len = sizeof(struct sockaddr_storage);
-        numRead = recvfrom(sfd, buf, BUF_SIZE, 0,
-                           (struct sockaddr *) &claddr, &len);
+        numRead = recvfrom(sfd, buf, BUF_SIZE, 0, (struct sockaddr *)&claddr, &len);
         if (numRead == -1)
             errExit("recvfrom");
 
-        if (sendto(sfd, buf, numRead, 0, (struct sockaddr *) &claddr, len)
-                        != numRead)
-            syslog(LOG_WARNING, "Error echoing response to %s (%s)",
-                    inetAddressStr((struct sockaddr *) &claddr, len,
-                                   addrStr, IS_ADDR_STR_LEN),
-                    strerror(errno));
+        if (sendto(sfd, buf, numRead, 0, (struct sockaddr *)&claddr, len) != numRead)
+            syslog(LOG_WARNING, "Error echoing response to %s (%s)", inetAddressStr((struct sockaddr *)&claddr, len, addrStr, IS_ADDR_STR_LEN), strerror(errno));
     }
 }

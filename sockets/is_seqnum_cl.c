@@ -17,14 +17,14 @@
 
    See also is_seqnum_sv.c.
 */
-#include <netdb.h>
 #include "is_seqnum.h"
+#include <netdb.h>
 
 int
 main(int argc, char *argv[])
 {
-    char *reqLenStr;                    /* Requested length of sequence */
-    char seqNumStr[INT_LEN];            /* Start of granted sequence */
+    char *reqLenStr; /* Requested length of sequence */
+    char seqNumStr[INT_LEN]; /* Start of granted sequence */
     int cfd;
     ssize_t numRead;
     struct addrinfo hints;
@@ -40,7 +40,7 @@ main(int argc, char *argv[])
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;
     hints.ai_next = NULL;
-    hints.ai_family = AF_UNSPEC;                /* Allows IPv4 or IPv6 */
+    hints.ai_family = AF_UNSPEC; /* Allows IPv4 or IPv6 */
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_NUMERICSERV;
 
@@ -53,10 +53,10 @@ main(int argc, char *argv[])
     for (rp = result; rp != NULL; rp = rp->ai_next) {
         cfd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol);
         if (cfd == -1)
-            continue;                           /* On error, try next address */
+            continue; /* On error, try next address */
 
         if (connect(cfd, rp->ai_addr, rp->ai_addrlen) != -1)
-            break;                              /* Success */
+            break; /* Success */
 
         /* Connect failed: close this socket and try next address */
 
@@ -71,7 +71,7 @@ main(int argc, char *argv[])
     /* Send requested sequence length, with terminating newline */
 
     reqLenStr = (argc > 2) ? argv[2] : "1";
-    if (write(cfd, reqLenStr, strlen(reqLenStr)) !=  strlen(reqLenStr))
+    if (write(cfd, reqLenStr, strlen(reqLenStr)) != strlen(reqLenStr))
         fatal("Partial/failed write (reqLenStr)");
     if (write(cfd, "\n", 1) != 1)
         fatal("Partial/failed write (newline)");
@@ -84,7 +84,7 @@ main(int argc, char *argv[])
     if (numRead == 0)
         fatal("Unexpected EOF from server");
 
-    printf("Sequence number: %s", seqNumStr);   /* Includes '\n' */
+    printf("Sequence number: %s", seqNumStr); /* Includes '\n' */
 
-    exit(EXIT_SUCCESS);                         /* Closes 'cfd' */
+    exit(EXIT_SUCCESS); /* Closes 'cfd' */
 }

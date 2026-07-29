@@ -20,10 +20,10 @@
    Either or both of owner and/or group can be specified as "-" to
    leave them unchanged.
 */
-#include <pwd.h>
-#include <grp.h>
-#include "ugid_functions.h"             /* Declarations of userIdFromName()
+#include "ugid_functions.h" /* Declarations of userIdFromName()
                                            and groupIdFromName() */
+#include <grp.h>
+#include <pwd.h>
 #include "tlpi_hdr.h"
 
 int
@@ -36,20 +36,21 @@ main(int argc, char *argv[])
 
     if (argc < 3 || strcmp(argv[1], "--help") == 0)
         usageErr("%s owner group [file...]\n"
-                "        owner or group can be '-', "
-                "meaning leave unchanged\n", argv[0]);
+                 "        owner or group can be '-', "
+                 "meaning leave unchanged\n",
+            argv[0]);
 
-    if (strcmp(argv[1], "-") == 0) {            /* "-" ==> don't change owner */
+    if (strcmp(argv[1], "-") == 0) { /* "-" ==> don't change owner */
         uid = -1;
-    } else {                                    /* Turn user name into UID */
+    } else { /* Turn user name into UID */
         uid = userIdFromName(argv[1]);
         if (uid == -1)
             fatal("No such user (%s)", argv[1]);
     }
 
-    if (strcmp(argv[2], "-") == 0) {            /* "-" ==> don't change group */
+    if (strcmp(argv[2], "-") == 0) { /* "-" ==> don't change group */
         gid = -1;
-    } else {                                    /* Turn group name into GID */
+    } else { /* Turn group name into GID */
         gid = groupIdFromName(argv[2]);
         if (gid == -1)
             fatal("No group user (%s)", argv[2]);

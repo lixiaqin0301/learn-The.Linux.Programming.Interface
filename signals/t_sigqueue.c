@@ -20,8 +20,8 @@
    accompanying data 'data' (an integer), to the process with the PID 'pid'.
 */
 #define _POSIX_C_SOURCE 199309
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
 int
 main(int argc, char *argv[])
@@ -36,8 +36,7 @@ main(int argc, char *argv[])
        corresponding fields of the siginfo_t argument supplied to the
        handler in the receiving process */
 
-    printf("%s: PID is %ld, UID is %ld\n", argv[0],
-            (long) getpid(), (long) getuid());
+    printf("%s: PID is %ld, UID is %ld\n", argv[0], (long)getpid(), (long)getuid());
 
     sig = getInt(argv[2], 0, "sig-num");
     sigData = getInt(argv[3], GN_ANY_BASE, "data");

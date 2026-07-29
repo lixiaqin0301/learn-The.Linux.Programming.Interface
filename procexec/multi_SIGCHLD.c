@@ -16,14 +16,14 @@
    SIGCHLD signals are not queued while the signal is blocked during the
    execution of the handler.
 */
+#include "curr_time.h"
+#include "print_wait_status.h"
+#include "tlpi_hdr.h"
 #include <signal.h>
 #include <sys/wait.h>
-#include "print_wait_status.h"
-#include "curr_time.h"
-#include "tlpi_hdr.h"
 
 static volatile int numLiveChildren = 0;
-                /* Number of children started but not yet waited on */
+/* Number of children started but not yet waited on */
 
 static void
 sigchldHandler(int sig)
@@ -34,15 +34,14 @@ sigchldHandler(int sig)
     /* UNSAFE: This handler uses non-async-signal-safe functions
        (printf(), printWaitStatus(), currTime(); see Section 21.1.2) */
 
-    savedErrno = errno;         /* In case we modify 'errno' */
+    savedErrno = errno; /* In case we modify 'errno' */
 
     printf("%s handler: Caught SIGCHLD\n", currTime("%T"));
 
     /* Do nonblocking waits until no more dead children are found */
 
     while ((childPid = waitpid(-1, &status, WNOHANG)) > 0) {
-        printf("%s handler: Reaped child %ld - ", currTime("%T"),
-                (long) childPid);
+        printf("%s handler: Reaped child %ld - ", currTime("%T"), (long)childPid);
         printWaitStatus(NULL, status);
         numLiveChildren--;
     }
@@ -50,7 +49,7 @@ sigchldHandler(int sig)
     if (childPid == -1 && errno != ECHILD)
         errMsg("waitpid");
 
-    sleep(5);           /* Artificially lengthen execution of handler */
+    sleep(5); /* Artificially lengthen execution of handler */
     printf("%s handler: returning\n", currTime("%T"));
 
     errno = savedErrno;
@@ -66,7 +65,7 @@ main(int argc, char *argv[])
     if (argc < 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s child-sleep-time...\n", argv[0]);
 
-    setbuf(stdout, NULL);       /* Disable buffering of stdout */
+    setbuf(stdout, NULL); /* Disable buffering of stdout */
 
     sigCnt = 0;
     numLiveChildren = argc - 1;
@@ -92,13 +91,12 @@ main(int argc, char *argv[])
         case -1:
             errExit("fork");
 
-        case 0:         /* Child - sleeps and then exits */
+        case 0: /* Child - sleeps and then exits */
             sleep(getInt(argv[j], GN_NONNEG, "child-sleep-time"));
-            printf("%s Child %d (PID=%ld) exiting\n", currTime("%T"),
-                    j, (long) getpid());
+            printf("%s Child %d (PID=%ld) exiting\n", currTime("%T"), j, (long)getpid());
             _exit(EXIT_SUCCESS);
 
-        default:        /* Parent - loops to create next child */
+        default: /* Parent - loops to create next child */
             break;
         }
     }
@@ -113,7 +111,8 @@ main(int argc, char *argv[])
     }
 
     printf("%s All %d children have terminated; SIGCHLD was caught "
-            "%d times\n", currTime("%T"), argc - 1, sigCnt);
+           "%d times\n",
+        currTime("%T"), argc - 1, sigCnt);
 
     exit(EXIT_SUCCESS);
 }

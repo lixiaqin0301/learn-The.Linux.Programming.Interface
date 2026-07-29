@@ -24,19 +24,20 @@
 
    This program is Linux-specific.
 */
-#define _GNU_SOURCE             /* To get DN_* constants from <fcntl.h> */
+#define _GNU_SOURCE /* To get DN_* constants from <fcntl.h> */
+#include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <signal.h>
-#include "tlpi_hdr.h"
 
-static void             /* Print (optional) message and usage info, then exit */
+static void /* Print (optional) message and usage info, then exit */
 usageError(const char *progName, const char *msg)
 {
     if (msg != NULL)
         fprintf(stderr, "%s", msg);
 
     fprintf(stderr, "Usage: %s directory:[events]...\n", progName);
-    fprintf(stderr, "    Events are:\n"
+    fprintf(stderr,
+        "    Events are:\n"
         "        a - access; A - attrib; c - create; d - delete\n"
         "        m - modify; r - rename; M - multishot\n"
         "        (default is all events)\n");
@@ -47,7 +48,7 @@ static void
 handler(int sig, siginfo_t *si, void *ucontext)
 {
     printf("Got event on descriptor %d\n", si->si_fd);
-                        /* UNSAFE (see Section 21.1.2) */
+    /* UNSAFE (see Section 21.1.2) */
 }
 
 int
@@ -65,29 +66,43 @@ main(int argc, char *argv[])
 
     sa.sa_sigaction = handler;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_SIGINFO;           /* So handler gets siginfo_t arg. */
+    sa.sa_flags = SA_SIGINFO; /* So handler gets siginfo_t arg. */
     if (sigaction(NOTIFY_SIG, &sa, NULL) == -1)
         errExit("sigaction");
 
     for (fnum = 1; fnum < argc; fnum++) {
-        p = strchr(argv[fnum], ':');    /* Look for optional ':' */
+        p = strchr(argv[fnum], ':'); /* Look for optional ':' */
 
-        if (p == NULL) {                /* Default is all events + multishot */
-            events = DN_ACCESS | DN_ATTRIB | DN_CREATE | DN_DELETE |
-                     DN_MODIFY | DN_RENAME | DN_MULTISHOT;
-        } else {                        /* ':' present, parse event chars */
-            *p = '\0';                  /* Terminates directory component */
+        if (p == NULL) { /* Default is all events + multishot */
+            events = DN_ACCESS | DN_ATTRIB | DN_CREATE | DN_DELETE | DN_MODIFY | DN_RENAME | DN_MULTISHOT;
+        } else { /* ':' present, parse event chars */
+            *p = '\0'; /* Terminates directory component */
             events = 0;
             for (p++; *p != '\0'; p++) {
                 switch (*p) {
-                case 'a': events |= DN_ACCESS;          break;
-                case 'A': events |= DN_ATTRIB;          break;
-                case 'c': events |= DN_CREATE;          break;
-                case 'd': events |= DN_DELETE;          break;
-                case 'm': events |= DN_MODIFY;          break;
-                case 'r': events |= DN_RENAME;          break;
-                case 'M': events |= DN_MULTISHOT;       break;
-                default:  usageError(argv[0], "Bad event character\n");
+                case 'a':
+                    events |= DN_ACCESS;
+                    break;
+                case 'A':
+                    events |= DN_ATTRIB;
+                    break;
+                case 'c':
+                    events |= DN_CREATE;
+                    break;
+                case 'd':
+                    events |= DN_DELETE;
+                    break;
+                case 'm':
+                    events |= DN_MODIFY;
+                    break;
+                case 'r':
+                    events |= DN_RENAME;
+                    break;
+                case 'M':
+                    events |= DN_MULTISHOT;
+                    break;
+                default:
+                    usageError(argv[0], "Bad event character\n");
                 }
             }
         }
@@ -108,9 +123,9 @@ main(int argc, char *argv[])
 
         if (fcntl(fd, F_NOTIFY, events) == -1)
             errExit("fcntl-F_NOTIFY");
-        printf("events: %o\n", (unsigned int) events);
+        printf("events: %o\n", (unsigned int)events);
     }
 
     for (;;)
-        pause();                        /* Wait for events */
+        pause(); /* Wait for events */
 }

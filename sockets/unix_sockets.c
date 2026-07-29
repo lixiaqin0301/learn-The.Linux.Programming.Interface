@@ -14,7 +14,7 @@
 
    A package of useful routines for UNIX domain sockets.
 */
-#include "unix_sockets.h"       /* Declares functions defined here */
+#include "unix_sockets.h" /* Declares functions defined here */
 #include "tlpi_hdr.h"
 
 /* Build a UNIX domain socket address structure for 'path', returning
@@ -56,10 +56,9 @@ unixConnect(const char *path, int type)
     if (sd == -1)
         return -1;
 
-    if (connect(sd, (struct sockaddr *) &addr,
-                sizeof(struct sockaddr_un)) == -1) {
+    if (connect(sd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1) {
         savedErrno = errno;
-        close(sd);                      /* Might change 'errno' */
+        close(sd); /* Might change 'errno' */
         errno = savedErrno;
         return -1;
     }
@@ -83,9 +82,9 @@ unixBind(const char *path, int type)
     if (sd == -1)
         return -1;
 
-    if (bind(sd, (struct sockaddr *) &addr, sizeof(struct sockaddr_un)) == -1) {
+    if (bind(sd, (struct sockaddr *)&addr, sizeof(struct sockaddr_un)) == -1) {
         savedErrno = errno;
-        close(sd);                      /* Might change 'errno' */
+        close(sd); /* Might change 'errno' */
         errno = savedErrno;
         return -1;
     }

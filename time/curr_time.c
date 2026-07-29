@@ -14,8 +14,8 @@
 
    Implement our currTime() function.
 */
+#include "curr_time.h" /* Declares function defined here */
 #include <time.h>
-#include "curr_time.h"          /* Declares function defined here */
 
 #define BUF_SIZE 1000
 
@@ -28,7 +28,7 @@
 char *
 currTime(const char *format)
 {
-    static char buf[BUF_SIZE];  /* Nonreentrant */
+    static char buf[BUF_SIZE]; /* Nonreentrant */
     time_t t;
     size_t s;
     struct tm *tm;

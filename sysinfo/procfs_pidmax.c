@@ -25,8 +25,8 @@
 
    This program is Linux-specific.
 */
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
 
 #define MAX_LINE 100
 
@@ -47,7 +47,7 @@ main(int argc, char *argv[])
 
     if (argc > 1)
         printf("Old value: ");
-    printf("%.*s", (int) n, line);
+    printf("%.*s", (int)n, line);
 
     if (argc > 1) {
         if (lseek(fd, 0, SEEK_SET) == -1)

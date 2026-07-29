@@ -14,7 +14,7 @@
 
    Some useful auxiliary functions when working with user namespaces.
 */
-#ifndef USERNS_FUNCTIONS_H          /* Prevent double inclusion */
+#ifndef USERNS_FUNCTIONS_H /* Prevent double inclusion */
 #define USERNS_FUNCTIONS_H
 
 #include <unistd.h>

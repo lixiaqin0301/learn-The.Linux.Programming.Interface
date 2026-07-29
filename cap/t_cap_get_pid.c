@@ -14,13 +14,16 @@
 
    Display the capabilities of a process with specified PID.
 */
-#include <sys/capability.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/capability.h>
+#include <unistd.h>
 
-#define errExit(msg)    do { perror(msg); exit(EXIT_FAILURE); \
-                        } while (0)
+#define errExit(msg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+    do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           \
+        perror(msg);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+        exit(EXIT_FAILURE);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    } while (0)
 
 int
 main(int argc, char *argv[])

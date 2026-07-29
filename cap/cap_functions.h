@@ -15,7 +15,7 @@
    Useful functions for working with capabilities.
 */
 
-#ifndef CAP_FUNCTIONS_H             /* Prevent double inclusion */
+#ifndef CAP_FUNCTIONS_H /* Prevent double inclusion */
 #define CAP_FUNCTIONS_H
 
 /* Change the 'setting' of the specified 'capability' in the capability set

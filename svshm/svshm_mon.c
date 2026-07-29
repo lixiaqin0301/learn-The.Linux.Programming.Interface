@@ -15,19 +15,18 @@
    Display information from the associated data structure for the
    System V shared memory segment identified on the command line.
 */
-#include <sys/types.h>
-#include <sys/shm.h>
-#include <time.h>
 #include "tlpi_hdr.h"
+#include <sys/shm.h>
+#include <sys/types.h>
+#include <time.h>
 
 static void
 printShmDS(const struct shmid_ds *ds)
 {
-    printf("Size:                      %ld\n", (long) ds->shm_segsz);
-    printf("# of attached processes:   %ld\n", (long) ds->shm_nattch);
+    printf("Size:                      %ld\n", (long)ds->shm_segsz);
+    printf("# of attached processes:   %ld\n", (long)ds->shm_nattch);
 
-    printf("Mode:                      %lo",
-            (unsigned long) ds->shm_perm.mode);
+    printf("Mode:                      %lo", (unsigned long)ds->shm_perm.mode);
 #ifdef SHM_DEST
     printf("%s", (ds->shm_perm.mode & SHM_DEST) ? " [DEST]" : "");
 #endif
@@ -40,8 +39,8 @@ printShmDS(const struct shmid_ds *ds)
     printf("Last shmdt():              %s", ctime(&ds->shm_dtime));
     printf("Last change:               %s", ctime(&ds->shm_ctime));
 
-    printf("Creator PID:               %ld\n", (long) ds->shm_cpid);
-    printf("PID of last attach/detach: %ld\n", (long) ds->shm_lpid);
+    printf("Creator PID:               %ld\n", (long)ds->shm_cpid);
+    printf("PID of last attach/detach: %ld\n", (long)ds->shm_lpid);
 }
 
 int

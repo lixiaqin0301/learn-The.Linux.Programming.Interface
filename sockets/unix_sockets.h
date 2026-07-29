@@ -15,7 +15,7 @@
    Header file for unix_sockets.c.
 */
 #ifndef UNIX_SOCKETS_H
-#define UNIX_SOCKETS_H      /* Prevent accidental double inclusion */
+#define UNIX_SOCKETS_H /* Prevent accidental double inclusion */
 
 #include <sys/socket.h>
 #include <sys/un.h>

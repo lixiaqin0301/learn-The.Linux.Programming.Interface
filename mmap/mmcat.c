@@ -15,10 +15,10 @@
    Use mmap() plus write() to display the contents of a file (specified
    as a command-line argument) on standard output.
 */
+#include "tlpi_hdr.h"
+#include <fcntl.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include "tlpi_hdr.h"
 
 int
 main(int argc, char *argv[])

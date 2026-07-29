@@ -15,9 +15,9 @@
    Show the interaction of multiple descriptors accessing the same
    file (some via the same shared open file table entry).
 */
-#include <sys/stat.h>
-#include <fcntl.h>
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int
 main(int argc, char *argv[])

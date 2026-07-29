@@ -15,16 +15,17 @@
    Show that getrusage() RUSAGE_CHILDREN retrieves information
    only about children that have been waited on.
 */
-#include <sys/wait.h>
-#include <signal.h>
-#include <time.h>
-#include <sys/resource.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
+#include <sys/resource.h>
+#include <sys/wait.h>
+#include <time.h>
 
-#define NSECS 3         /* Amount of CPU to consume in child */
+#define NSECS 3 /* Amount of CPU to consume in child */
 
-#define SIG SIGUSR1     /* Child uses this signal to tell parent
-                           that it is about to terminate */
+#define SIG                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        \
+    SIGUSR1 /* Child uses this signal to tell parent                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+               that it is about to terminate */
 
 static void
 handler(int sig)
@@ -40,9 +41,7 @@ printChildRusage(const char *msg)
     printf("%s", msg);
     if (getrusage(RUSAGE_CHILDREN, &ru) == -1)
         errExit("getrusage");
-    printf("user CPU=%.2f secs; system CPU=%.2f secs\n",
-            ru.ru_utime.tv_sec + ru.ru_utime.tv_usec / 1000000.0,
-            ru.ru_stime.tv_sec + ru.ru_stime.tv_usec / 1000000.0);
+    printf("user CPU=%.2f secs; system CPU=%.2f secs\n", ru.ru_utime.tv_sec + ru.ru_utime.tv_usec / 1000000.0, ru.ru_stime.tv_sec + ru.ru_stime.tv_usec / 1000000.0);
 }
 
 int
@@ -52,7 +51,7 @@ main(int argc, char *argv[])
     sigset_t mask;
     struct sigaction sa;
 
-    setbuf(stdout, NULL);       /* Disable buffering of stdout */
+    setbuf(stdout, NULL); /* Disable buffering of stdout */
 
     sa.sa_handler = handler;
     sa.sa_flags = 0;
@@ -72,9 +71,9 @@ main(int argc, char *argv[])
     case -1:
         errExit("fork");
 
-    case 0:             /* Child */
+    case 0: /* Child */
         for (start = clock(); clock() - start < NSECS * CLOCKS_PER_SEC;)
-            continue;           /* Burn NSECS seconds of CPU time */
+            continue; /* Burn NSECS seconds of CPU time */
         printf("Child terminating\n");
 
         /* Tell parent we're nearly done */
@@ -83,11 +82,11 @@ main(int argc, char *argv[])
             errExit("kill");
         _exit(EXIT_SUCCESS);
 
-    default:    /* Parent */
+    default: /* Parent */
         sigemptyset(&mask);
-        sigsuspend(&mask);      /* Wait for signal from child */
+        sigsuspend(&mask); /* Wait for signal from child */
 
-        sleep(2);               /* Allow child a bit more time to terminate */
+        sleep(2); /* Allow child a bit more time to terminate */
 
         printChildRusage("Before wait: ");
         if (wait(NULL) == -1)

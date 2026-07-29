@@ -45,8 +45,8 @@ main(int argc, char *argv[])
     blockSize = getInt(argv[2], GN_GT_0 | GN_ANY_BASE, "block-size");
 
     freeStep = (argc > 3) ? getInt(argv[3], GN_GT_0, "step") : 1;
-    freeMin =  (argc > 4) ? getInt(argv[4], GN_GT_0, "min") : 1;
-    freeMax =  (argc > 5) ? getInt(argv[5], GN_GT_0, "max") : numAllocs;
+    freeMin = (argc > 4) ? getInt(argv[4], GN_GT_0, "min") : 1;
+    freeMax = (argc > 5) ? getInt(argv[5], GN_GT_0, "max") : numAllocs;
 
     if (freeMax > numAllocs)
         cmdLineErr("free-max > num-allocs\n");
@@ -62,8 +62,7 @@ main(int argc, char *argv[])
 
     printf("Program break is now:           %10p\n", sbrk(0));
 
-    printf("Freeing blocks from %d to %d in steps of %d\n",
-                freeMin, freeMax, freeStep);
+    printf("Freeing blocks from %d to %d in steps of %d\n", freeMin, freeMax, freeStep);
     for (j = freeMin - 1; j < freeMax; j += freeStep)
         free(ptr[j]);
 

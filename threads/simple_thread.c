@@ -14,17 +14,17 @@
 
    A simple POSIX threads example: create a thread, and then join with it.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
 static void *
 threadFunc(void *arg)
 {
-    char *s = (char *) arg;
+    char *s = (char *)arg;
 
     printf("%s", s);
 
-    return (void *) strlen(s);
+    return (void *)strlen(s);
 }
 
 int
@@ -43,7 +43,7 @@ main(int argc, char *argv[])
     if (s != 0)
         errExitEN(s, "pthread_join");
 
-    printf("Thread returned %ld\n", (long) res);
+    printf("Thread returned %ld\n", (long)res);
 
     exit(EXIT_SUCCESS);
 }

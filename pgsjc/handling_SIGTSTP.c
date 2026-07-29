@@ -16,24 +16,24 @@
    parent process that is monitoring this program can see that it was stopped
    by SIGTSTP).
 */
-#include <signal.h>
 #include "tlpi_hdr.h"
+#include <signal.h>
 
-static void                             /* Handler for SIGTSTP */
+static void /* Handler for SIGTSTP */
 tstpHandler(int sig)
 {
     sigset_t tstpMask, prevMask;
     int savedErrno;
     struct sigaction sa;
 
-    savedErrno = errno;                 /* In case we change 'errno' here */
+    savedErrno = errno; /* In case we change 'errno' here */
 
-    printf("Caught SIGTSTP\n");         /* UNSAFE (see Section 21.1.2) */
+    printf("Caught SIGTSTP\n"); /* UNSAFE (see Section 21.1.2) */
 
     if (signal(SIGTSTP, SIG_DFL) == SIG_ERR)
-        errExit("signal");              /* Set handling to default */
+        errExit("signal"); /* Set handling to default */
 
-    raise(SIGTSTP);                     /* Generate a further SIGTSTP */
+    raise(SIGTSTP); /* Generate a further SIGTSTP */
 
     /* Unblock SIGTSTP; the pending SIGTSTP immediately suspends the program */
 
@@ -45,9 +45,9 @@ tstpHandler(int sig)
     /* Execution resumes here after SIGCONT */
 
     if (sigprocmask(SIG_SETMASK, &prevMask, NULL) == -1)
-        errExit("sigprocmask");         /* Reblock SIGTSTP */
+        errExit("sigprocmask"); /* Reblock SIGTSTP */
 
-    sigemptyset(&sa.sa_mask);           /* Reestablish handler */
+    sigemptyset(&sa.sa_mask); /* Reestablish handler */
     sa.sa_flags = SA_RESTART;
     sa.sa_handler = tstpHandler;
     if (sigaction(SIGTSTP, &sa, NULL) == -1)
@@ -75,7 +75,7 @@ main(int argc, char *argv[])
             errExit("sigaction");
     }
 
-    for (;;) {                          /* Wait for signals */
+    for (;;) { /* Wait for signals */
         pause();
         printf("Main\n");
     }

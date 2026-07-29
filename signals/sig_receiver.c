@@ -20,13 +20,13 @@
    program, the use of sigaction() is always preferable for this task.
 */
 #define _GNU_SOURCE
-#include <signal.h>
-#include "signal_functions.h"           /* Declaration of printSigset() */
+#include "signal_functions.h" /* Declaration of printSigset() */
 #include "tlpi_hdr.h"
+#include <signal.h>
 
-static int sigCnt[NSIG];                /* Counts deliveries of each signal */
+static int sigCnt[NSIG]; /* Counts deliveries of each signal */
 static volatile sig_atomic_t gotSigint = 0;
-                                        /* Set nonzero if SIGINT is delivered */
+/* Set nonzero if SIGINT is delivered */
 
 static void
 handler(int sig)
@@ -43,14 +43,14 @@ main(int argc, char *argv[])
     int n, numSecs;
     sigset_t pendingMask, blockingMask, emptyMask;
 
-    printf("%s: PID is %ld\n", argv[0], (long) getpid());
+    printf("%s: PID is %ld\n", argv[0], (long)getpid());
 
     /* Here we use the simpler signal() API to establish a signal handler,
        but for the reasons described in Section 22.7 of TLPI, sigaction()
        is the (strongly) preferred API for this task. */
 
-    for (n = 1; n < NSIG; n++)          /* Same handler for all signals */
-        (void) signal(n, handler);      /* Ignore errors */
+    for (n = 1; n < NSIG; n++) /* Same handler for all signals */
+        (void)signal(n, handler); /* Ignore errors */
 
     /* If a sleep time was specified, temporarily block all signals,
        sleep (while another process sends us signals), and then
@@ -72,18 +72,17 @@ main(int argc, char *argv[])
         printf("%s: pending signals are: \n", argv[0]);
         printSigset(stdout, "\t\t", &pendingMask);
 
-        sigemptyset(&emptyMask);        /* Unblock all signals */
+        sigemptyset(&emptyMask); /* Unblock all signals */
         if (sigprocmask(SIG_SETMASK, &emptyMask, NULL) == -1)
             errExit("sigprocmask");
     }
 
-    while (!gotSigint)                  /* Loop until SIGINT caught */
+    while (!gotSigint) /* Loop until SIGINT caught */
         continue;
 
-    for (n = 1; n < NSIG; n++)          /* Display number of signals received */
+    for (n = 1; n < NSIG; n++) /* Display number of signals received */
         if (sigCnt[n] != 0)
-            printf("%s: signal %d caught %d time%s\n", argv[0], n,
-                    sigCnt[n], (sigCnt[n] == 1) ? "" : "s");
+            printf("%s: signal %d caught %d time%s\n", argv[0], n, sigCnt[n], (sigCnt[n] == 1) ? "" : "s");
 
     exit(EXIT_SUCCESS);
 }

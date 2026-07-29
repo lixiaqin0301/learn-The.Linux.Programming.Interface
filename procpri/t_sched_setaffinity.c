@@ -28,8 +28,8 @@
    since kernel 2.6.
 */
 #define _GNU_SOURCE
-#include <sched.h>
 #include "tlpi_hdr.h"
+#include <sched.h>
 
 int
 main(int argc, char *argv[])

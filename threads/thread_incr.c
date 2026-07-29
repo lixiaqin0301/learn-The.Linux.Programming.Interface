@@ -18,15 +18,15 @@
 
    See also thread_incr_mutex.c.
 */
-#include <pthread.h>
 #include "tlpi_hdr.h"
+#include <pthread.h>
 
-static volatile int glob = 0;   /* "volatile" prevents compiler optimizations
-                                   of arithmetic operations on 'glob' */
-static void *                   /* Loop 'arg' times incrementing 'glob' */
+static volatile int glob = 0; /* "volatile" prevents compiler optimizations
+                                 of arithmetic operations on 'glob' */
+static void * /* Loop 'arg' times incrementing 'glob' */
 threadFunc(void *arg)
 {
-    int loops = *((int *) arg);
+    int loops = *((int *)arg);
     int loc, j;
 
     for (j = 0; j < loops; j++) {

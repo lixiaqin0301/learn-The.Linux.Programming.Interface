@@ -16,8 +16,8 @@
 
    Linux supports POSIX message queues since kernel 2.6.6.
 */
-#include <mqueue.h>
 #include "tlpi_hdr.h"
+#include <mqueue.h>
 
 int
 main(int argc, char *argv[])
@@ -29,7 +29,7 @@ main(int argc, char *argv[])
         usageErr("%s mq-name\n", argv[0]);
 
     mqd = mq_open(argv[1], O_RDONLY);
-    if (mqd == (mqd_t) -1)
+    if (mqd == (mqd_t)-1)
         errExit("mq_open");
 
     if (mq_getattr(mqd, &attr) == -1)

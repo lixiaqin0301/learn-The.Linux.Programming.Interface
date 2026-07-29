@@ -27,7 +27,7 @@ main(int argc, char *argv[])
 {
     pid_t ppid, ppidOrig;
 
-    setbuf(stdout, NULL);       /* Disable buffering of stdout */
+    setbuf(stdout, NULL); /* Disable buffering of stdout */
 
     ppidOrig = getpid();
 
@@ -35,17 +35,17 @@ main(int argc, char *argv[])
     case -1:
         errExit("fork");
 
-    case 0:             /* Child */
-        while ((ppid = getppid()) == ppidOrig) {   /* Loop until orphaned */
-            printf("Child running (parent PID=%ld)\n", (long) ppid);
+    case 0: /* Child */
+        while ((ppid = getppid()) == ppidOrig) { /* Loop until orphaned */
+            printf("Child running (parent PID=%ld)\n", (long)ppid);
             sleep(1);
         }
-        printf("Child is orphaned (parent PID=%ld)\n", (long) ppid);
+        printf("Child is orphaned (parent PID=%ld)\n", (long)ppid);
         _exit(EXIT_SUCCESS);
 
-    default:            /* Parent */
-        printf("Parent (PID=%ld) sleeping\n", (long) getpid());
-        sleep(3);                           /* Give child a chance to start */
+    default: /* Parent */
+        printf("Parent (PID=%ld) sleeping\n", (long)getpid());
+        sleep(3); /* Give child a chance to start */
         printf("Parent exiting\n");
         exit(EXIT_SUCCESS);
     }

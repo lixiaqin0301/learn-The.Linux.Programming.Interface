@@ -24,36 +24,37 @@
    This program is Linux-specific.
 */
 #define _GNU_SOURCE
-#include <string.h>
-#include <signal.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <sched.h>
-#include <sys/mman.h>
 #include "print_wait_status.h"
 #include "tlpi_hdr.h"
+#include <fcntl.h>
+#include <sched.h>
+#include <signal.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
 
 #ifndef CHILD_SIG
-#define CHILD_SIG SIGUSR1       /* Signal to be generated on termination
-                                   of cloned child */
+#define CHILD_SIG                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  \
+    SIGUSR1 /* Signal to be generated on termination                                                                                                                                                                                                                                                                                                                                                                                                                                                               \
+               of cloned child */
 #endif
 
-typedef struct {        /* For passing info to child startup function */
-    int    fd;
+typedef struct { /* For passing info to child startup function */
+    int fd;
     mode_t umask;
-    int    exitStatus;
-    int    signal;
+    int exitStatus;
+    int signal;
 } ChildParams;
 
-static int              /* Startup function for cloned child */
+static int /* Startup function for cloned child */
 childFunc(void *arg)
 {
     ChildParams *cp;
 
-    printf("Child:  PID=%ld PPID=%ld\n", (long) getpid(), (long) getppid());
+    printf("Child:  PID=%ld PPID=%ld\n", (long)getpid(), (long)getppid());
 
-    cp = (ChildParams *) arg;   /* Cast arg to true form */
+    cp = (ChildParams *)arg; /* Cast arg to true form */
 
     /* The following changes may affect parent */
 
@@ -63,10 +64,10 @@ childFunc(void *arg)
     if (signal(cp->signal, SIG_DFL) == SIG_ERR)
         errExit("child:signal");
 
-    return cp->exitStatus;      /* Child terminates now */
+    return cp->exitStatus; /* Child terminates now */
 }
 
-static void             /* Handler for child termination signal */
+static void /* Handler for child termination signal */
 grimReaper(int sig)
 {
     int savedErrno;
@@ -74,7 +75,7 @@ grimReaper(int sig)
     /* UNSAFE: This handler uses non-async-signal-safe functions
        (printf(), strsignal(); see Section 21.1.2) */
 
-    savedErrno = errno;         /* In case we change 'errno' here */
+    savedErrno = errno; /* In case we change 'errno' here */
 
     printf("Caught signal %d (%s)\n", sig, strsignal(sig));
 
@@ -97,11 +98,11 @@ usageError(char *progName)
 int
 main(int argc, char *argv[])
 {
-    const int STACK_SIZE = 65536;       /* Stack size for cloned child */
-    char *stack;                        /* Start of stack buffer area */
-    char *stackTop;                     /* End of stack buffer area */
-    int flags;                          /* Flags for cloning child */
-    ChildParams cp;                     /* Passed to child function */
+    const int STACK_SIZE = 65536; /* Stack size for cloned child */
+    char *stack; /* Start of stack buffer area */
+    char *stackTop; /* End of stack buffer area */
+    int flags; /* Flags for cloning child */
+    ChildParams cp; /* Passed to child function */
     const mode_t START_UMASK = S_IWOTH; /* Initial umask setting */
     struct sigaction sa;
     char *p;
@@ -109,44 +110,49 @@ main(int argc, char *argv[])
     ssize_t s;
     pid_t pid;
 
-    printf("Parent: PID=%ld PPID=%ld\n", (long) getpid(), (long) getppid());
+    printf("Parent: PID=%ld PPID=%ld\n", (long)getpid(), (long)getppid());
 
     /* Set up an argument structure to be passed to cloned child, and
        set some process attributes that will be modified by child */
 
-    cp.exitStatus = 22;                 /* Child will exit with this status */
+    cp.exitStatus = 22; /* Child will exit with this status */
 
-    umask(START_UMASK);                 /* Initialize umask to some value */
-    cp.umask = S_IWGRP;                 /* Child sets umask to this value */
+    umask(START_UMASK); /* Initialize umask to some value */
+    cp.umask = S_IWGRP; /* Child sets umask to this value */
 
-    cp.fd = open("/dev/null", O_RDWR);  /* Child will close this fd */
+    cp.fd = open("/dev/null", O_RDWR); /* Child will close this fd */
     if (cp.fd == -1)
         errExit("open");
 
-    cp.signal = SIGTERM;                /* Child will change disposition */
-    if (signal(cp.signal, SIG_IGN) == SIG_ERR)  errExit("signal");
+    cp.signal = SIGTERM; /* Child will change disposition */
+    if (signal(cp.signal, SIG_IGN) == SIG_ERR)
+        errExit("signal");
 
     /* Initialize clone flags using command-line argument (if supplied) */
 
     flags = 0;
     if (argc > 1) {
         for (p = argv[1]; *p != '\0'; p++) {
-            if      (*p == 'd') flags |= CLONE_FILES;
-            else if (*p == 'f') flags |= CLONE_FS;
-            else if (*p == 's') flags |= CLONE_SIGHAND;
-            else if (*p == 'v') flags |= CLONE_VM;
-            else usageError(argv[0]);
+            if (*p == 'd')
+                flags |= CLONE_FILES;
+            else if (*p == 'f')
+                flags |= CLONE_FS;
+            else if (*p == 's')
+                flags |= CLONE_SIGHAND;
+            else if (*p == 'v')
+                flags |= CLONE_VM;
+            else
+                usageError(argv[0]);
         }
     }
 
     /* Allocate stack for child */
 
-    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE,
-                 MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
+    stack = mmap(NULL, STACK_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_STACK, -1, 0);
     if (stack == MAP_FAILED)
         errExit("mmap");
 
-    stackTop = stack + STACK_SIZE;  /* Assume stack grows downward */
+    stackTop = stack + STACK_SIZE; /* Assume stack grows downward */
 
     /* Establish handler to catch child termination signal */
 
@@ -170,7 +176,7 @@ main(int argc, char *argv[])
     if (pid == -1)
         errExit("waitpid");
 
-    printf("    Child PID=%ld\n", (long) pid);
+    printf("    Child PID=%ld\n", (long)pid);
     printWaitStatus("    Status: ", status);
 
     /* Check whether changes made by cloned child have affected parent */
@@ -185,8 +191,7 @@ main(int argc, char *argv[])
     if (s == -1 && errno == EBADF)
         printf("    file descriptor %d has been closed\n", cp.fd);
     else if (s == -1)
-        printf("    write() on file descriptor %d failed (%s)\n",
-                cp.fd, strerror(errno));
+        printf("    write() on file descriptor %d failed (%s)\n", cp.fd, strerror(errno));
     else
         printf("    write() on file descriptor %d succeeded\n", cp.fd);
 

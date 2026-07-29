@@ -19,16 +19,16 @@
 
    See also svmsg_send.c.
 */
-#define _GNU_SOURCE             /* Get definition of MSG_EXCEPT */
-#include <sys/types.h>
-#include <sys/msg.h>
+#define _GNU_SOURCE /* Get definition of MSG_EXCEPT */
 #include "tlpi_hdr.h"
+#include <sys/msg.h>
+#include <sys/types.h>
 
 #define MAX_MTEXT 1024
 
 struct mbuf {
-    long mtype;                 /* Message type */
-    char mtext[MAX_MTEXT];      /* Message body */
+    long mtype; /* Message type */
+    char mtext[MAX_MTEXT]; /* Message body */
 };
 
 static void
@@ -53,8 +53,8 @@ main(int argc, char *argv[])
     int msqid, flags, type;
     ssize_t msgLen;
     size_t maxBytes;
-    struct mbuf msg;            /* Message buffer for msgrcv() */
-    int opt;                    /* Option character from getopt() */
+    struct mbuf msg; /* Message buffer for msgrcv() */
+    int opt; /* Option character from getopt() */
 
     /* Parse command-line options and arguments */
 
@@ -62,13 +62,22 @@ main(int argc, char *argv[])
     type = 0;
     while ((opt = getopt(argc, argv, "ent:x")) != -1) {
         switch (opt) {
-        case 'e':       flags |= MSG_NOERROR;   break;
-        case 'n':       flags |= IPC_NOWAIT;    break;
-        case 't':       type = atoi(optarg);    break;
+        case 'e':
+            flags |= MSG_NOERROR;
+            break;
+        case 'n':
+            flags |= IPC_NOWAIT;
+            break;
+        case 't':
+            type = atoi(optarg);
+            break;
 #ifdef MSG_EXCEPT
-        case 'x':       flags |= MSG_EXCEPT;    break;
+        case 'x':
+            flags |= MSG_EXCEPT;
+            break;
 #endif
-        default:        usageError(argv[0], NULL);
+        default:
+            usageError(argv[0], NULL);
         }
     }
 
@@ -76,8 +85,7 @@ main(int argc, char *argv[])
         usageError(argv[0], "Wrong number of arguments\n");
 
     msqid = getInt(argv[optind], 0, "msqid");
-    maxBytes = (argc > optind + 1) ?
-                getInt(argv[optind + 1], 0, "max-bytes") : MAX_MTEXT;
+    maxBytes = (argc > optind + 1) ? getInt(argv[optind + 1], 0, "max-bytes") : MAX_MTEXT;
 
     /* Get message and display on stdout */
 
@@ -85,7 +93,7 @@ main(int argc, char *argv[])
     if (msgLen == -1)
         errExit("msgrcv");
 
-    printf("Received: type=%ld; length=%ld", msg.mtype, (long) msgLen);
+    printf("Received: type=%ld; length=%ld", msg.mtype, (long)msgLen);
     if (msgLen > 0)
         printf("; body=%s", msg.mtext);
     printf("\n");

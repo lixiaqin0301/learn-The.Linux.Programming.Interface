@@ -15,10 +15,10 @@
    A small program that simply consumes CPU time, displaying the amount of
    elapsed time that was required to consume each CPU second.
 */
+#include "tlpi_hdr.h"
+#include <signal.h>
 #include <sys/times.h>
 #include <time.h>
-#include <signal.h>
-#include "tlpi_hdr.h"
 
 static volatile sig_atomic_t gotSig = 0;
 
@@ -63,12 +63,8 @@ main(int argc, char *argv[])
             if (clock_gettime(CLOCK_REALTIME, &curr_rt) == -1)
                 errExit("clock_gettime");
 
-            elapsed_us = (curr_rt.tv_sec - prev_rt.tv_sec) * 1000000 +
-                         (curr_rt.tv_nsec - prev_rt.tv_nsec) / 1000;
-            printf("[%ld] %ld: elapsed/cpu = %5.3f; %%CPU = %5.3f\n",
-                    (long) getpid(),
-                    (long) curr_cpu.tv_sec, elapsed_us / 1000000.0,
-                    1000000.0 / elapsed_us * 100.0);
+            elapsed_us = (curr_rt.tv_sec - prev_rt.tv_sec) * 1000000 + (curr_rt.tv_nsec - prev_rt.tv_nsec) / 1000;
+            printf("[%ld] %ld: elapsed/cpu = %5.3f; %%CPU = %5.3f\n", (long)getpid(), (long)curr_cpu.tv_sec, elapsed_us / 1000000.0, 1000000.0 / elapsed_us * 100.0);
             prev_cpu_secs = curr_cpu.tv_sec;
             prev_rt = curr_rt;
         }

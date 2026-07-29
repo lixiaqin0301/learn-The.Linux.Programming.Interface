@@ -20,9 +20,9 @@
         r = attach with SHM_RND flag
         R = attach with SHM_RDONLY flag
 */
-#include <sys/types.h>
-#include <sys/shm.h>
 #include "tlpi_hdr.h"
+#include <sys/shm.h>
+#include <sys/types.h>
 
 static void
 usageError(char *progName)
@@ -39,21 +39,20 @@ main(int argc, char *argv[])
     char *retAddr, *p;
     int j, flags, shmid;
 
-    printf("SHMLBA = %ld (%#lx), PID = %ld\n",
-            (long) SHMLBA, (unsigned long) SHMLBA, (long) getpid());
+    printf("SHMLBA = %ld (%#lx), PID = %ld\n", (long)SHMLBA, (unsigned long)SHMLBA, (long)getpid());
 
     for (j = 1; j < argc; j++) {
         shmid = strtol(argv[j], &p, 0);
         if (*p != ':')
             usageError(argv[0]);
 
-        addr = (void *) strtol(p + 1, NULL, 0);
+        addr = (void *)strtol(p + 1, NULL, 0);
         flags = (strchr(p + 1, 'r') != NULL) ? SHM_RND : 0;
         if (strchr(p + 1, 'R') != NULL)
             flags |= SHM_RDONLY;
 
         retAddr = shmat(shmid, addr, flags);
-        if (retAddr == (void *) -1)
+        if (retAddr == (void *)-1)
             errExit("shmat: %s", argv[j]);
 
         printf("%d: %s ==> %p\n", j, argv[j], retAddr);

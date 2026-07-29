@@ -17,16 +17,16 @@
    Set the values of all of the members of a System V semaphore set according
    to the values supplied on the command line.
 */
-#include <sys/types.h>
-#include <sys/sem.h>
-#include "semun.h"                      /* Definition of semun union */
+#include "semun.h" /* Definition of semun union */
 #include "tlpi_hdr.h"
+#include <sys/sem.h>
+#include <sys/types.h>
 
 int
 main(int argc, char *argv[])
 {
     struct semid_ds ds;
-    union semun arg;                    /* Fourth argument for semctl() */
+    union semun arg; /* Fourth argument for semctl() */
     int j, semid;
 
     if (argc < 3 || strcmp(argv[1], "--help") == 0)
@@ -44,8 +44,7 @@ main(int argc, char *argv[])
        number of semaphores in the set */
 
     if (ds.sem_nsems != argc - 2)
-        cmdLineErr("Set contains %ld semaphores, but %d values were supplied\n",
-                (long) ds.sem_nsems, argc - 2);
+        cmdLineErr("Set contains %ld semaphores, but %d values were supplied\n", (long)ds.sem_nsems, argc - 2);
 
     /* Set up array of values; perform semaphore initialization */
 
@@ -58,7 +57,7 @@ main(int argc, char *argv[])
 
     if (semctl(semid, 0, SETALL, arg) == -1)
         errExit("semctl-SETALL");
-    printf("Semaphore values changed (PID=%ld)\n", (long) getpid());
+    printf("Semaphore values changed (PID=%ld)\n", (long)getpid());
 
     exit(EXIT_SUCCESS);
 }

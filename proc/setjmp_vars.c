@@ -21,9 +21,9 @@
    and optimized (cc -O -S) versions of this program to see the cause
    of these differences.
 */
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <setjmp.h>
 
 static jmp_buf env;
 
@@ -38,20 +38,20 @@ int
 main(int argc, char *argv[])
 {
     int nvar;
-    register int rvar;          /* Allocated in register if possible */
-    volatile int vvar;          /* See text */
+    register int rvar; /* Allocated in register if possible */
+    volatile int vvar; /* See text */
 
     nvar = 111;
     rvar = 222;
     vvar = 333;
 
-    if (setjmp(env) == 0) {     /* Code executed after setjmp() */
+    if (setjmp(env) == 0) { /* Code executed after setjmp() */
         nvar = 777;
         rvar = 888;
         vvar = 999;
         doJump(nvar, rvar, vvar);
 
-    } else {                    /* Code executed after longjmp() */
+    } else { /* Code executed after longjmp() */
 
         printf("After longjmp(): nvar=%d rvar=%d vvar=%d\n", nvar, rvar, vvar);
     }

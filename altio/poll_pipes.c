@@ -21,16 +21,16 @@
    randomly selected pipes. Then use poll() to inspect the read ends
    of the pipes to see which pipes are readable.
 */
-#include <time.h>
-#include <poll.h>
 #include "tlpi_hdr.h"
+#include <poll.h>
+#include <time.h>
 
 int
 main(int argc, char *argv[])
 {
     int numPipes, ready, randPipe, numWrites, j;
     struct pollfd *pollFd;
-    int (*pfds)[2];                     /* File descriptors for all pipes */
+    int (*pfds)[2]; /* File descriptors for all pipes */
 
     if (argc < 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s num-pipes [num-writes]\n", argv[0]);
@@ -41,7 +41,7 @@ main(int argc, char *argv[])
     numPipes = getInt(argv[1], GN_GT_0, "num-pipes");
     numWrites = (argc > 2) ? getInt(argv[2], GN_GT_0, "num-writes") : 1;
 
-    pfds = calloc(numPipes, sizeof(int [2]));
+    pfds = calloc(numPipes, sizeof(int[2]));
     if (pfds == NULL)
         errExit("calloc");
     pollFd = calloc(numPipes, sizeof(struct pollfd));
@@ -56,11 +56,10 @@ main(int argc, char *argv[])
 
     /* Perform specified number of writes to random pipes */
 
-    srandom((int) time(NULL));
+    srandom((int)time(NULL));
     for (j = 0; j < numWrites; j++) {
         randPipe = random() % numPipes;
-        printf("Writing to fd: %3d (read fd: %3d)\n",
-                pfds[randPipe][1], pfds[randPipe][0]);
+        printf("Writing to fd: %3d (read fd: %3d)\n", pfds[randPipe][1], pfds[randPipe][0]);
         if (write(pfds[randPipe][1], "a", 1) == -1)
             errExit("write %d", pfds[randPipe][1]);
     }

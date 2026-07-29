@@ -14,11 +14,11 @@
 
    Demonstrate message notification via threads on a POSIX message queue.
 */
-#include <pthread.h>
-#include <mqueue.h>
-#include <signal.h>
-#include <fcntl.h>              /* For definition of O_NONBLOCK */
 #include "tlpi_hdr.h"
+#include <fcntl.h> /* For definition of O_NONBLOCK */
+#include <mqueue.h>
+#include <pthread.h>
+#include <signal.h>
 
 /* This program does not handle the case where a message already exists on
    the queue by the time the first attempt is made to register for message
@@ -27,7 +27,7 @@
 
 static void notifySetup(mqd_t *mqdp);
 
-static void                     /* Thread notification function */
+static void /* Thread notification function */
 threadFunc(union sigval sv)
 {
     ssize_t numRead;
@@ -52,9 +52,9 @@ threadFunc(union sigval sv)
     notifySetup(mqdp);
 
     while ((numRead = mq_receive(*mqdp, buffer, attr.mq_msgsize, NULL)) >= 0)
-        printf("Read %ld bytes\n", (long) numRead);
+        printf("Read %ld bytes\n", (long)numRead);
 
-    if (errno != EAGAIN)                        /* Unexpected error */
+    if (errno != EAGAIN) /* Unexpected error */
         errExit("mq_receive");
 
     free(buffer);
@@ -65,11 +65,11 @@ notifySetup(mqd_t *mqdp)
 {
     struct sigevent sev;
 
-    sev.sigev_notify = SIGEV_THREAD;            /* Notify via thread */
+    sev.sigev_notify = SIGEV_THREAD; /* Notify via thread */
     sev.sigev_notify_function = threadFunc;
     sev.sigev_notify_attributes = NULL;
-            /* Could be pointer to pthread_attr_t structure */
-    sev.sigev_value.sival_ptr = mqdp;           /* Argument to threadFunc() */
+    /* Could be pointer to pthread_attr_t structure */
+    sev.sigev_value.sival_ptr = mqdp; /* Argument to threadFunc() */
 
     if (mq_notify(*mqdp, &sev) == -1)
         errExit("mq_notify");
@@ -84,9 +84,9 @@ main(int argc, char *argv[])
         usageErr("%s mq-name\n", argv[0]);
 
     mqd = mq_open(argv[1], O_RDONLY | O_NONBLOCK);
-    if (mqd == (mqd_t) -1)
+    if (mqd == (mqd_t)-1)
         errExit("mq_open");
 
     notifySetup(&mqd);
-    pause();                    /* Wait for notifications via thread function */
+    pause(); /* Wait for notifications via thread function */
 }
