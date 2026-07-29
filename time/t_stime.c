@@ -29,7 +29,7 @@ int
 main(int argc, char *argv[])
 {
     struct tm tm;
-    time_t t;
+    struct timespec ts;
 
     if (argc != 2 || strcmp(argv[1], "--help") == 0)
         usageErr("%s \"DD MMM YYYY HH:MM:SS\"\n", argv[0]);
@@ -37,9 +37,10 @@ main(int argc, char *argv[])
     if (strptime(argv[1], "%d %b %Y %H:%M:%S", &tm) == NULL)
         fatal("strptime failed");
 
-    t = mktime(&tm);
-    if (stime(&t) == -1)
-        errExit("stime");
+    ts.tv_sec = mktime(&tm);
+    ts.tv_nsec = 0;
+    if (clock_settime(CLOCK_REALTIME, &ts) == -1)
+        errExit("clock_settime");
 
     exit(EXIT_SUCCESS);
 }
